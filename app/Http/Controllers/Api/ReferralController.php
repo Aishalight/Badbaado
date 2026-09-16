@@ -11,6 +11,7 @@ use App\Http\Resources\Api\ReferralResource;
 use App\Models\Referral;
 use App\Services\AuditLogger;
 use App\Services\ReferralWorkflowService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ReferralController extends Controller
@@ -72,7 +73,7 @@ class ReferralController extends Controller
         ]));
     }
 
-    public function transition(TransitionReferralRequest $request, Referral $referral): ReferralResource
+    public function transition(TransitionReferralRequest $request, Referral $referral): ReferralResource|JsonResponse
     {
         $this->authorize('transition', [$referral, $request->enum('status', ReferralStatus::class)]);
 
