@@ -23,9 +23,9 @@ function matchQuery(referral, query) {
 
 function referralRow(referral) {
     return `
-    <a href="#" data-referral-id="${referral.id}" class="referral-card grid grid-cols-2 items-center gap-2 rounded-xl border border-slate-100 bg-white px-4 py-3.5 shadow-sm transition hover:border-brand-300 hover:shadow-md sm:grid-cols-12">
+    <a href="#" data-referral-id="${referral.id}" class="referral-card card card-hover grid grid-cols-2 items-center gap-2 p-4 sm:grid-cols-12">
         <div class="sm:col-span-2">
-            <div class="text-xs font-bold text-slate-500">${escapeHtml(referral.referral_number)}</div>
+            <div class="font-mono text-xs font-bold text-slate-500">${escapeHtml(referral.referral_number)}</div>
         </div>
         <div class="sm:col-span-3">
             <div class="text-sm font-semibold text-slate-800">${escapeHtml(referral.patient?.name ?? 'Unknown')}</div>
@@ -71,23 +71,26 @@ export const referralsPage = {
             <div class="mx-auto max-w-6xl">
                 <div class="flex flex-wrap items-end justify-between gap-4">
                     <div>
-                        <h1 class="text-xl font-extrabold tracking-tight text-brand-950">Referrals</h1>
+                        <h1 class="page-heading text-2xl">Referrals</h1>
                         <p class="mt-1 text-sm text-slate-500">${result.meta?.total ?? referrals.length} referrals across your visibility.</p>
                     </div>
-                    <button id="new-referral-btn" class="rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-600">+ New referral</button>
+                    <button id="new-referral-btn" class="btn-primary">
+                        <svg viewBox="0 0 20 20" fill="none" class="h-4 w-4"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                        New referral
+                    </button>
                 </div>
 
                 <div class="mt-6 flex flex-wrap items-center justify-between gap-3">
-                    <div class="flex gap-1 rounded-lg border border-slate-200 bg-white p-1 text-sm">
-                        <button class="tab-btn rounded-md px-3 py-1.5 font-medium" data-tab="all">All</button>
-                        <button class="tab-btn rounded-md px-3 py-1.5 font-medium" data-tab="incoming">Incoming</button>
-                        <button class="tab-btn rounded-md px-3 py-1.5 font-medium" data-tab="outgoing">Outgoing</button>
-                        <button class="tab-btn rounded-md px-3 py-1.5 font-medium" data-tab="emergency">Emergency</button>
+                    <div class="flex gap-1 rounded-[10px] border border-slate-200 bg-white p-1 text-sm shadow-sm">
+                        <button class="tab-btn rounded-lg px-3 py-1.5 font-medium" data-tab="all">All</button>
+                        <button class="tab-btn rounded-lg px-3 py-1.5 font-medium" data-tab="incoming">Incoming</button>
+                        <button class="tab-btn rounded-lg px-3 py-1.5 font-medium" data-tab="outgoing">Outgoing</button>
+                        <button class="tab-btn rounded-lg px-3 py-1.5 font-medium" data-tab="emergency">Emergency</button>
                     </div>
-                    <input id="referral-search" type="search" placeholder="Search referrals…" class="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-200 focus:outline-none sm:w-64">
+                    <input id="referral-search" type="search" placeholder="Search referrals…" class="input w-full sm:w-64">
                 </div>
 
-                <div id="referral-list" class="mt-4 grid gap-2.5"></div>
+                <div id="referral-list" class="mt-4 space-y-2.5"></div>
             </div>
         `;
 

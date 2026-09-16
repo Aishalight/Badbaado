@@ -1,41 +1,44 @@
-const urgencyColors = {
-    critical: 'bg-red-100 text-red-700',
-    emergent: 'bg-orange-100 text-orange-700',
-    urgent: 'bg-yellow-100 text-yellow-800',
-    routine: 'bg-green-100 text-green-700',
+const urgencyMeta = {
+    critical: { label: 'Critical', klass: 'bg-red-50 text-red-600' },
+    emergent: { label: 'High', klass: 'bg-orange-50 text-orange-600' },
+    urgent: { label: 'Medium', klass: 'bg-amber-50 text-amber-700' },
+    routine: { label: 'Normal', klass: 'bg-emerald-50 text-emerald-600' },
 };
 
 const urgencyDotColors = {
     critical: 'bg-red-500',
     emergent: 'bg-orange-500',
-    urgent: 'bg-yellow-500',
-    routine: 'bg-green-500',
+    urgent: 'bg-amber-500',
+    routine: 'bg-emerald-500',
 };
 
 const statusColors = {
-    draft: 'bg-slate-200 text-slate-700',
-    sent: 'bg-blue-100 text-blue-700',
-    received: 'bg-cyan-100 text-cyan-800',
-    under_review: 'bg-yellow-100 text-yellow-800',
-    accepted: 'bg-green-100 text-green-700',
-    transfer_in_progress: 'bg-orange-100 text-orange-700',
-    arrived: 'bg-purple-100 text-purple-700',
+    draft: 'bg-slate-100 text-slate-600',
+    sent: 'bg-brand-50 text-brand-700',
+    received: 'bg-accent-50 text-accent-700',
+    under_review: 'bg-amber-50 text-amber-700',
+    accepted: 'bg-emerald-50 text-emerald-700',
+    transfer_in_progress: 'bg-orange-50 text-orange-600',
+    arrived: 'bg-purple-50 text-purple-700',
     completed: 'bg-emerald-100 text-emerald-700',
-    rejected: 'bg-red-100 text-red-700',
+    rejected: 'bg-red-50 text-red-600',
     cancelled: 'bg-slate-100 text-slate-500',
 };
 
 export function urgencyBadge(urgency) {
     if (!urgency) return '';
-    const klass = urgencyColors[urgency] ?? 'bg-slate-200 text-slate-700';
-    return `<span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${klass}">
-        <span class="h-1.5 w-1.5 rounded-full ${urgencyDotColors[urgency]}"></span>${capitalize(urgency)}
-    </span>`;
+    const meta = urgencyMeta[urgency] ?? { label: capitalize(urgency), klass: 'bg-slate-100 text-slate-600' };
+    return `<span class="urgency-pill ${meta.klass}">${meta.label}</span>`;
+}
+
+export function urgencyDot(urgency) {
+    if (!urgency) return '';
+    return `<span class="inline-block h-1.5 w-1.5 rounded-full ${urgencyDotColors[urgency] ?? 'bg-slate-400'}"></span>`;
 }
 
 export function statusBadge(status) {
-    const klass = statusColors[status] ?? 'bg-slate-200 text-slate-700';
-    return `<span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${klass}">${statusLabel(status)}</span>`;
+    const klass = statusColors[status] ?? 'bg-slate-100 text-slate-600';
+    return `<span class="status-pill ${klass}">${statusLabel(status)}</span>`;
 }
 
 export function capitalize(value) {

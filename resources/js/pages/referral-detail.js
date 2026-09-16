@@ -15,14 +15,16 @@ function stepState(current, step) {
 
 function timeline(referral) {
     return `
-    <div class="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
-        <div class="text-sm font-bold uppercase tracking-wide text-slate-500">Progress</div>
+    <div class="card p-6">
+        <div class="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Progress</div>
         <div class="mt-4 flex flex-wrap items-center gap-1.5">
             ${FLOW.map((step) => {
                 const state = stepState(referral.status, step);
-                const wrapper = state === 'done' ? 'bg-brand-500' : state === 'active' ? 'bg-brand-600 ring-2 ring-brand-200' : 'bg-slate-200';
-                const text = state === 'todo' ? 'text-slate-500' : 'text-white';
-                return `<span class="rounded-full px-2.5 py-1 text-[11px] font-bold ${wrapper} ${text}">${step.replaceAll('_', ' ')}</span>`;
+                const wrapper = state === 'done' ? 'bg-brand-500 text-white'
+                    : state === 'active' ? 'bg-accent-500 text-white ring-2 ring-accent-200'
+                    : 'bg-slate-100 text-slate-500';
+                return `<span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold ${wrapper}">
+                    <span class="h-1.5 w-1.5 rounded-full ${state === 'todo' ? 'bg-slate-300' : 'bg-white/80'}"></span>${step.replaceAll('_', ' ')}</span>`;
             }).join('')}
         </div>
     </div>`;
@@ -82,14 +84,15 @@ function infoRow(label, value) {
 function aiSuggestionBlock(referral) {
     if (!referral.ai_suggestion) return '';
     const ai = referral.ai_suggestion;
-    const suggestedTone = ai.urgency === 'critical' ? 'text-red-700' : ai.urgency === 'emergent' ? 'text-orange-700' : 'text-slate-700';
     return `
-    <div class="rounded-xl border border-brand-100 bg-brand-50 p-5">
+    <div class="card border-brand-100 bg-brand-50/60 p-5">
         <div class="flex items-center gap-2 text-sm font-bold text-brand-900">
-            <span>✦</span> AI urgency suggestion
+            <svg viewBox="0 0 20 20" fill="none" class="h-4 w-4 text-accent-600"><path d="M12 2a2 2 0 0 0-2 2v1H8v5H6V8H3l1 4h2v4l3 2v2h6v-5h2l1-4h-1V4l-5-2Z" fill="currentColor" opacity="0.9"/></svg>
+            AI urgency suggestion
         </div>
-        <div class="mt-2 text-sm text-brand-800">
-            Suggested urgency <span class="font-bold ${suggestedTone}">${ai.urgency}</span>
+        <div class="mt-2 flex flex-wrap items-center gap-2 text-sm text-brand-800">
+            <span class="text-slate-500">Suggested</span>
+            ${urgencyBadge(ai.urgency)}
             <span class="text-xs text-slate-500">· ${Math.round((ai.confidence ?? 0) * 100)}% confidence</span>
         </div>
         ${ai.reason ? `<div class="mt-1 text-xs text-slate-600">${escapeHtml(ai.reason)}</div>` : ''}
@@ -107,19 +110,18 @@ export const referralDetailPage = {
         let actionForm = '';
         if (actions.length) {
             actionForm = `
-            <div class="mt-5 border-t border-slate-100 pt-5">
+            <div class="mt-5 border-t border-slate-200/70 pt-5">
                 <div class="flex flex-wrap gap-2">
-                    ${actions.map((action) => `
-                        <button data-transition="${action.target}"
-                            class="transition-btn rounded-lg px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${
-                                action.tone === 'danger' ? 'border border-red-200 bg-red-50 text-red-700 hover:bg-red-100'
-                                : action.tone === 'ghost' ? 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
-                                : action.tone === 'orange' ? 'border border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100'
-                                : 'border border-brand-300 bg-brand-500 text-white hover:bg-brand-600'}"
-                        >${action.label}</button>`).join('')}
+                    ${actions.map((action) => {
+                        const toneClass = action.tone === 'danger' ? 'btn-danger'
+                            : action.tone === 'ghost' ? 'btn-secondary'
+                            : action.tone === 'orange' ? 'btn-secondary border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100'
+                            : 'btn-primary';
+                        return `<button data-transition="${action.target}" class="transition-btn btn ${toneClass}">${action.label}</button>`;
+                    }).join('')}
                 </div>
                 <div id="reject-reason-wrap" class="mt-3 hidden">
-                    <textarea id="reject-reason" rows="2" placeholder="Reason for declining (required)…" class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-200 focus:outline-none"></textarea>
+                    <textarea id="reject-reason" rows="2" placeholder="Reason for declining (required)…" class="input"></textarea>
                 </div>
             </div>`;
         }
@@ -128,13 +130,13 @@ export const referralDetailPage = {
             <div class="mx-auto max-w-5xl">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div class="flex items-center gap-3">
-                        <button id="back-btn" class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50">← Back</button>
+                        <button id="back-btn" class="btn btn-secondary btn-sm">← Back</button>
                         <div>
                             <div class="flex flex-wrap items-center gap-2">
                                 <span class="font-mono text-sm font-bold text-brand-800">${escapeHtml(referral.referral_number)}</span>
                                 ${statusBadge(referral.status)}
                                 ${urgencyBadge(referral.urgency)}
-                                ${referral.is_emergency ? '<span class="rounded-full bg-red-100 px-2 py-1 text-[11px] font-bold text-red-700">PRE-ALERT</span>' : ''}
+                                ${referral.is_emergency ? '<span class="badge bg-red-50 text-red-600">● Pre-alert</span>' : ''}
                             </div>
                             <div class="mt-1 text-sm text-slate-500">
                                 ${escapeHtml(referral.referring_hospital?.name ?? '?')} → ${escapeHtml(referral.receiving_hospital?.name ?? '?')}
@@ -149,8 +151,8 @@ export const referralDetailPage = {
                         ${aiSuggestionBlock(referral)}
                         ${timeline(referral)}
 
-                        <div class="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
-                            <div class="text-sm font-bold uppercase tracking-wide text-slate-500">Clinical picture</div>
+                        <div class="card p-6">
+                            <div class="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Clinical picture</div>
                             <div class="mt-4 grid gap-4 sm:grid-cols-2">
                                 ${infoRow('Department', escapeHtml(referral.department ?? '—'))}
                                 ${infoRow('Consciousness', escapeHtml(referral.consciousness ?? '—'))}
@@ -163,8 +165,8 @@ export const referralDetailPage = {
                             ${referral.notes ? `<div class="mt-4">${infoRow('Notes', escapeHtml(referral.notes))}</div>` : ''}
                         </div>
 
-                        <div class="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
-                            <div class="text-sm font-bold uppercase tracking-wide text-slate-500">Vitals</div>
+                        <div class="card p-6">
+                            <div class="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Vitals</div>
                             <div class="mt-4">${vitalsBlock(referral.vitals)}</div>
                         </div>
 
@@ -178,8 +180,8 @@ export const referralDetailPage = {
                     </div>
 
                     <div class="space-y-4">
-                        <div class="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
-                            <div class="text-sm font-bold uppercase tracking-wide text-slate-500">Patient</div>
+                        <div class="card p-6">
+                            <div class="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Patient</div>
                             <div class="mt-4 space-y-3">
                                 ${infoRow('Name', escapeHtml(referral.patient?.name ?? '—'))}
                                 ${infoRow('Reference', escapeHtml(referral.patient?.reference ?? '—'))}
@@ -189,8 +191,8 @@ export const referralDetailPage = {
                             </div>
                         </div>
 
-                        <div class="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
-                            <div class="text-sm font-bold uppercase tracking-wide text-slate-500">Referred by</div>
+                        <div class="card p-6">
+                            <div class="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Referred by</div>
                             <div class="mt-4 space-y-3">
                                 ${infoRow('Name', escapeHtml(referral.referring_user?.name ?? '—'))}
                                 ${infoRow('Role', escapeHtml(referral.referring_user?.title ?? '—'))}
@@ -200,9 +202,9 @@ export const referralDetailPage = {
                     </div>
                 </div>
 
-                <div class="mt-6 rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
+                <div class="mt-6 card p-6">
                     <div class="flex items-center justify-between">
-                        <div class="text-sm font-bold uppercase tracking-wide text-slate-500">Discussion</div>
+                        <div class="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Discussion</div>
                         <span class="text-xs text-slate-400">${messages.length} messages</span>
                     </div>
                     <div id="message-thread" class="mt-4 space-y-3">
@@ -219,8 +221,8 @@ export const referralDetailPage = {
                             </div>`).join('') || '<div class="text-sm text-slate-400">No messages yet.</div>'}
                     </div>
                     <form id="message-form" class="mt-4 flex gap-2">
-                        <input id="message-input" type="text" placeholder="Add a note for both hospitals…" class="flex-1 rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-200 focus:outline-none">
-                        <button type="submit" class="rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-600">Send</button>
+                        <input id="message-input" type="text" placeholder="Add a note for both hospitals…" class="input flex-1">
+                        <button type="submit" class="btn btn-primary">Send</button>
                     </form>
                 </div>
             </div>

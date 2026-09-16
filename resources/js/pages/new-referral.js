@@ -17,13 +17,20 @@ function suggestUrgency(input) {
 
 function toneClasses(urgency) {
     const map = {
-        critical: 'border-red-200 bg-red-50 text-red-800',
-        emergent: 'border-orange-200 bg-orange-50 text-orange-800',
-        urgent: 'border-yellow-200 bg-yellow-50 text-yellow-900',
-        routine: 'border-green-200 bg-green-50 text-green-800',
+        critical: 'border-red-200 bg-red-50/70 text-red-800',
+        emergent: 'border-orange-200 bg-orange-50/70 text-orange-800',
+        urgent: 'border-amber-200 bg-amber-50/70 text-amber-900',
+        routine: 'border-emerald-200 bg-emerald-50/70 text-emerald-800',
     };
     return map[urgency] ?? 'border-slate-200 bg-slate-50 text-slate-700';
 }
+
+const urgencyOptions = [
+    ['routine', 'Normal'],
+    ['urgent', 'Medium'],
+    ['emergent', 'High'],
+    ['critical', 'Critical'],
+];
 
 let hospitalsCache = null;
 
@@ -49,43 +56,43 @@ export const newReferralPage = {
             <div class="mx-auto max-w-3xl">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h1 class="text-xl font-extrabold tracking-tight text-brand-950">New referral</h1>
+                        <h1 class="page-heading text-2xl">New referral</h1>
                         <p class="mt-1 text-sm text-slate-500">Build a structured handover. The receiving team sees everything at once.</p>
                     </div>
-                    <button id="new-ref-back" class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50">← Back</button>
+                    <button id="new-ref-back" class="btn btn-secondary btn-sm">← Back</button>
                 </div>
 
-                <form id="referral-form" class="mt-6 space-y-6">
-                    <section class="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
-                        <div class="text-sm font-bold uppercase tracking-wide text-slate-500">Destination</div>
+                <form id="referral-form" class="mt-6 space-y-5">
+                    <section class="card p-6">
+                        <div class="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Destination</div>
                         <div class="mt-4 grid gap-4 sm:grid-cols-2">
                             <div class="sm:col-span-1">
-                                <label class="block text-sm font-medium text-slate-700">Receiving hospital</label>
-                                <select id="rf-receiving" required class="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-200 focus:outline-none">
+                                <label class="label" for="rf-receiving">Receiving hospital</label>
+                                <select id="rf-receiving" required class="input mt-1.5">
                                     <option value="">Select hospital…</option>${options}
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700">Department</label>
-                                <input id="rf-department" type="text" placeholder="e.g. Cardiology" required class="mt-1.5 w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-200 focus:outline-none">
+                                <label class="label" for="rf-department">Department</label>
+                                <input id="rf-department" type="text" placeholder="e.g. Cardiology" required class="input mt-1.5">
                             </div>
                         </div>
                     </section>
 
-                    <section class="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
-                        <div class="text-sm font-bold uppercase tracking-wide text-slate-500">Patient</div>
+                    <section class="card p-6">
+                        <div class="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Patient</div>
                         <div class="mt-4 grid gap-4 sm:grid-cols-4">
                             <div class="sm:col-span-2">
-                                <label class="block text-sm font-medium text-slate-700">Full name</label>
-                                <input id="rf-patient-name" type="text" required class="mt-1.5 w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-200 focus:outline-none">
+                                <label class="label" for="rf-patient-name">Full name</label>
+                                <input id="rf-patient-name" type="text" required class="input mt-1.5">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700">Age</label>
-                                <input id="rf-age" type="number" min="0" max="130" class="mt-1.5 w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-200 focus:outline-none">
+                                <label class="label" for="rf-age">Age</label>
+                                <input id="rf-age" type="number" min="0" max="130" class="input mt-1.5">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700">Gender</label>
-                                <select id="rf-gender" class="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-200 focus:outline-none">
+                                <label class="label" for="rf-gender">Gender</label>
+                                <select id="rf-gender" class="input mt-1.5">
                                     <option value="">—</option>
                                     <option value="male">Male</option>
                                     <option value="female">Female</option>
@@ -95,28 +102,28 @@ export const newReferralPage = {
                         </div>
                     </section>
 
-                    <section class="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
-                        <div class="text-sm font-bold uppercase tracking-wide text-slate-500">Clinical handover</div>
+                    <section class="card p-6">
+                        <div class="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Clinical handover</div>
                         <div class="mt-4 space-y-4">
                             <div>
-                                <label class="block text-sm font-medium text-slate-700">Reason for referral</label>
-                                <textarea id="rf-reason" rows="2" required class="mt-1.5 w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-200 focus:outline-none" placeholder="Why is this patient being referred?"></textarea>
+                                <label class="label" for="rf-reason">Reason for referral</label>
+                                <textarea id="rf-reason" rows="2" required class="input mt-1.5" placeholder="Why is this patient being referred?"></textarea>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700">Symptoms</label>
-                                <textarea id="rf-symptoms" rows="2" class="mt-1.5 w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-200 focus:outline-none"></textarea>
+                                <label class="label" for="rf-symptoms">Symptoms</label>
+                                <textarea id="rf-symptoms" rows="2" class="input mt-1.5"></textarea>
                             </div>
                             <div class="grid gap-4 sm:grid-cols-5">
-                                <div><label class="block text-sm font-medium text-slate-700">BP</label><input id="vit-bp" placeholder="120/80" class="mt-1.5 w-full rounded-lg border border-slate-300 px-3.5 py-2 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-200 focus:outline-none"></div>
-                                <div><label class="block text-sm font-medium text-slate-700">HR</label><input id="vit-hr" type="number" placeholder="80" class="mt-1.5 w-full rounded-lg border border-slate-300 px-3.5 py-2 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-200 focus:outline-none"></div>
-                                <div><label class="block text-sm font-medium text-slate-700">RR</label><input id="vit-rr" type="number" placeholder="16" class="mt-1.5 w-full rounded-lg border border-slate-300 px-3.5 py-2 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-200 focus:outline-none"></div>
-                                <div><label class="block text-sm font-medium text-slate-700">SpO₂</label><input id="vit-spo2" type="number" placeholder="98" class="mt-1.5 w-full rounded-lg border border-slate-300 px-3.5 py-2 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-200 focus:outline-none"></div>
-                                <div><label class="block text-sm font-medium text-slate-700">Temp</label><input id="vit-temp" type="number" step="0.1" placeholder="36.8" class="mt-1.5 w-full rounded-lg border border-slate-300 px-3.5 py-2 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-200 focus:outline-none"></div>
+                                <div><label class="label" for="vit-bp">BP</label><input id="vit-bp" placeholder="120/80" class="input mt-1.5"></div>
+                                <div><label class="label" for="vit-hr">HR</label><input id="vit-hr" type="number" placeholder="80" class="input mt-1.5"></div>
+                                <div><label class="label" for="vit-rr">RR</label><input id="vit-rr" type="number" placeholder="16" class="input mt-1.5"></div>
+                                <div><label class="label" for="vit-spo2">SpO₂</label><input id="vit-spo2" type="number" placeholder="98" class="input mt-1.5"></div>
+                                <div><label class="label" for="vit-temp">Temp</label><input id="vit-temp" type="number" step="0.1" placeholder="36.8" class="input mt-1.5"></div>
                             </div>
                             <div class="grid gap-4 sm:grid-cols-2">
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700">Consciousness</label>
-                                    <select id="rf-consciousness" class="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-200 focus:outline-none">
+                                    <label class="label" for="rf-consciousness">Consciousness</label>
+                                    <select id="rf-consciousness" class="input mt-1.5">
                                         <option value="">—</option>
                                         <option value="alert">Alert</option>
                                         <option value="confused">Confused</option>
@@ -125,45 +132,45 @@ export const newReferralPage = {
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700">Existing conditions</label>
-                                    <input id="rf-conditions" type="text" placeholder="e.g. Diabetes, HTN" class="mt-1.5 w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-200 focus:outline-none">
+                                    <label class="label" for="rf-conditions">Existing conditions</label>
+                                    <input id="rf-conditions" type="text" placeholder="e.g. Diabetes, HTN" class="input mt-1.5">
                                 </div>
                             </div>
                         </div>
                     </section>
 
-                    <section class="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
+                    <section class="card p-6">
                         <div class="grid gap-4 sm:grid-cols-2">
-                            <label class="flex items-center gap-3 rounded-lg border border-slate-200 p-4">
-                                <input id="rf-trauma" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-brand-500 focus:ring-brand-300">
+                            <label class="flex items-center gap-3 rounded-[10px] border border-slate-200 bg-white p-4 transition hover:border-brand-200">
+                                <input id="rf-trauma" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-accent-600 focus:ring-accent-300">
                                 <span class="text-sm font-medium text-slate-700">Trauma indicator</span>
                             </label>
-                            <label class="flex items-center gap-3 rounded-lg border border-slate-200 p-4">
-                                <input id="rf-emergency" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-brand-500 focus:ring-brand-300">
-                                <span class="text-sm font-medium text-slate-700">⚠ Emergency pre-alert</span>
+                            <label class="flex items-center gap-3 rounded-[10px] border border-slate-200 bg-white p-4 transition hover:border-brand-200">
+                                <input id="rf-emergency" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-accent-600 focus:ring-accent-300">
+                                <span class="text-sm font-medium text-slate-700">Emergency pre-alert</span>
                             </label>
                         </div>
                     </section>
 
-                    <section class="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
+                    <section class="card p-6">
                         <div class="flex items-center justify-between">
-                            <div class="text-sm font-bold uppercase tracking-wide text-slate-500">Urgency (assisted)</div>
+                            <div class="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Urgency (assisted)</div>
                             <button type="button" id="recompute-ai" class="text-xs font-semibold text-brand-600 hover:text-brand-700">Re-assess</button>
                         </div>
-                        <div id="ai-box" class="mt-3 hidden rounded-xl border p-4 text-sm"></div>
+                        <div id="ai-box" class="mt-3 hidden rounded-[12px] border p-4 text-sm"></div>
                         <div class="mt-4 grid gap-2 sm:grid-cols-4">
-                            ${['routine', 'urgent', 'emergent', 'critical'].map((u) => `
+                            ${urgencyOptions.map(([value, label]) => `
                                 <label class="cursor-pointer">
-                                    <input type="radio" name="urgency" value="${u}" class="peer sr-only">
-                                    <span class="block rounded-xl border border-slate-200 p-3 text-center text-sm font-semibold capitalize text-slate-600 transition peer-checked:border-brand-400 peer-checked:bg-brand-50 peer-checked:text-brand-800">${u}</span>
+                                    <input type="radio" name="urgency" value="${value}" class="peer sr-only">
+                                    <span class="urgency-pill w-full justify-center border border-slate-200 bg-white py-3 text-slate-500 uppercase transition peer-checked:border-accent-400 peer-checked:bg-accent-50 peer-checked:text-accent-800">${label}</span>
                                 </label>`).join('')}
                         </div>
                         <p class="mt-2 text-xs text-slate-400">Urgency is a clinical decision. The AI suggestion informs, never decides.</p>
                     </section>
 
                     <div class="flex items-center justify-end gap-3">
-                        <button type="button" id="ref-cancel" class="rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">Cancel</button>
-                        <button type="submit" id="ref-submit" class="rounded-lg bg-brand-500 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60">Create referral</button>
+                        <button type="button" id="ref-cancel" class="btn btn-ghost">Cancel</button>
+                        <button type="submit" id="ref-submit" class="btn btn-primary px-6">Create referral</button>
                     </div>
                 </form>
             </div>
@@ -183,10 +190,14 @@ export const newReferralPage = {
             const suggestion = suggestUrgency(input);
             const box = document.querySelector('#ai-box');
             box.classList.remove('hidden');
-            box.className = `mt-3 rounded-xl border p-4 text-sm ${toneClasses(suggestion.urgency)}`;
+            box.className = `mt-3 rounded-[12px] border p-4 text-sm ${toneClasses(suggestion.urgency)}`;
+            const label = urgencyOptions.find(([value]) => value === suggestion.urgency)?.[1] ?? suggestion.urgency;
             box.innerHTML = `
-                <div class="flex items-center justify-between">
-                    <span class="font-bold">✦ Suggested: ${suggestion.urgency}</span>
+                <div class="flex items-center justify-between gap-3">
+                    <span class="inline-flex items-center gap-2 font-bold">
+                        <svg viewBox="0 0 20 20" fill="none" class="h-4 w-4"><path d="M12 2a2 2 0 0 0-2 2v1H8v5H6V8H3l1 4h2v4l3 2v2h6v-5h2l1-4h-1V4l-5-2Z" fill="currentColor" opacity="0.9"/></svg>
+                        Suggested: <span class="urgency-pill bg-white text-current my-0.5">${label}</span>
+                    </span>
                     <span class="text-xs opacity-70">${Math.round(suggestion.confidence * 100)}% confidence</span>
                 </div>
                 <div class="mt-1 text-xs opacity-90">${escapeHtml(suggestion.reason)}</div>`;

@@ -3,12 +3,18 @@ import { api } from './lib/api';
 import { loginPage } from './pages/login';
 import { appShell } from './app-shell';
 import { renderToast } from './lib/toast';
+import { initReveal } from './lib/reveal';
 
 const boot = () => {
     const hasToken = Boolean(sessionStorage.getItem('badbaado_token'));
 
     if (window.BADBAADO.loginOnly) {
         loginPage.init();
+        return;
+    }
+
+    if (window.BADBAADO.publicPage) {
+        initReveal();
         return;
     }
 

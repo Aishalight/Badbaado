@@ -12,12 +12,19 @@ function statCard(label, value, tone) {
         warn: 'text-orange-500',
         info: 'text-brand-600',
         ok: 'text-emerald-600',
-        neutral: 'text-slate-800',
+        neutral: 'text-brand-950',
     };
     return `
-    <div class="rounded-xl border border-slate-100 bg-white p-5 shadow-sm">
-        <div class="text-xs font-semibold uppercase tracking-wide text-slate-400">${label}</div>
-        <div class="mt-2 text-3xl font-extrabold ${tones[tone]}">${value}</div>
+    <div class="metric-card">
+        <div class="flex items-center justify-between">
+            <div class="metric-value ${tones[tone]}">${value}</div>
+            <span class="hidden h-8 w-8 items-center justify-center rounded-[10px] bg-brand-50 text-brand-600 ring-1 ring-brand-100 sm:flex">
+                <svg viewBox="0 0 20 20" fill="none" class="h-4 w-4">
+                    <path d="M3 10h14M3 10l4-4M3 10l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+        </div>
+        <div class="metric-label">${label}</div>
     </div>`;
 }
 
@@ -25,11 +32,11 @@ function referralCard(referral) {
     const direction = referral.referring_hospital?.short_name ?? '?';
     const patient = referral.patient;
     return `
-    <a href="#" data-referral-id="${referral.id}" class="referral-card block rounded-xl border border-slate-100 bg-white p-4 shadow-sm transition hover:border-brand-300 hover:shadow-md">
+    <a href="#" data-referral-id="${referral.id}" class="referral-card card card-hover block p-4">
         <div class="flex items-start justify-between gap-2">
             <div class="flex items-center gap-2">
                 ${urgencyBadge(referral.urgency)}
-                ${referral.is_emergency ? '<span class="rounded-full bg-red-100 px-2 py-1 text-[11px] font-bold text-red-700">PRE-ALERT</span>' : ''}
+                ${referral.is_emergency ? '<span class="badge bg-red-50 text-red-600">● Pre-alert</span>' : ''}
             </div>
             ${statusBadge(referral.status)}
         </div>
