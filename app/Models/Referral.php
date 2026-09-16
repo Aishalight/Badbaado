@@ -84,4 +84,9 @@ class Referral extends Model
     {
         return $this->hasMany(Notification::class);
     }
+
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(ReferralAttachment::class);
+    }
 }

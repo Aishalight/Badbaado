@@ -30,10 +30,32 @@ async function handleSubmit(event) {
     }
 }
 
+async function handleDemoLogin(event) {
+    const button = event.currentTarget;
+    button.disabled = true;
+
+    try {
+        const result = await api.post('/login', {
+            email: button.dataset.demoEmail,
+            password: 'password',
+        });
+        setToken(result.token);
+        renderToast(`Signed in as ${result.user.name}`);
+        window.location.href = '/dashboard';
+    } catch (error) {
+        renderToast(error.message, 'error');
+        button.disabled = false;
+    }
+}
+
 export const loginPage = {
     init() {
         const form = document.querySelector('#login-form');
         if (form) form.addEventListener('submit', handleSubmit);
+
+        document.querySelectorAll('.demo-login').forEach((button) => {
+            button.addEventListener('click', handleDemoLogin);
+        });
 
         const token = sessionStorage.getItem('badbaado_token');
         if (token) window.location.href = '/dashboard';

@@ -13,14 +13,16 @@ export function clearToken() {
 }
 
 async function raw(method, path, body) {
-    const headers = { Accept: 'application/json', 'Content-Type': 'application/json' };
+    const isFormData = body instanceof FormData;
+    const headers = { Accept: 'application/json' };
+    if (!isFormData) headers['Content-Type'] = 'application/json';
     const token = getToken();
     if (token) headers.Authorization = `Bearer ${token}`;
 
     const response = await fetch(`/api${path}`, {
         method,
         headers,
-        body: body !== undefined ? JSON.stringify(body) : undefined,
+        body: body !== undefined ? (isFormData ? body : JSON.stringify(body)) : undefined,
     });
 
     let data = null;
@@ -50,4 +52,11 @@ export const api = {
     put: (path, body) => raw('PUT', path, body),
     patch: (path, body) => raw('PATCH', path, body),
     delete: (path) => raw('DELETE', path),
+    download: (path) => {
+        const headers = { Accept: 'application/octet-stream' };
+        const token = getToken();
+        if (token) headers.Authorization = `Bearer ${token}`;
+
+        return fetch(`/api${path}`, { headers });
+    },
 };

@@ -81,6 +81,34 @@ function infoRow(label, value) {
     </div>`;
 }
 
+function formatBytes(bytes) {
+    if (!bytes) return '';
+    const units = ['B', 'KB', 'MB', 'GB'];
+    const index = Math.min(units.length - 1, Math.floor(Math.log(bytes) / Math.log(1024)));
+    return `${(bytes / 1024 ** index).toFixed(index ? 1 : 0)} ${units[index]}`;
+}
+
+function attachmentsBlock(attachments) {
+    return `
+    <div class="card p-6">
+        <div class="flex items-center justify-between">
+            <div class="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Attachments</div>
+            <span class="text-xs text-slate-400">${attachments.length} file${attachments.length === 1 ? '' : 's'}</span>
+        </div>
+        <div class="mt-4 space-y-2">
+            ${attachments.map((a) => `
+                <button data-download-attachment="${a.id}" class="flex w-full items-center gap-3 rounded-[10px] border border-slate-200 bg-white px-3 py-2.5 text-left transition hover:border-brand-200 hover:bg-brand-50/40">
+                    <svg viewBox="0 0 20 20" fill="none" class="h-4 w-4 shrink-0 text-brand-500"><path d="M7 3h4l4 4v9a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+                    <span class="min-w-0 flex-1">
+                        <span class="block truncate text-sm font-medium text-slate-700">${escapeHtml(a.original_name)}</span>
+                        <span class="block text-xs text-slate-400">${formatBytes(a.size)} · ${formatDate(a.created_at)}</span>
+                    </span>
+                    <svg viewBox="0 0 20 20" fill="none" class="h-4 w-4 shrink-0 text-slate-400"><path d="M10 3v9M10 12l-3-3M10 12l3-3M4 14v2a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>`).join('') || '<div class="text-sm text-slate-400">No files attached.</div>'}
+        </div>
+    </div>`;
+}
+
 function aiSuggestionBlock(referral) {
     if (!referral.ai_suggestion) return '';
     const ai = referral.ai_suggestion;
@@ -170,6 +198,8 @@ export const referralDetailPage = {
                             <div class="mt-4">${vitalsBlock(referral.vitals)}</div>
                         </div>
 
+                        ${attachmentsBlock(referral.attachments ?? [])}
+
                         ${referral.rejection_reason ? `
                         <div class="rounded-xl border border-red-100 bg-red-50 p-5">
                             <div class="text-sm font-bold text-red-700">Decline reason</div>
@@ -230,6 +260,34 @@ export const referralDetailPage = {
 
         document.querySelector('#back-btn').addEventListener('click', () => {
             window.dispatchEvent(new CustomEvent('badbaado:navigate', { detail: 'referrals' }));
+        });
+
+        document.querySelectorAll('[data-download-attachment]').forEach((btn) => {
+            btn.addEventListener('click', async () => {
+                const id = btn.dataset.downloadAttachment;
+                const attachment = (referral.attachments ?? []).find((a) => a.id === Number(id));
+                btn.disabled = true;
+                try {
+                    const response = await api.download(`/referrals/${referral.id}/attachments/${id}`);
+                    if (!response.ok) {
+                        const data = await response.json().catch(() => null);
+                        throw new Error(data?.message ?? 'Download failed.');
+                    }
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = attachment?.original_name ?? 'attachment';
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    URL.revokeObjectURL(url);
+                } catch (error) {
+                    renderToast(error.message, 'error');
+                } finally {
+                    btn.disabled = false;
+                }
+            });
         });
 
         document.querySelectorAll('.transition-btn').forEach((btn) => {

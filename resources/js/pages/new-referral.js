@@ -106,35 +106,28 @@ export const newReferralPage = {
                         <div class="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Clinical handover</div>
                         <div class="mt-4 space-y-4">
                             <div>
-                                <label class="label" for="rf-reason">Reason for referral</label>
-                                <textarea id="rf-reason" rows="2" required class="input mt-1.5" placeholder="Why is this patient being referred?"></textarea>
+                                <label class="label" for="rf-reason">Clinical summary</label>
+                                <textarea id="rf-reason" rows="3" required class="input mt-1.5" placeholder="Why is this patient being referred? Key findings, current status, and what you need from the receiving team."></textarea>
                             </div>
                             <div>
-                                <label class="label" for="rf-symptoms">Symptoms</label>
-                                <textarea id="rf-symptoms" rows="2" class="input mt-1.5"></textarea>
-                            </div>
-                            <div class="grid gap-4 sm:grid-cols-5">
-                                <div><label class="label" for="vit-bp">BP</label><input id="vit-bp" placeholder="120/80" class="input mt-1.5"></div>
-                                <div><label class="label" for="vit-hr">HR</label><input id="vit-hr" type="number" placeholder="80" class="input mt-1.5"></div>
-                                <div><label class="label" for="vit-rr">RR</label><input id="vit-rr" type="number" placeholder="16" class="input mt-1.5"></div>
-                                <div><label class="label" for="vit-spo2">SpO₂</label><input id="vit-spo2" type="number" placeholder="98" class="input mt-1.5"></div>
-                                <div><label class="label" for="vit-temp">Temp</label><input id="vit-temp" type="number" step="0.1" placeholder="36.8" class="input mt-1.5"></div>
-                            </div>
-                            <div class="grid gap-4 sm:grid-cols-2">
-                                <div>
-                                    <label class="label" for="rf-consciousness">Consciousness</label>
-                                    <select id="rf-consciousness" class="input mt-1.5">
-                                        <option value="">—</option>
-                                        <option value="alert">Alert</option>
-                                        <option value="confused">Confused</option>
-                                        <option value="lethargic">Lethargic</option>
-                                        <option value="unresponsive">Unresponsive</option>
-                                    </select>
+                                <label class="label">Vitals (optional)</label>
+                                <div class="mt-1.5 grid grid-cols-2 gap-3 sm:grid-cols-5">
+                                    <div><label class="label" for="vit-bp">BP</label><input id="vit-bp" placeholder="120/80" class="input mt-1.5"></div>
+                                    <div><label class="label" for="vit-hr">HR</label><input id="vit-hr" type="number" placeholder="80" class="input mt-1.5"></div>
+                                    <div><label class="label" for="vit-rr">RR</label><input id="vit-rr" type="number" placeholder="16" class="input mt-1.5"></div>
+                                    <div><label class="label" for="vit-spo2">SpO₂</label><input id="vit-spo2" type="number" placeholder="98" class="input mt-1.5"></div>
+                                    <div><label class="label" for="vit-temp">Temp</label><input id="vit-temp" type="number" step="0.1" placeholder="36.8" class="input mt-1.5"></div>
                                 </div>
-                                <div>
-                                    <label class="label" for="rf-conditions">Existing conditions</label>
-                                    <input id="rf-conditions" type="text" placeholder="e.g. Diabetes, HTN" class="input mt-1.5">
-                                </div>
+                            </div>
+                            <div>
+                                <label class="label" for="rf-consciousness">Consciousness</label>
+                                <select id="rf-consciousness" class="input mt-1.5">
+                                    <option value="">—</option>
+                                    <option value="alert">Alert</option>
+                                    <option value="confused">Confused</option>
+                                    <option value="lethargic">Lethargic</option>
+                                    <option value="unresponsive">Unresponsive</option>
+                                </select>
                             </div>
                         </div>
                     </section>
@@ -149,6 +142,21 @@ export const newReferralPage = {
                                 <input id="rf-emergency" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-accent-600 focus:ring-accent-300">
                                 <span class="text-sm font-medium text-slate-700">Emergency pre-alert</span>
                             </label>
+                        </div>
+                    </section>
+
+                    <section class="card p-6">
+                        <div class="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Attachments</div>
+                        <div class="mt-4">
+                            <label for="rf-files" class="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-[12px] border-2 border-dashed border-slate-200 bg-slate-50/50 px-4 py-8 text-center transition hover:border-brand-300 hover:bg-brand-50/40">
+                                <svg viewBox="0 0 20 20" fill="none" class="h-6 w-6 text-slate-400">
+                                    <path d="M10 2v10M10 12l-3-3M10 12l3-3M4 13v3a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span class="text-sm font-semibold text-slate-600">Upload scans, reports, or images</span>
+                                <span class="text-xs text-slate-400">PDF, images, Office, CSV, TXT · up to 10 MB each · max 5 files</span>
+                            </label>
+                            <input id="rf-files" type="file" multiple accept=".pdf,.jpeg,.jpg,.png,.doc,.docx,.xls,.xlsx,.csv,.txt" class="sr-only">
+                            <div id="rf-file-list" class="mt-3 space-y-2"></div>
                         </div>
                     </section>
 
@@ -179,7 +187,7 @@ export const newReferralPage = {
         const runAI = () => {
             const input = {
                 reason: document.querySelector('#rf-reason').value,
-                symptoms: document.querySelector('#rf-symptoms').value,
+                symptoms: document.querySelector('#rf-reason').value,
                 bp: document.querySelector('#vit-bp').value,
                 hr: document.querySelector('#vit-hr').value,
                 spo2: document.querySelector('#vit-spo2').value,
@@ -205,10 +213,41 @@ export const newReferralPage = {
             if (radio) radio.checked = true;
         };
 
-        ['#rf-reason', '#rf-symptoms', '#vit-bp', '#vit-hr', '#vit-spo2', '#rf-consciousness', '#rf-trauma', '#rf-emergency'].forEach((sel) => {
+        ['#rf-reason', '#vit-bp', '#vit-hr', '#vit-spo2', '#rf-consciousness', '#rf-trauma', '#rf-emergency'].forEach((sel) => {
             document.querySelector(sel).addEventListener('input', debounce(runAI, 500));
         });
         document.querySelector('#recompute-ai').addEventListener('click', runAI);
+
+        let selectedFiles = [];
+        const fileInput = document.querySelector('#rf-files');
+        const fileList = document.querySelector('#rf-file-list');
+        const renderFileList = () => {
+            fileList.innerHTML = selectedFiles.map((file, index) => `
+                <div class="flex items-center justify-between gap-3 rounded-[10px] border border-slate-200 bg-white px-3 py-2.5 text-sm">
+                    <div class="flex min-w-0 items-center gap-2.5">
+                        <svg viewBox="0 0 20 20" fill="none" class="h-4 w-4 shrink-0 text-brand-500"><path d="M7 3h4l4 4v9a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+                        <span class="truncate font-medium text-slate-700">${escapeHtml(file.name)}</span>
+                        <span class="shrink-0 text-xs text-slate-400">${formatBytes(file.size)}</span>
+                    </div>
+                    <button type="button" data-remove-file="${index}" class="shrink-0 text-xs font-semibold text-red-500 hover:text-red-600">Remove</button>
+                </div>`).join('') || '<div class="text-xs text-slate-400">No files selected.</div>';
+        };
+        fileInput.addEventListener('change', () => {
+            const incoming = Array.from(fileInput.files);
+            if (incoming.length > 5 - selectedFiles.length) {
+                renderToast('You can attach up to 5 files.', 'error');
+            } else {
+                selectedFiles = [...selectedFiles, ...incoming];
+            }
+            fileInput.value = '';
+            renderFileList();
+        });
+        fileList.addEventListener('click', (event) => {
+            const btn = event.target.closest('[data-remove-file]');
+            if (!btn) return;
+            selectedFiles.splice(Number(btn.dataset.removeFile), 1);
+            renderFileList();
+        });
 
         const back = document.querySelector('#new-ref-back');
         if (back) back.addEventListener('click', () => window.dispatchEvent(new CustomEvent('badbaado:navigate', { detail: 'referrals' })));
@@ -229,24 +268,24 @@ export const newReferralPage = {
 
             const urgency = document.querySelector('input[name="urgency"]:checked')?.value ?? null;
 
-            const payload = {
-                receiving_hospital_id: Number(document.querySelector('#rf-receiving').value),
-                department: document.querySelector('#rf-department').value.trim(),
-                referral_reason: document.querySelector('#rf-reason').value.trim(),
-                symptoms: document.querySelector('#rf-symptoms').value.trim() || null,
-                vitals: Object.keys(vitals).length ? vitals : null,
-                consciousness: document.querySelector('#rf-consciousness').value || null,
-                trauma_indicator: document.querySelector('#rf-trauma').checked,
-                is_emergency: document.querySelector('#rf-emergency').checked,
-                existing_conditions: document.querySelector('#rf-conditions').value.trim() || null,
-                urgency,
-                ai_suggestion: document.querySelector('#ai-box')?.dataset?.suggestion ?? null,
-                patient: {
-                    name: document.querySelector('#rf-patient-name').value.trim(),
-                    age: document.querySelector('#rf-age').value ? Number(document.querySelector('#rf-age').value) : null,
-                    gender: document.querySelector('#rf-gender').value || null,
-                },
-            };
+            const payload = new FormData();
+            payload.append('receiving_hospital_id', document.querySelector('#rf-receiving').value);
+            payload.append('department', document.querySelector('#rf-department').value.trim());
+            payload.append('referral_reason', document.querySelector('#rf-reason').value.trim());
+            payload.append('urgency', urgency ?? '');
+            payload.append('is_emergency', document.querySelector('#rf-emergency').checked ? '1' : '0');
+            payload.append('trauma_indicator', document.querySelector('#rf-trauma').checked ? '1' : '0');
+            const consciousness = document.querySelector('#rf-consciousness').value;
+            if (consciousness) payload.append('consciousness', consciousness);
+            for (const [key, val] of Object.entries(vitals)) {
+                payload.append(`vitals[${key}]`, String(val));
+            }
+            payload.append('patient[name]', document.querySelector('#rf-patient-name').value.trim());
+            const age = document.querySelector('#rf-age').value;
+            if (age !== '') payload.append('patient[age]', age);
+            const gender = document.querySelector('#rf-gender').value;
+            if (gender) payload.append('patient[gender]', gender);
+            selectedFiles.forEach((file) => payload.append('attachments[]', file));
 
             try {
                 const created = await api.post('/referrals', payload);
@@ -260,6 +299,13 @@ export const newReferralPage = {
         });
     },
 };
+
+function formatBytes(bytes) {
+    if (!bytes) return '';
+    const units = ['B', 'KB', 'MB', 'GB'];
+    const index = Math.min(units.length - 1, Math.floor(Math.log(bytes) / Math.log(1024)));
+    return `${(bytes / 1024 ** index).toFixed(index ? 1 : 0)} ${units[index]}`;
+}
 
 function debounce(fn, delay) {
     let timer;

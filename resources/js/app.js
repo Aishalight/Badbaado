@@ -23,10 +23,8 @@ const boot = () => {
         return;
     }
 
-    appShell.mount();
-
     api.get('/me')
-        .then((user) => appShell.setUser(user))
+        .then((user) => appShell.mount(user))
         .catch(() => {
             sessionStorage.removeItem('badbaado_token');
             window.location.href = '/login';

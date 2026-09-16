@@ -56,6 +56,7 @@ class ReferralController extends Controller
             'receivingHospital',
             'referringUser',
             'patient',
+            'attachments',
         ]));
     }
 
@@ -70,6 +71,7 @@ class ReferralController extends Controller
             'coordinator:id,name,title,email',
             'patient',
             'messages.sender:id,name,title',
+            'attachments',
         ]));
     }
 

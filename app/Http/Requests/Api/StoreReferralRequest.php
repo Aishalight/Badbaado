@@ -45,6 +45,12 @@ class StoreReferralRequest extends FormRequest
             'patient.age' => ['nullable', 'integer', 'min:0', 'max:130'],
             'patient.gender' => ['nullable', 'string', 'max:50'],
             'patient.blood_group' => ['nullable', 'string', 'max:10'],
+            'attachments' => ['sometimes', 'array', 'max:5'],
+            'attachments.*' => [
+                'file',
+                'max:10240',
+                'mimes:pdf,jpeg,jpg,png,doc,docx,xls,xlsx,csv,txt',
+            ],
         ];
     }
 }

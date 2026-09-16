@@ -6,7 +6,9 @@ use App\Enums\ReferralStatus;
 use App\Exceptions\InvalidReferralTransitionException;
 use App\Models\Patient;
 use App\Models\Referral;
+use App\Models\ReferralAttachment;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -49,6 +51,8 @@ class ReferralWorkflowService
                 'notes' => $data['notes'] ?? null,
             ]);
 
+            $this->storeAttachments($user, $referral, $data['attachments'] ?? []);
+
             $this->auditLogger->record($user, 'referral_created', $referral, [
                 'referral_number' => $referral->referral_number,
                 'receiving_hospital_id' => $referral->receiving_hospital_id,
@@ -56,6 +60,42 @@ class ReferralWorkflowService
 
             return $referral;
         });
+    }
+
+    /**
+     * @param  array<int, UploadedFile>  $files
+     */
+    private function storeAttachments(User $user, Referral $referral, array $files): void
+    {
+        foreach ($files as $file) {
+            if (! $file instanceof UploadedFile) {
+                continue;
+            }
+
+            $storedName = $this->generateStoredFileName($file);
+
+            $file->storeAs("referrals/{$referral->id}", $storedName, 'local');
+
+            ReferralAttachment::create([
+                'referral_id' => $referral->id,
+                'user_id' => $user->id,
+                'original_name' => $file->getClientOriginalName(),
+                'filename' => $storedName,
+                'mime' => $file->getMimeType(),
+                'size' => $file->getSize(),
+            ]);
+        }
+
+        if ($files) {
+            $this->auditLogger->record($user, 'referral_attachments_added', $referral, [
+                'attachments' => count($files),
+            ]);
+        }
+    }
+
+    private function generateStoredFileName(UploadedFile $file): string
+    {
+        return Str::random(32).'.'.$file->getClientOriginalExtension();
     }
 
     public function transition(User $user, Referral $referral, ReferralStatus $next, ?string $rejectionReason = null): Referral

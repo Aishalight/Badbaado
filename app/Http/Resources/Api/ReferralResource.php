@@ -41,6 +41,13 @@ class ReferralResource extends JsonResource
             'referring_user' => new UserResource($this->whenLoaded('referringUser')),
             'coordinator' => new UserResource($this->whenLoaded('coordinator')),
             'patient' => $this->whenLoaded('patient'),
+            'attachments' => $this->whenLoaded('attachments', fn () => $this->attachments->map(fn ($attachment) => [
+                'id' => $attachment->id,
+                'original_name' => $attachment->original_name,
+                'mime' => $attachment->mime,
+                'size' => $attachment->size,
+                'created_at' => $attachment->created_at,
+            ])),
         ];
     }
 }

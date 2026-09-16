@@ -88,11 +88,22 @@
                 </button>
             </form>
 
-            <div class="mt-6 rounded-xl border border-brand-100 bg-white px-4 py-3 text-xs leading-relaxed text-brand-800 shadow-sm">
-                <strong class="font-bold">Demo access</strong> — use
-                <code class="rounded bg-brand-50 px-1 py-0.5 font-mono">admin@badbaado.bd</code> /
-                <code class="rounded bg-brand-50 px-1 py-0.5 font-mono">password</code>
-                (system admin), or any hospital account.
+            <div class="mt-6">
+                <div class="flex items-center gap-3">
+                    <span class="h-px flex-1 bg-slate-200"></span>
+                    <span class="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">Try a demo role</span>
+                    <span class="h-px flex-1 bg-slate-200"></span>
+                </div>
+                <div class="mt-4 grid grid-cols-2 gap-2">
+                    <button type="button" data-demo-email="admin@badbaado.bd" class="demo-login btn btn-ghost justify-center">System admin</button>
+                    <button type="button" data-demo-email="hospital.admin@alhilal.bd" class="demo-login btn btn-ghost justify-center">Hospital admin</button>
+                    <button type="button" data-demo-email="coordinator@alhilal.bd" class="demo-login btn btn-ghost justify-center">Coordinator</button>
+                    <button type="button" data-demo-email="dr.rahman@alhilal.bd" class="demo-login btn btn-ghost justify-center">Healthcare worker</button>
+                </div>
+                <p class="mt-3 text-center text-xs text-slate-400">
+                    Each role opens its own console. All use the password
+                    <code class="font-mono text-slate-500">password</code>.
+                </p>
             </div>
 
             <p class="mt-8 text-center text-sm text-slate-500">
