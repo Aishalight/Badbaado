@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign in — BADBAADO</title>
+  <link rel="icon" href="./assets/badbaado-logo.jpg">
+  <meta name="description" content="BADBAADO — Inter-Hospital Referral & Emergency Pre-Arrival Alert System">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: { colors: {
+      brand: {50:'#f0fbfd',100:'#d9f5f9',200:'#b2eaf2',300:'#86ddea',400:'#4fcede',500:'#22c0d6',600:'#12a8be',700:'#0f8fa3',800:'#0d7688',900:'#0c5c6b'}
+    }, fontFamily: { sans: ['Inter','system-ui','sans-serif'] } } } };
+  </script>
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body class="login-bg min-h-screen" data-page="login">
+  <div class="mx-auto grid min-h-screen w-full max-w-6xl gap-10 px-5 py-8 lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-8">
+
+    <!-- Brand panel -->
+    <div class="hidden text-white lg:block">
+      <a href="index.html" class="flex items-center gap-3">
+        <img src="./assets/badbaado-logo.jpg" alt="BADBAADO logo" class="h-12 w-12 rounded-full object-cover ring-1 ring-white/20">
+        <span class="text-2xl font-extrabold tracking-tight">BADBAADO<span class="text-brand-400">.</span></span>
+      </a>
+      <h1 class="mt-10 max-w-md text-4xl font-extrabold leading-tight tracking-tight">
+        Connecting hospitals before the patient arrives.
+      </h1>
+      <p class="mt-4 max-w-md text-[15px] leading-relaxed text-brand-200/75">
+        BADBAADO lets doctors securely transfer referral information between hospitals and alerts
+        the receiving Emergency Room before an ambulance arrives.
+      </p>
+
+      <div class="mt-8 max-w-md rounded-2xl bg-white/5 p-5 ring-1 ring-white/10">
+        <svg viewBox="0 0 440 90" class="w-full max-w-md" aria-hidden="true">
+          <polyline class="pulse-line" points="0,70 60,70 90,25 120,78 150,45 185,70 260,70 300,18 335,66 370,52 400,70 440,70"
+            fill="none" stroke="#0f8fa3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="mt-4 grid grid-cols-3 divide-x divide-white/10 text-center">
+          <div><p class="text-2xl font-extrabold text-brand-400">8</p><p class="text-xs text-brand-200/70">Hospitals online</p></div>
+          <div><p class="text-2xl font-extrabold text-brand-400">38s</p><p class="text-xs text-brand-200/70">Avg. referral time</p></div>
+          <div><p class="text-2xl font-extrabold text-brand-400">24/7</p><p class="text-xs text-brand-200/70">ER alerting</p></div>
+        </div>
+      </div>
+
+      <p class="mt-10 text-xs font-semibold uppercase tracking-widest text-brand-200/50">
+        Inter-Hospital Referral &amp; Emergency Pre-Arrival Alert System · v1.0
+      </p>
+    </div>
+
+    <!-- Login card -->
+    <div class="flex items-center justify-center">
+      <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-2xl shadow-slate-900/30">
+        <div class="flex justify-center">
+          <img src="./assets/badbaado-logo.jpg" alt="BADBAADO logo" class="h-20 w-20 rounded-full object-cover shadow-md shadow-slate-900/10 ring-1 ring-slate-100">
+        </div>
+        <p class="mt-4 text-center text-xs font-bold uppercase tracking-widest text-brand-600">BADBAADO</p>
+
+        <h2 class="mt-2 text-center text-2xl font-extrabold tracking-tight text-slate-900">Welcome back</h2>
+        <p class="mt-1 text-center text-sm text-slate-500">Sign in to your hospital account to manage referrals.</p>
+
+        <form id="loginForm" class="mt-7 space-y-5" novalidate>
+          <div>
+            <label class="fld" for="loginEmail">Email or username</label>
+            <div class="relative">
+              <span class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </span>
+              <input id="loginEmail" type="email" class="input !pl-10" placeholder="you@hospital.org.bd" autocomplete="username">
+            </div>
+            <p class="field-error" id="emailErr">Please enter your email or username.</p>
+          </div>
+
+          <div>
+            <label class="fld" for="loginPass">Password</label>
+            <div class="relative">
+              <span class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span>
+              <input id="loginPass" type="password" class="input !pl-10 !pr-10" placeholder="••••••••" autocomplete="current-password">
+              <button type="button" id="passEye" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600" aria-label="Toggle password">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <p class="field-error" id="passErr">Please enter your password.</p>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <label class="flex cursor-pointer items-center gap-2 text-sm text-slate-600">
+              <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500" checked>
+              Remember me
+            </label>
+            <a href="#" id="forgotLink" class="text-sm font-semibold text-brand-700 hover:text-brand-800">Forgot password?</a>
+          </div>
+
+          <button type="submit" id="loginBtn" class="btn btn-primary w-full !py-3 text-base">
+            Sign in
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </form>
+
+        <div class="mt-6 rounded-xl border border-dashed border-brand-200 bg-brand-50/60 p-3.5">
+          <p class="text-xs font-bold uppercase tracking-wide text-brand-800">Demo account</p>
+          <p class="mt-0.5 text-xs text-brand-700/80">No sign-up needed — use any credentials or:</p>
+          <button type="button" id="useDemo" class="btn btn-outline mt-2.5 w-full !py-2 text-sm !text-brand-700">
+            Use demo account
+          </button>
+        </div>
+
+        <p class="mt-6 text-center text-sm text-slate-500">
+          Don't have an account?
+          <a href="#" id="createAccount" class="font-bold text-brand-700 hover:text-brand-800">Create Account</a>
+        </p>
+        <a href="index.html" class="mt-5 flex items-center justify-center gap-1.5 text-xs font-bold text-slate-400 transition hover:text-brand-700">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          Back to Home
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Forgot password modal -->
+  <div class="modal" id="forgotModal">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-shell">
+      <div class="modal-panel w-full max-w-sm p-6">
+        <div class="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-brand-50 text-brand-600"> 
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <h3 class="text-center text-lg font-bold text-slate-900">Reset your password</h3>
+        <p class="mt-1.5 text-center text-sm text-slate-500">Enter your registered email and we will send a secure reset link.</p>
+        <div class="mt-5">
+          <label class="fld" for="forgotEmail">Email address</label>
+          <input id="forgotEmail" type="email" class="input" placeholder="you@hospital.org.bd">
+        </div>
+        <button id="forgotSend" class="btn btn-primary mt-5 w-full !py-2.5">Send reset link</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./js/data.js"></script>
+  <script src="./js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var send = document.getElementById('forgotSend');
+      var modal = document.getElementById('forgotModal');
+      function close() { if (modal) modal.classList.remove('open'); }
+      if (send) send.addEventListener('click', function () {
+        var m = document.getElementById('forgotModal');
+        if (m) m.classList.remove('open');
+        BD_PAGE.toast('Reset link sent — check your inbox.', 'success');
+      });
+      var ca = document.getElementById('createAccount');
+      if (ca) ca.addEventListener('click', function (e) {
+        e.preventDefault();
+        BD_PAGE.toast('Account creation is managed by your hospital administrator in this build.', 'info');
+      });
+      var backdrops = document.querySelectorAll('[data-close]');
+      backdrops.forEach(function (b) {
+        b.addEventListener('click', function () { if (b.parentElement) b.parentElement.classList.remove('open'); });
+      });
+    });
+  </script>
+</body>
+</html>

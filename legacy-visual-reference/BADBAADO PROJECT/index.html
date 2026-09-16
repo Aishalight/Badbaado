@@ -1,0 +1,1220 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BADBAADO · Connecting Hospitals. Saving Lives.</title>
+    <link rel="icon" href="./assets/badbaado-logo.jpg" />
+    <meta
+      name="description"
+      content="BADBAADO is an inter-hospital referral and emergency pre-arrival alert system. Fast, secure, and structured patient referrals between hospitals."
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                50: "#f0fbfd",
+                100: "#d9f5f9",
+                200: "#b2eaf2",
+                300: "#86ddea",
+                400: "#4fcede",
+                500: "#22c0d6",
+                600: "#12a8be",
+                700: "#0f8fa3",
+                800: "#0d7688",
+                900: "#0c5c6b",
+              },
+              body: "#0b1220",
+            },
+            fontFamily: {
+              sans: ["Inter", "system-ui", "Segoe UI", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: "Inter", system-ui, "Segoe UI", sans-serif;
+      }
+      section[id] {
+        scroll-margin-top: 76px;
+      }
+    </style>
+  </head>
+  <body class="bg-white font-sans text-slate-900 antialiased">
+    <!-- ===================== NAVBAR ===================== -->
+    <header
+      id="navbar"
+      class="sticky top-0 z-30 border-b border-slate-100 bg-white/85 backdrop-blur transition-shadow"
+    >
+      <div
+        class="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 py-3 lg:px-8"
+      >
+        <a href="#home" class="flex items-center gap-2.5">
+          <img
+            src="assets/badbaado-logo.jpg"
+            alt="BADBAADO logo"
+            class="h-10 w-10 rounded-full object-cover shadow-sm ring-1 ring-slate-100"
+          />
+          <span class="text-lg font-black tracking-tight text-brand-700"
+            >BADBAADO</span
+          >
+        </a>
+
+        <nav
+          class="hidden items-center gap-7 text-sm font-semibold text-slate-600 md:flex"
+        >
+          <a href="#home" class="transition hover:text-brand-700">Home</a>
+          <a href="#about" class="transition hover:text-brand-700">About Us</a>
+          <a href="#how" class="transition hover:text-brand-700"
+            >How It Works</a
+          >
+          <a href="#emergency" class="transition hover:text-brand-700"
+            >Emergency Referral</a
+          >
+          <a href="#contact" class="transition hover:text-brand-700"
+            >Contact Us</a
+          >
+        </nav>
+
+        <div class="flex items-center gap-2">
+          <a
+            href="login.html"
+            class="hidden rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white shadow-sm shadow-brand-600/25 transition hover:bg-brand-700 sm:inline-block"
+          >
+            Sign In
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="ml-1 inline h-3.5 w-3.5"
+            >
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </a>
+          <button
+            id="menuBtn"
+            class="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 text-slate-700 md:hidden"
+            aria-label="Menu"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="h-5 w-5"
+            >
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div
+        id="mobileMenu"
+        class="hidden border-t border-slate-100 bg-white px-5 pb-4 pt-2 md:hidden"
+      >
+        <a href="#home" class="block py-2 text-sm font-semibold text-slate-700"
+          >Home</a
+        >
+        <a href="#about" class="block py-2 text-sm font-semibold text-slate-700"
+          >About Us</a
+        >
+        <a href="#how" class="block py-2 text-sm font-semibold text-slate-700"
+          >How It Works</a
+        >
+        <a
+          href="#emergency"
+          class="block py-2 text-sm font-semibold text-slate-700"
+          >Emergency Referral</a
+        >
+        <a
+          href="#contact"
+          class="block py-2 text-sm font-semibold text-slate-700"
+          >Contact Us</a
+        >
+        <a
+          href="login.html"
+          class="mt-2 block rounded-xl bg-brand-600 px-4 py-2.5 text-center text-sm font-bold text-white"
+          >Sign In</a
+        >
+      </div>
+    </header>
+
+    <!-- ===================== HERO ===================== -->
+    <section id="home" class="relative overflow-hidden">
+      <div
+        class="pointer-events-none absolute -left-32 -top-24 h-80 w-80 rounded-full bg-brand-100/70 blur-3xl"
+      ></div>
+      <div
+        class="pointer-events-none absolute -right-24 top-40 h-72 w-72 rounded-full bg-brand-100/60 blur-3xl"
+      ></div>
+
+      <div
+        class="relative mx-auto max-w-4xl px-5 py-16 text-center md:py-24 lg:px-8"
+      >
+        <span
+          class="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-brand-50 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-brand-700"
+        >
+          <span class="relative flex h-2 w-2">
+            <span
+              class="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-400 opacity-75"
+            ></span>
+            <span
+              class="relative inline-flex h-2 w-2 rounded-full bg-brand-500"
+            ></span>
+          </span>
+          Inter-Hospital Referral &amp; Pre-Arrival Alert System
+        </span>
+
+        <h1
+          class="mt-6 text-4xl font-black leading-[1.1] tracking-tight text-slate-900 md:text-6xl"
+        >
+          Connecting Hospitals.
+          <span class="text-brand-600">Saving Lives.</span>
+        </h1>
+
+        <p
+          class="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate-600 md:text-lg"
+        >
+          BADBAADO connects hospitals and enables fast, secure patient referrals
+          with emergency pre-arrival alerts. Doctors transfer a patient's
+          referral information in minutes, and receiving Emergency teams are
+          ready before the ambulance arrives.
+        </p>
+
+        <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <a
+            href="login.html"
+            class="rounded-xl bg-brand-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-brand-600/25 transition hover:bg-brand-700"
+          >
+            Get Started
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="ml-1.5 inline h-4 w-4"
+            >
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </a>
+          <a
+            href="#about"
+            class="rounded-xl border border-slate-200 bg-white px-6 py-3.5 text-sm font-bold text-slate-700 transition hover:border-brand-300 hover:text-brand-700"
+          >
+            Learn More
+          </a>
+        </div>
+
+        <div
+          class="mt-9 flex flex-wrap items-center justify-center gap-x-7 gap-y-3 text-sm font-semibold text-slate-500"
+        >
+          <span class="inline-flex items-center gap-2"
+            ><span class="h-2 w-2 rounded-full bg-[#386fae]"></span>8+ hospitals
+            connected</span
+          >
+          <span class="inline-flex items-center gap-2"
+            ><span class="h-2 w-2 rounded-full bg-brand-500"></span>Pre-arrival
+            ER alerts</span
+          >
+          <span class="inline-flex items-center gap-2"
+            ><span class="h-2 w-2 rounded-full bg-[#0f519e]"></span>Scannable
+            triage QR</span
+          >
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== ABOUT BADBAADO ===================== -->
+    <section id="about" class="border-t border-slate-100 bg-slate-50/50">
+      <div class="mx-auto max-w-3xl px-5 py-20 text-center lg:px-8">
+        <p class="text-xs font-bold uppercase tracking-widest text-brand-600">
+          About BADBAADO
+        </p>
+        <h2
+          class="mt-3 text-3xl font-black tracking-tight text-slate-900 md:text-4xl"
+        >
+          A referral network built for speed and safety
+        </h2>
+        <p class="mt-5 text-base leading-relaxed text-slate-600">
+          BADBAADO is a paperless referral platform for hospitals. Instead of
+          phone calls, guesswork, and handwritten notes, it moves a structured
+          referral packet — patient summary, triage level, department, and a
+          scannable QR badge — from one hospital to another in seconds.
+        </p>
+        <p class="mt-4 text-base leading-relaxed text-slate-600">
+          When a referral is critical, the receiving Emergency Room gets a
+          pre-arrival alert before the ambulance arrives, so the right team,
+          bed, and equipment are waiting.
+        </p>
+        <div class="mt-9 grid grid-cols-3 gap-4">
+          <div
+            class="rounded-2xl border border-slate-100 bg-white p-4 text-center"
+          >
+            <p class="text-2xl font-black text-brand-600">8</p>
+            <p class="mt-1 text-xs font-semibold text-slate-500">
+              Hospitals online
+            </p>
+          </div>
+          <div
+            class="rounded-2xl border border-slate-100 bg-white p-4 text-center"
+          >
+            <p class="text-2xl font-black text-brand-600">24/7</p>
+            <p class="mt-1 text-xs font-semibold text-slate-500">ER alerting</p>
+          </div>
+          <div
+            class="rounded-2xl border border-slate-100 bg-white p-4 text-center"
+          >
+            <p class="text-2xl font-black text-brand-600">4</p>
+            <p class="mt-1 text-xs font-semibold text-slate-500">
+              Triage levels
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== HOW IT WORKS ===================== -->
+    <section id="how" class="bg-white">
+      <div class="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+        <div class="mx-auto max-w-2xl text-center">
+          <p class="text-xs font-bold uppercase tracking-widest text-brand-600">
+            How It Works
+          </p>
+          <h2
+            class="mt-3 text-3xl font-black tracking-tight text-slate-900 md:text-4xl"
+          >
+            From referral to ready, in four steps
+          </h2>
+          <p class="mt-4 text-slate-600">
+            Every movement of a patient between hospitals follows the same clear
+            path.
+          </p>
+        </div>
+
+        <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div
+            class="relative rounded-2xl border border-slate-100 bg-slate-50/60 p-6"
+          >
+            <span
+              class="grid h-11 w-11 place-items-center rounded-xl bg-brand-600 text-lg font-black text-white"
+              >1</span
+            >
+            <h3 class="mt-4 text-base font-extrabold text-slate-900">Refer</h3>
+            <p class="mt-1.5 text-sm leading-relaxed text-slate-600">
+              The referring doctor selects a receiving hospital, department, and
+              triage level and submits the referral packet.
+            </p>
+          </div>
+          <div
+            class="relative rounded-2xl border border-slate-100 bg-slate-50/60 p-6"
+          >
+            <span
+              class="grid h-11 w-11 place-items-center rounded-xl bg-brand-500 text-lg font-black text-white"
+              >2</span
+            >
+            <h3 class="mt-4 text-base font-extrabold text-slate-900">Alert</h3>
+            <p class="mt-1.5 text-sm leading-relaxed text-slate-600">
+              The receiving ER receives a pre-arrival alert with the triage
+              level, condition summary, and patient QR badge.
+            </p>
+          </div>
+          <div
+            class="relative rounded-2xl border border-slate-100 bg-slate-50/60 p-6"
+          >
+            <span
+              class="grid h-11 w-11 place-items-center rounded-xl bg-[#386fae] text-lg font-black text-white"
+              >3</span
+            >
+            <h3 class="mt-4 text-base font-extrabold text-slate-900">
+              Prepare
+            </h3>
+            <p class="mt-1.5 text-sm leading-relaxed text-slate-600">
+              The receiving team accepts the handoff and prepares the room,
+              staff, and equipment before arrival.
+            </p>
+          </div>
+          <div
+            class="relative rounded-2xl border border-slate-100 bg-slate-50/60 p-6"
+          >
+            <span
+              class="grid h-11 w-11 place-items-center rounded-xl bg-[#0f519e] text-lg font-black text-white"
+              >4</span
+            >
+            <h3 class="mt-4 text-base font-extrabold text-slate-900">
+              Arrive &amp; treat
+            </h3>
+            <p class="mt-1.5 text-sm leading-relaxed text-slate-600">
+              On arrival, the receiving team scans the QR badge for instant,
+              verified patient and referral details. No lost notes.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== EMERGENCY REFERRAL + TRIAGE ===================== -->
+    <section id="emergency" class="border-t border-white/10 bg-[#0f519e]">
+      <div class="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+        <div class="grid items-start gap-12 lg:grid-cols-2">
+          <div>
+            <span
+              class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-brand-100 ring-1 ring-white/15"
+            >
+              <span class="h-2 w-2 rounded-full bg-red-400"></span> Emergency
+              Referral
+            </span>
+            <h2
+              class="mt-4 text-3xl font-black tracking-tight text-white md:text-4xl"
+            >
+              Every second counts. Alert the ER before the ambulance arrives.
+            </h2>
+            <p class="mt-5 text-base leading-relaxed text-slate-300">
+              In an emergency, BADBAADO's fast-referral mode sends a critical
+              alert to the receiving hospital in under a minute. The ER sees the
+              triage level instantly and can confirm the bed before the patient
+              reaches the door.
+            </p>
+            <ul class="mt-6 space-y-3 text-sm text-slate-200">
+              <li class="flex items-center gap-3">
+                <span
+                  class="grid h-6 w-6 flex-none place-items-center rounded-full bg-brand-600 text-white"
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="h-3.5 w-3.5"
+                  >
+                    <path d="M20 6 9 17l-5-5" /></svg></span
+                >One-click emergency referral widget
+              </li>
+              <li class="flex items-center gap-3">
+                <span
+                  class="grid h-6 w-6 flex-none place-items-center rounded-full bg-brand-600 text-white"
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="h-3.5 w-3.5"
+                  >
+                    <path d="M20 6 9 17l-5-5" /></svg></span
+                >Live triage level shown to the receiving ER
+              </li>
+              <li class="flex items-center gap-3">
+                <span
+                  class="grid h-6 w-6 flex-none place-items-center rounded-full bg-brand-600 text-white"
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="h-3.5 w-3.5"
+                  >
+                    <path d="M20 6 9 17l-5-5" /></svg></span
+                >Accept &amp; prepare confirmation from the receiving team
+              </li>
+            </ul>
+            <a
+              href="emergency.html"
+              class="mt-7 inline-flex items-center gap-2 rounded-xl bg-red-500 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-red-500/25 transition hover:bg-red-600"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="h-4 w-4"
+              >
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+              </svg>
+              Open Emergency Console
+            </a>
+          </div>
+
+          <div>
+            <h3
+              class="text-xs font-bold uppercase tracking-widest text-brand-200"
+            >
+              Emergency Triage Levels
+            </h3>
+            <div class="mt-5 space-y-3">
+              <div class="flex items-start gap-3 rounded-2xl bg-white p-4">
+                <span
+                  class="grid h-10 w-10 flex-none place-items-center rounded-xl bg-red-500 text-lg font-black text-white"
+                  >I</span
+                >
+                <div>
+                  <p class="text-sm font-extrabold text-slate-900">
+                    Critical
+                    <span class="ml-1 text-xs font-bold text-red-600"
+                      >(Red)</span
+                    >
+                  </p>
+                  <p class="mt-0.5 text-xs leading-relaxed text-slate-500">
+                    Immediate, life-threatening condition. Requires rapid
+                    resuscitation — e.g. cardiac arrest, severe trauma.
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 rounded-2xl bg-white p-4">
+                <span
+                  class="grid h-10 w-10 flex-none place-items-center rounded-xl bg-orange-500 text-lg font-black text-white"
+                  >II</span
+                >
+                <div>
+                  <p class="text-sm font-extrabold text-slate-900">
+                    Emergent
+                    <span class="ml-1 text-xs font-bold text-orange-600"
+                      >(Orange)</span
+                    >
+                  </p>
+                  <p class="mt-0.5 text-xs leading-relaxed text-slate-500">
+                    Potentially life-threatening. Needs treatment within minutes
+                    — e.g. stroke, acute chest pain.
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 rounded-2xl bg-white p-4">
+                <span
+                  class="grid h-10 w-10 flex-none place-items-center rounded-xl bg-amber-400 text-lg font-black text-white"
+                  >III</span
+                >
+                <div>
+                  <p class="text-sm font-extrabold text-slate-900">
+                    Urgent
+                    <span class="ml-1 text-xs font-bold text-amber-600"
+                      >(Yellow)</span
+                    >
+                  </p>
+                  <p class="mt-0.5 text-xs leading-relaxed text-slate-500">
+                    Serious but stable. Should be treated as soon as possible —
+                    e.g. severe abdominal pain.
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 rounded-2xl bg-white p-4">
+                <span
+                  class="grid h-10 w-10 flex-none place-items-center rounded-xl bg-emerald-500 text-lg font-black text-white"
+                  >IV</span
+                >
+                <div>
+                  <p class="text-sm font-extrabold text-slate-900">
+                    Non-urgent
+                    <span class="ml-1 text-xs font-bold text-emerald-600"
+                      >(Green)</span
+                    >
+                  </p>
+                  <p class="mt-0.5 text-xs leading-relaxed text-slate-500">
+                    Minor condition. Can wait — e.g. minor cuts, routine
+                    follow-ups.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== WHY CHOOSE BADBAADO ===================== -->
+    <section id="why" class="bg-white">
+      <div class="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+        <div class="mx-auto max-w-2xl text-center">
+          <p class="text-xs font-bold uppercase tracking-widest text-brand-600">
+            Why Choose BADBAADO
+          </p>
+          <h2
+            class="mt-3 text-3xl font-black tracking-tight text-slate-900 md:text-4xl"
+          >
+            Built for the way hospitals actually work
+          </h2>
+        </div>
+
+        <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div class="rounded-2xl border border-slate-100 bg-slate-50/60 p-7">
+            <span
+              class="grid h-11 w-11 place-items-center rounded-xl bg-brand-600 text-white"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="h-5 w-5"
+              >
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </span>
+            <h3 class="mt-4 text-base font-extrabold text-slate-900">
+              Secure &amp; role-based
+            </h3>
+            <p class="mt-1.5 text-sm leading-relaxed text-slate-600">
+              Hospital accounts with role-based access keep patient data safe
+              and an audit trail clear.
+            </p>
+          </div>
+          <div class="rounded-2xl border border-slate-100 bg-slate-50/60 p-7">
+            <span
+              class="grid h-11 w-11 place-items-center rounded-xl bg-brand-400 text-white"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="h-5 w-5"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 6v6l4 2" />
+              </svg>
+            </span>
+            <h3 class="mt-4 text-base font-extrabold text-slate-900">
+              Referrals in minutes
+            </h3>
+            <p class="mt-1.5 text-sm leading-relaxed text-slate-600">
+              A structured two-minute form replaces long phone calls and
+              handwritten referral notes.
+            </p>
+          </div>
+          <div class="rounded-2xl border border-slate-100 bg-slate-50/60 p-7">
+            <span
+              class="grid h-11 w-11 place-items-center rounded-xl bg-[#386fae] text-white"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="h-5 w-5"
+              >
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+                <path d="M14 14h3v3h-3z" />
+                <path d="M21 14h.01" />
+              </svg>
+            </span>
+            <h3 class="mt-4 text-base font-extrabold text-slate-900">
+              Zero-touch handoff
+            </h3>
+            <p class="mt-1.5 text-sm leading-relaxed text-slate-600">
+              Each referral carries a scannable QR badge — one scan at the ER
+              gives the full patient picture.
+            </p>
+          </div>
+          <div class="rounded-2xl border border-slate-100 bg-slate-50/60 p-7">
+            <span
+              class="grid h-11 w-11 place-items-center rounded-xl bg-[#0f519e] text-white"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="h-5 w-5"
+              >
+                <path
+                  d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+                />
+                <path d="M12 9v4" />
+                <path d="M12 17h.01" />
+              </svg>
+            </span>
+            <h3 class="mt-4 text-base font-extrabold text-slate-900">
+              Pre-arrival alerts
+            </h3>
+            <p class="mt-1.5 text-sm leading-relaxed text-slate-600">
+              Critical cases alert the receiving ER while the ambulance is still
+              on the road.
+            </p>
+          </div>
+          <div class="rounded-2xl border border-slate-100 bg-slate-50/60 p-7">
+            <span
+              class="grid h-11 w-11 place-items-center rounded-xl bg-brand-700 text-white"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="h-5 w-5"
+              >
+                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+            </span>
+            <h3 class="mt-4 text-base font-extrabold text-slate-900">
+              Response accountability
+            </h3>
+            <p class="mt-1.5 text-sm leading-relaxed text-slate-600">
+              Accept &amp; prepare confirmations and status tracking make every
+              handoff traceable.
+            </p>
+          </div>
+          <div class="rounded-2xl border border-slate-100 bg-slate-50/60 p-7">
+            <span
+              class="grid h-11 w-11 place-items-center rounded-xl bg-brand-500 text-white"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="h-5 w-5"
+              >
+                <rect x="2" y="2" width="20" height="8" rx="2" />
+                <rect x="2" y="14" width="20" height="8" rx="2" />
+                <line x1="6" y1="6" x2="6.01" y2="6" />
+                <line x1="6" y1="18" x2="6.01" y2="18" />
+              </svg>
+            </span>
+            <h3 class="mt-4 text-base font-extrabold text-slate-900">
+              Works on any device
+            </h3>
+            <p class="mt-1.5 text-sm leading-relaxed text-slate-600">
+              Responsive design works on ER workstations, ward desktops, and
+              phones in the field.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== CONNECTED HOSPITALS ===================== -->
+    <section id="hospitals" class="border-t border-slate-100 bg-slate-50/50">
+      <div class="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+        <div class="mx-auto max-w-2xl text-center">
+          <p class="text-xs font-bold uppercase tracking-widest text-brand-600">
+            Connected Hospitals
+          </p>
+          <h2
+            class="mt-3 text-3xl font-black tracking-tight text-slate-900 md:text-4xl"
+          >
+            One network. Every hospital.
+          </h2>
+          <p class="mt-4 text-slate-600">
+            Referral and emergency teams share a single, always-on network.
+          </p>
+        </div>
+
+        <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div class="rounded-2xl border border-slate-100 bg-white p-5">
+            <span
+              class="grid h-9 w-9 place-items-center rounded-lg bg-brand-100 text-xs font-black text-brand-700"
+              >H01</span
+            >
+            <p class="mt-3 text-sm font-extrabold text-slate-900">
+              BIRDEM General Hospital
+            </p>
+            <p class="mt-0.5 text-xs font-semibold text-slate-400">
+              Shahbag, Dhaka
+            </p>
+            <span
+              class="mt-3 inline-block rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700"
+              >● ER available</span
+            >
+          </div>
+          <div class="rounded-2xl border border-slate-100 bg-white p-5">
+            <span
+              class="grid h-9 w-9 place-items-center rounded-lg bg-brand-100 text-xs font-black text-brand-700"
+              >H02</span
+            >
+            <p class="mt-3 text-sm font-extrabold text-slate-900">
+              Dhaka Medical College Hospital
+            </p>
+            <p class="mt-0.5 text-xs font-semibold text-slate-400">
+              Shahbag, Dhaka
+            </p>
+            <span
+              class="mt-3 inline-block rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700"
+              >● ER busy</span
+            >
+          </div>
+          <div class="rounded-2xl border border-slate-100 bg-white p-5">
+            <span
+              class="grid h-9 w-9 place-items-center rounded-lg bg-brand-100 text-xs font-black text-brand-700"
+              >H03</span
+            >
+            <p class="mt-3 text-sm font-extrabold text-slate-900">
+              Evercare Hospital Dhaka
+            </p>
+            <p class="mt-0.5 text-xs font-semibold text-slate-400">
+              Bashundhara R/A, Dhaka
+            </p>
+            <span
+              class="mt-3 inline-block rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700"
+              >● ER available</span
+            >
+          </div>
+          <div class="rounded-2xl border border-slate-100 bg-white p-5">
+            <span
+              class="grid h-9 w-9 place-items-center rounded-lg bg-brand-100 text-xs font-black text-brand-700"
+              >H04</span
+            >
+            <p class="mt-3 text-sm font-extrabold text-slate-900">
+              United Hospital Limited
+            </p>
+            <p class="mt-0.5 text-xs font-semibold text-slate-400">
+              Gulshan 2, Dhaka
+            </p>
+            <span
+              class="mt-3 inline-block rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700"
+              >● ER available</span
+            >
+          </div>
+          <div class="rounded-2xl border border-slate-100 bg-white p-5">
+            <span
+              class="grid h-9 w-9 place-items-center rounded-lg bg-brand-100 text-xs font-black text-brand-700"
+              >H05</span
+            >
+            <p class="mt-3 text-sm font-extrabold text-slate-900">
+              Labaid Cardiac Hospital
+            </p>
+            <p class="mt-0.5 text-xs font-semibold text-slate-400">
+              Dhanmondi, Dhaka
+            </p>
+            <span
+              class="mt-3 inline-block rounded-full bg-brand-50 px-2.5 py-1 text-[11px] font-bold text-brand-700"
+              >● Referral centre</span
+            >
+          </div>
+          <div class="rounded-2xl border border-slate-100 bg-white p-5">
+            <span
+              class="grid h-9 w-9 place-items-center rounded-lg bg-brand-100 text-xs font-black text-brand-700"
+              >H06</span
+            >
+            <p class="mt-3 text-sm font-extrabold text-slate-900">
+              Square Hospitals Ltd.
+            </p>
+            <p class="mt-0.5 text-xs font-semibold text-slate-400">
+              Panchlaish, Chattogram
+            </p>
+            <span
+              class="mt-3 inline-block rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700"
+              >● ER available</span
+            >
+          </div>
+          <div class="rounded-2xl border border-slate-100 bg-white p-5">
+            <span
+              class="grid h-9 w-9 place-items-center rounded-lg bg-brand-100 text-xs font-black text-brand-700"
+              >H07</span
+            >
+            <p class="mt-3 text-sm font-extrabold text-slate-900">
+              Chattogram Maa-O-Shishu Hospital
+            </p>
+            <p class="mt-0.5 text-xs font-semibold text-slate-400">
+              Agrabad, Chattogram
+            </p>
+            <span
+              class="mt-3 inline-block rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-500"
+              >● ER offline</span
+            >
+          </div>
+          <div class="rounded-2xl border border-slate-100 bg-white p-5">
+            <span
+              class="grid h-9 w-9 place-items-center rounded-lg bg-brand-100 text-xs font-black text-brand-700"
+              >H08</span
+            >
+            <p class="mt-3 text-sm font-extrabold text-slate-900">
+              Rajshahi Medical College Hospital
+            </p>
+            <p class="mt-0.5 text-xs font-semibold text-slate-400">
+              Laxmipur, Rajshahi
+            </p>
+            <span
+              class="mt-3 inline-block rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-500"
+              >● ER offline</span
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== CONTACT US ===================== -->
+    <section id="contact" class="bg-white">
+      <div class="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+        <div class="grid gap-12 lg:grid-cols-2">
+          <div>
+            <p
+              class="text-xs font-bold uppercase tracking-widest text-brand-600"
+            >
+              Contact Us
+            </p>
+            <h2
+              class="mt-3 text-3xl font-black tracking-tight text-slate-900 md:text-4xl"
+            >
+              Work with BADBAADO
+            </h2>
+            <p class="mt-4 max-w-md text-base leading-relaxed text-slate-600">
+              Want to join the network or demonstrate BADBAADO at your
+              programme? Reach out to the team and we'll get your hospital
+              onboard.
+            </p>
+
+            <div class="mt-8 space-y-4">
+              <div class="flex items-center gap-4">
+                <span
+                  class="grid h-11 w-11 flex-none place-items-center rounded-xl bg-brand-50 text-brand-700"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="h-5 w-5"
+                  >
+                    <path
+                      d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                    />
+                    <polyline points="22,6 12,13 2,6" />
+                  </svg>
+                </span>
+                <div>
+                  <p
+                    class="text-xs font-bold uppercase tracking-wide text-slate-400"
+                  >
+                    Email
+                  </p>
+                  <p class="text-sm font-semibold text-slate-800">
+                    hello@badbaado.org
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center gap-4">
+                <span
+                  class="grid h-11 w-11 flex-none place-items-center rounded-xl bg-brand-50 text-brand-700"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="h-5 w-5"
+                  >
+                    <path
+                      d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+                    />
+                  </svg>
+                </span>
+                <div>
+                  <p
+                    class="text-xs font-bold uppercase tracking-wide text-slate-400"
+                  >
+                    Phone
+                  </p>
+                  <p class="text-sm font-semibold text-slate-800">
+                    +252 770788346
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center gap-4">
+                <span
+                  class="grid h-11 w-11 flex-none place-items-center rounded-xl bg-brand-50 text-brand-700"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="h-5 w-5"
+                  >
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                </span>
+                <div>
+                  <p
+                    class="text-xs font-bold uppercase tracking-wide text-slate-400"
+                  >
+                    Address
+                  </p>
+                  <p class="text-sm font-semibold text-slate-800">
+                    Shahbag, Dhaka, Bangladesh
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-2xl border border-slate-100 bg-slate-50/60 p-7">
+            <h3 class="text-lg font-extrabold text-slate-900">
+              Send us a message
+            </h3>
+            <form id="contactForm" class="mt-5 space-y-4">
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label
+                    class="mb-1.5 block text-xs font-bold text-slate-600"
+                    for="cfName"
+                    >Full name</label
+                  >
+                  <input
+                    id="cfName"
+                    type="text"
+                    required
+                    placeholder="Dr. Amina Yusuf"
+                    class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
+                  />
+                </div>
+                <div>
+                  <label
+                    class="mb-1.5 block text-xs font-bold text-slate-600"
+                    for="cfHosp"
+                    >Hospital (optional)</label
+                  >
+                  <input
+                    id="cfHosp"
+                    type="text"
+                    placeholder="Your hospital"
+                    class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
+                  />
+                </div>
+              </div>
+              <div>
+                <label
+                  class="mb-1.5 block text-xs font-bold text-slate-600"
+                  for="cfEmail"
+                  >Email address</label
+                >
+                <input
+                  id="cfEmail"
+                  type="email"
+                  required
+                  placeholder="you@hospital.org"
+                  class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
+                />
+              </div>
+              <div>
+                <label
+                  class="mb-1.5 block text-xs font-bold text-slate-600"
+                  for="cfMsg"
+                  >Message</label
+                >
+                <textarea
+                  id="cfMsg"
+                  rows="4"
+                  required
+                  placeholder="Tell us how you'd like to work with BADBAADO..."
+                  class="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
+                ></textarea>
+              </div>
+              <button
+                type="submit"
+                class="w-full rounded-xl bg-brand-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-brand-600/25 transition hover:bg-brand-700"
+              >
+                Send message
+              </button>
+              <p
+                id="cfDone"
+                class="hidden rounded-xl bg-brand-50 px-4 py-3 text-sm font-semibold text-brand-700"
+              >
+                Thanks — our team will get back to you soon.
+              </p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="border-t border-slate-100 bg-slate-50/50">
+      <div class="mx-auto max-w-7xl px-5 py-12 lg:px-8">
+        <div class="grid gap-10 md:grid-cols-4">
+          <div class="md:col-span-2">
+            <a href="#home" class="flex items-center gap-2.5">
+              <img
+                src="assets/badbaado-logo.jpg"
+                alt="BADBAADO logo"
+                class="h-10 w-10 rounded-full object-cover ring-1 ring-slate-100"
+              />
+              <span class="text-lg font-black tracking-tight text-brand-700"
+                >BADBAADO</span
+              >
+            </a>
+            <p class="mt-4 max-w-sm text-sm leading-relaxed text-slate-500">
+              Inter-Hospital Referral &amp; Emergency Pre-Arrival Alert System.
+              Fast, secure, structured referrals — so the right team is ready
+              before the patient arrives.
+            </p>
+          </div>
+          <div>
+            <p
+              class="text-xs font-bold uppercase tracking-widest text-slate-400"
+            >
+              Platform
+            </p>
+            <ul class="mt-4 space-y-2.5 text-sm font-semibold text-slate-600">
+              <li>
+                <a href="login.html" class="transition hover:text-brand-700"
+                  >Sign In</a
+                >
+              </li>
+              <li>
+                <a href="emergency.html" class="transition hover:text-brand-700"
+                  >Emergency Console</a
+                >
+              </li>
+              <li>
+                <a href="referrals.html" class="transition hover:text-brand-700"
+                  >Live Referrals</a
+                >
+              </li>
+              <li>
+                <a href="hospitals.html" class="transition hover:text-brand-700"
+                  >Hospitals</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <p
+              class="text-xs font-bold uppercase tracking-widest text-slate-400"
+            >
+              Navigate
+            </p>
+            <ul class="mt-4 space-y-2.5 text-sm font-semibold text-slate-600">
+              <li>
+                <a href="#about" class="transition hover:text-brand-700"
+                  >About Us</a
+                >
+              </li>
+              <li>
+                <a href="#how" class="transition hover:text-brand-700"
+                  >How It Works</a
+                >
+              </li>
+              <li>
+                <a href="#emergency" class="transition hover:text-brand-700"
+                  >Emergency Referral</a
+                >
+              </li>
+              <li>
+                <a href="#contact" class="transition hover:text-brand-700"
+                  >Contact Us</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div
+          class="mt-10 flex flex-col items-center justify-between gap-3 border-t border-slate-200 pt-6 text-xs text-slate-500 sm:flex-row"
+        >
+          <span>© 2026 BADBAADO. University HealthTech project.</span>
+          <a
+            href="#home"
+            class="flex items-center gap-1.5 font-bold text-brand-700 transition hover:text-brand-800"
+          >
+            Back to top
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="h-3.5 w-3.5"
+            >
+              <path d="M12 19V5M5 12l7-7 7 7" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      var menuBtn = document.getElementById("menuBtn");
+      var mobileMenu = document.getElementById("mobileMenu");
+      if (menuBtn && mobileMenu) {
+        menuBtn.addEventListener("click", function () {
+          mobileMenu.classList.toggle("hidden");
+        });
+        mobileMenu.querySelectorAll("a").forEach(function (a) {
+          a.addEventListener("click", function () {
+            mobileMenu.classList.add("hidden");
+          });
+        });
+      }
+      var cf = document.getElementById("contactForm");
+      if (cf) {
+        cf.addEventListener("submit", function (e) {
+          e.preventDefault();
+          var done = document.getElementById("cfDone");
+          if (done) {
+            done.classList.remove("hidden");
+            cf.reset();
+            setTimeout(function () {
+              done.classList.add("hidden");
+            }, 5000);
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
