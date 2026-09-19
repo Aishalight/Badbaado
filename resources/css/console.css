@@ -1,0 +1,1366 @@
+/* ==========================================================================
+   BADBAADO: Cinematic console
+   --------------------------------------------------------------------------
+   Lifts the signed-in console onto the same design system as the marketing
+   site: same tokens, same glass, same motion. Scoped to .console-shell so it
+   never bleeds into other surfaces. Dark by default; flips with
+   `html.theme-light`.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ */
+/*  Surface + atmosphere                                               */
+/* ------------------------------------------------------------------ */
+
+.console-shell {
+    background-color: var(--m-bg) !important;
+    background-image: none !important;
+    color: var(--m-ink-soft);
+}
+
+.console-shell::before,
+.console-shell::after {
+    content: '';
+    position: fixed;
+    z-index: 0;
+    border-radius: 50%;
+    filter: blur(100px);
+    pointer-events: none;
+}
+
+.console-shell::before {
+    top: -20rem;
+    right: -14rem;
+    width: 42rem;
+    height: 42rem;
+    background: var(--m-orb-2);
+}
+
+.console-shell::after {
+    bottom: -22rem;
+    left: -12rem;
+    width: 46rem;
+    height: 46rem;
+    background: var(--m-orb-3);
+}
+
+.console-shell > .flex {
+    position: relative;
+    z-index: 1;
+}
+
+.console-shell ::selection {
+    background: rgb(var(--m-accent-rgb) / 30%);
+    color: var(--m-ink);
+}
+
+.console-shell ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+.console-shell ::-webkit-scrollbar-thumb {
+    background: var(--m-border-strong);
+    border: 3px solid transparent;
+    background-clip: content-box;
+    border-radius: 999px;
+}
+
+.console-shell ::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Sidebar                                                            */
+/* ------------------------------------------------------------------ */
+
+.console-shell .console-sidebar {
+    background: var(--m-header);
+    border-color: var(--m-border);
+    backdrop-filter: blur(24px) saturate(150%);
+    -webkit-backdrop-filter: blur(24px) saturate(150%);
+}
+
+.console-shell .console-sidebar .text-brand-950,
+.console-shell .console-sidebar .text-slate-800 {
+    color: var(--m-ink);
+}
+
+.console-shell .console-sidebar .text-accent-600 {
+    color: var(--m-accent);
+}
+
+.console-shell .console-sidebar .text-slate-400 {
+    color: var(--m-faint);
+}
+
+.console-shell .console-sidebar .ring-slate-200 {
+    --tw-ring-color: var(--m-border-strong);
+}
+
+.console-shell .console-sidebar .border-slate-100,
+.console-shell .console-sidebar .border-slate-200\/80 {
+    border-color: var(--m-border);
+}
+
+.console-shell .console-nav-link {
+    position: relative;
+    border-radius: 0.65rem;
+    color: var(--m-muted);
+    letter-spacing: 0.005em;
+    transition: color 0.3s var(--m-ease), background 0.3s var(--m-ease);
+}
+
+.console-shell .console-nav-link::before {
+    margin-right: 0.65rem;
+    background: var(--m-border-strong);
+    transition: background 0.3s var(--m-ease), box-shadow 0.3s var(--m-ease);
+}
+
+.console-shell .console-nav-link:hover {
+    background: var(--m-panel);
+    color: var(--m-ink);
+}
+
+.console-shell .console-nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    height: 55%;
+    width: 2px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, var(--m-accent), transparent);
+    opacity: 0;
+    transform: translateY(-50%);
+    transition: opacity 0.3s var(--m-ease);
+}
+
+.console-shell .console-nav-link.is-active {
+    background: linear-gradient(90deg, rgb(var(--m-accent-rgb) / 13%), transparent 78%);
+    color: var(--m-ink);
+    box-shadow: none;
+}
+
+.console-shell .console-nav-link.is-active::before {
+    background: var(--m-accent);
+    box-shadow: 0 0 8px rgb(var(--m-accent-rgb) / 70%);
+}
+
+.console-shell .console-nav-link.is-active::after {
+    opacity: 1;
+}
+
+/* Sidebar profile card */
+.console-shell .console-icon-btn {
+    border-color: var(--m-border-strong);
+    color: var(--m-ink);
+}
+
+.console-shell .console-icon-btn:hover {
+    background: var(--m-panel);
+    color: var(--m-ink);
+}
+
+.console-shell .console-profile {
+    background: var(--m-panel);
+    border-color: var(--m-border);
+}
+
+.console-shell .console-profile .text-slate-500 {
+    color: var(--m-muted);
+}
+
+.console-shell .console-profile .badge.bg-brand-50 {
+    background: rgb(var(--m-accent-rgb) / 14%);
+    color: var(--m-accent);
+}
+
+.console-shell .console-profile .border-white {
+    border-color: var(--m-border-strong);
+}
+
+/* Notifications badge in the sidebar */
+.console-shell .nav-badge {
+    background: var(--m-accent);
+    color: var(--m-on-accent);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Top bars                                                           */
+/* ------------------------------------------------------------------ */
+
+.console-shell .console-topbar {
+    background: var(--m-header);
+    border-color: var(--m-border);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+}
+
+.console-shell .console-topbar .text-brand-950 {
+    color: var(--m-ink);
+}
+
+.console-shell .console-topbar .text-accent-600 {
+    color: var(--m-accent);
+}
+
+.console-shell .console-topbar .ring-slate-200 {
+    --tw-ring-color: var(--m-border-strong);
+}
+
+.console-shell .console-topbar .bg-accent-100 {
+    background: rgb(var(--m-accent-rgb) / 16%);
+}
+
+.console-shell .console-topbar .text-accent-700 {
+    color: var(--m-accent);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Main content                                                       */
+/* ------------------------------------------------------------------ */
+
+.console-shell main {
+    background: transparent;
+}
+
+.console-shell .card,
+.console-shell .metric-card {
+    border: 1px solid var(--m-border);
+    border-radius: var(--m-radius);
+    background: var(--m-card);
+    box-shadow: inset 0 1px 0 var(--m-card-inset), var(--m-shadow);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+.console-shell .card:hover,
+.console-shell .card-hover:hover {
+    box-shadow: inset 0 1px 0 var(--m-card-inset), var(--m-shadow);
+    transform: translateY(-2px);
+    border-color: var(--m-border-strong);
+}
+
+.console-shell .metric-value {
+    color: var(--m-ink);
+}
+
+.console-shell .metric-label {
+    color: var(--m-muted);
+}
+
+.console-shell .page-heading {
+    color: var(--m-ink);
+    letter-spacing: -0.025em;
+}
+
+.console-shell .section-eyebrow {
+    color: var(--m-accent);
+    letter-spacing: 0.24em;
+}
+
+/* ==========================================================================
+   Dashboard & Analytics — Enterprise visual layer
+   -------------------------------------------------------------------------- */
+
+/* Dashboard surfaces */
+.dashboard-hero,
+.dashboard-alert,
+.dashboard-stat,
+.dashboard-queue,
+.analytics-panel {
+    border: 1px solid var(--m-border);
+    background: var(--m-card);
+    box-shadow: inset 0 1px 0 var(--m-card-inset), var(--m-shadow);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+/* Dashboard hero — refined hero with gradient accent */
+.dashboard-hero {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.75rem 2rem;
+    border-radius: var(--m-radius);
+    position: relative;
+    overflow: hidden;
+}
+.dashboard-hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--m-blue), var(--m-accent));
+    opacity: 0.7;
+}
+.dashboard-hero__greeting { margin: 0; }
+.dashboard-hero__greeting h1 { margin: 0; color: var(--m-ink); font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.2; }
+.dashboard-hero__greeting p { margin: 0.3rem 0 0; color: var(--m-muted); font-size: 0.875rem; }
+.dashboard-hero__actions { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
+
+/* Stat cards — enhanced with gradient top accent and hover lift */
+.dashboard-stat {
+    position: relative;
+    min-height: 10.5rem;
+    padding: 1.5rem;
+    border-radius: var(--m-radius-sm);
+    overflow: hidden;
+    cursor: default;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.dashboard-stat__value { margin: 0.5rem 0 0; color: var(--m-ink); font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; }
+.dashboard-stat__label { color: var(--m-muted); font-size: 0.8125rem; font-weight: 600; }
+
+.dashboard-stat::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-radius: var(--m-radius-sm) var(--m-radius-sm) 0 0;
+}
+.dashboard-stat--blue::before { background: var(--m-blue); }
+.dashboard-stat--cyan::before { background: var(--m-accent); }
+.dashboard-stat--red::before { background: #fb7185; }
+.dashboard-stat--amber::before { background: #fbbf24; }
+.dashboard-stat:hover { transform: translateY(-2px); box-shadow: inset 0 1px 0 var(--m-card-inset), 0 8px 24px rgba(0,0,0,0.08); }
+
+.dashboard-stat__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+.dashboard-stat__value { margin: 0; color: var(--m-ink); font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; }
+.dashboard-stat__label { color: var(--m-muted); font-size: 0.8125rem; font-weight: 600; }
+.dashboard-stat__trend { display: inline-flex; align-items: center; gap: 0.3rem; }
+.dashboard-stat__trend i { font-size: 0.625rem; }
+.dashboard-stat__trend--up { color: #34d399; }
+.dashboard-stat__trend--down { color: #fb7185; }
+.dashboard-stat__detail { margin-top: 0.75rem; color: var(--m-faint); font-size: 0.75rem; line-height: 1.5; }
+
+/* Stat icon — enhanced with subtle glow ring */
+.dashboard-stat__icon,
+.dashboard-alert__icon,
+.dashboard-empty__icon {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.75rem;
+    font-weight: 800;
+    position: relative;
+}
+.dashboard-stat__icon::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 1rem;
+    border: 2px solid transparent;
+    opacity: 0;
+    transition: opacity 0.25s ease, border-color 0.25s ease;
+}
+.dashboard-stat:hover .dashboard-stat__icon::after { opacity: 1; border-color: currentColor; }
+.dashboard-stat__icon--blue { background: rgb(var(--m-blue-rgb) / 14%); color: var(--m-blue); }
+.dashboard-stat__icon--cyan { background: rgb(var(--m-accent-rgb) / 14%); color: var(--m-accent); }
+.dashboard-stat__icon--red { background: rgb(var(--m-red-rgb) / 14%); color: #fb7185; }
+.dashboard-stat__icon--amber { background: rgb(245 158 11 / 14%); color: #fbbf24; }
+
+/* Alert — refined */
+.dashboard-alert {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1rem 1.25rem;
+    border-color: rgb(var(--m-red-rgb) / 35%);
+    border-radius: var(--m-radius-sm);
+    background: linear-gradient(135deg, rgb(var(--m-red-rgb) / 8%), var(--m-card));
+    color: var(--m-ink-soft);
+}
+.dashboard-alert__icon { width: 2.25rem; height: 2.25rem; background: rgb(var(--m-red-rgb) / 18%); color: #fb7185; }
+.dashboard-alert p { margin: 0; color: var(--m-muted); font-size: 0.8125rem; line-height: 1.5; }
+.dashboard-alert a { margin-left: auto; color: #fb7185; font-size: 0.8125rem; font-weight: 700; white-space: nowrap; transition: color 0.2s ease; }
+.dashboard-alert a:hover { color: #f87171; }
+.dashboard-section-title { color: var(--m-ink); font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; }
+.dashboard-section-subtitle { color: var(--m-muted); font-size: 0.8125rem; margin-top: 0.2rem; }
+
+/* Queue table — refined */
+.dashboard-queue { overflow: hidden; border-radius: var(--m-radius); }
+.dashboard-queue__head,
+.dashboard-queue__row { display: grid; grid-template-columns: minmax(0, 1fr) auto 7rem; align-items: center; gap: 1rem; }
+.dashboard-queue__head { padding: 0.8rem 1.25rem; border-bottom: 1px solid var(--m-border); color: var(--m-faint); font-size: 0.6875rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; background: var(--m-bg-soft); }
+.dashboard-queue__head span:nth-child(2) { text-align: center; }
+.dashboard-queue__head span:last-child { text-align: right; }
+.dashboard-queue__row { padding: 1rem 1.25rem; border-bottom: 1px solid var(--m-border); transition: background 0.2s ease, padding-left 0.2s ease; }
+.dashboard-queue li:last-child .dashboard-queue__row { border-bottom: 0; }
+.dashboard-queue__row:hover { background: rgb(var(--m-accent-rgb) / 5%); padding-left: 1.35rem; }
+.dashboard-patient { display: flex; min-width: 0; align-items: center; gap: 0.85rem; }
+.dashboard-patient__avatar { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; flex: 0 0 auto; border-radius: 0.75rem; background: linear-gradient(135deg, rgb(var(--m-accent-rgb) / 16%), rgb(var(--m-accent-rgb) / 6%)); color: var(--m-accent); font-weight: 800; font-size: 0.875rem; }
+.dashboard-patient strong { display: block; overflow: hidden; color: var(--m-ink); font-size: 0.875rem; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.dashboard-patient small { display: block; margin-top: 0.15rem; overflow: hidden; color: var(--m-muted); font-size: 0.72rem; text-overflow: ellipsis; white-space: nowrap; }
+.dashboard-patient small b { color: var(--m-accent); font-weight: 600; }
+.dashboard-queue time { color: var(--m-faint); font-size: 0.72rem; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Status pills in queue */
+.dashboard-queue .status-pill { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.03em; }
+.dashboard-queue .status-pill--pending { background: rgb(245 158 11 / 12%); color: #f59e0b; }
+.dashboard-queue .status-pill--active { background: rgb(var(--m-accent-rgb) / 12%); color: var(--m-accent); }
+.dashboard-queue .status-pill--completed { background: rgb(52 211 153 / 12%); color: #34d399; }
+.dashboard-queue .status-pill::before { content: ''; width: 0.375rem; height: 0.375rem; border-radius: 50%; background: currentColor; }
+
+.dashboard-empty { padding: 4rem 1.5rem; text-align: center; }
+.dashboard-empty__icon { margin: 0 auto; background: rgb(var(--m-accent-rgb) / 12%); color: var(--m-accent); }
+.dashboard-empty h2 { margin-top: 0.8rem; color: var(--m-ink); font-weight: 750; }
+.dashboard-empty p { margin-top: 0.3rem; color: var(--m-muted); font-size: 0.875rem; }
+
+/* ==========================================================================
+   Analytics — Refined panel styling
+   -------------------------------------------------------------------------- */
+.analytics-stat { position: relative; min-height: 11rem; padding: 1.5rem; overflow: hidden; border: 1px solid var(--m-border); border-radius: var(--m-radius-sm); background: var(--m-card); box-shadow: inset 0 1px 0 var(--m-card-inset), var(--m-shadow); transition: transform 0.25s ease, box-shadow 0.25s ease; }
+.analytics-stat:hover { transform: translateY(-2px); box-shadow: inset 0 1px 0 var(--m-card-inset), 0 8px 24px rgba(0,0,0,0.08); }
+.analytics-stat::after { content: ''; position: absolute; right: -2rem; bottom: -3rem; width: 8rem; height: 8rem; border-radius: 50%; background: var(--stat-glow, rgb(var(--m-accent-rgb) / 12%)); filter: blur(12px); opacity: 0.6; transition: opacity 0.3s ease, transform 0.3s ease; }
+.analytics-stat:hover::after { opacity: 0.9; transform: scale(1.15); }
+.analytics-stat--blue { --stat-glow: rgb(var(--m-blue-rgb) / 16%); }
+.analytics-stat--red { --stat-glow: rgb(var(--m-red-rgb) / 15%); }
+.analytics-stat--cyan { --stat-glow: rgb(var(--m-accent-rgb) / 15%); }
+.analytics-stat--violet { --stat-glow: rgb(var(--m-violet-rgb) / 15%); }
+.analytics-stat__icon { display: inline-grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 0.75rem; background: linear-gradient(135deg, rgb(var(--m-accent-rgb) / 16%), rgb(var(--m-accent-rgb) / 8%)); color: var(--m-accent); font-weight: 800; font-size: 0.75rem; }
+.analytics-stat__label { color: var(--m-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+.analytics-stat__value { margin: 0.4rem 0 0; color: var(--m-ink); font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; }
+.analytics-stat__note { margin-top: 0.6rem; color: var(--m-faint); font-size: 0.72rem; line-height: 1.5; }
+.analytics-stat__trend { display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.75rem; font-weight: 700; }
+.analytics-stat__trend--up { color: #34d399; }
+.analytics-stat__trend--down { color: #fb7185; }
+.analytics-panel { min-width: 0; border-radius: var(--m-radius); transition: box-shadow 0.3s ease; }
+.analytics-panel:hover { box-shadow: inset 0 1px 0 var(--m-card-inset), 0 4px 16px rgba(0,0,0,0.05); }
+.analytics-panel__header { padding: 1.5rem 1.75rem 0; }
+.analytics-panel__title { margin-top: 0.25rem; color: var(--m-ink); font-size: 1.05rem; font-weight: 750; }
+.analytics-panel__description { margin-top: 0.3rem; color: var(--m-faint); font-size: 0.8125rem; line-height: 1.5; }
+.analytics-chart { position: relative; padding: 1.25rem 1.75rem 1.5rem; }
+.analytics-chart--trend { height: 18rem; }
+.analytics-chart--status { height: 15rem; }
+.analytics-legend { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.65rem 1rem; padding: 0 1.75rem 1.5rem; color: var(--m-muted); font-size: 0.72rem; }
+.analytics-legend span { display: flex; align-items: center; gap: 0.45rem; min-width: 0; }
+.analytics-legend i { width: 0.5rem; height: 0.5rem; flex: 0 0 auto; border-radius: 50%; }
+.analytics-legend b { margin-left: auto; color: var(--m-ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* Chart container refinement */
+.analytics-panel canvas { border-radius: var(--m-radius-sm); }
+
+/* ==========================================================================
+   Button enhancements
+   -------------------------------------------------------------------------- */
+.btn-accent { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.6rem 1.25rem; border-radius: var(--m-radius-sm); border: none; background: linear-gradient(135deg, var(--m-blue), var(--m-accent)); color: #fff; font-size: 0.8125rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease; box-shadow: 0 2px 8px rgb(var(--m-blue-rgb) / 25%); }
+.btn-accent:hover { opacity: 0.92; transform: translateY(-1px); box-shadow: 0 4px 16px rgb(var(--m-blue-rgb) / 30%); }
+.btn-accent:active { transform: translateY(0); }
+.btn-accent:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.btn-ghost { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.6rem 1.25rem; border-radius: var(--m-radius-sm); border: 1px solid var(--m-border); background: transparent; color: var(--m-ink-soft); font-size: 0.8125rem; font-weight: 600; cursor: pointer; transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
+.btn-ghost:hover { background: var(--m-bg-soft); border-color: var(--m-accent); color: var(--m-accent); }
+.btn-ghost:active { background: rgb(var(--m-accent-rgb) / 5%); }
+
+.btn-sm { padding: 0.375rem 0.875rem; font-size: 0.75rem; }
+
+.btn-danger { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.6rem 1.25rem; border-radius: var(--m-radius-sm); border: 1px solid rgb(var(--m-red-rgb) / 30%); background: rgb(var(--m-red-rgb) / 8%); color: #fb7185; font-size: 0.8125rem; font-weight: 700; cursor: pointer; transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
+.btn-danger:hover { background: rgb(var(--m-red-rgb) / 15%); border-color: #fb7185; color: #f87171; }
+.btn-danger:active { background: rgb(var(--m-red-rgb) / 20%); }
+.btn-danger.btn-sm { padding: 0.375rem 0.875rem; font-size: 0.75rem; }
+
+/* ==========================================================================
+    Animations & micro-interactions
+    -------------------------------------------------------------------------- */
+@keyframes fadeSlideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse-glow { 0%, 100% { opacity: 0.6; } 50% { opacity: 0.9; } }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+.reveal { animation: fadeSlideUp 0.4s ease both; }
+.reveal:nth-child(2) { animation-delay: 0.05s; }
+.reveal:nth-child(3) { animation-delay: 0.1s; }
+.reveal:nth-child(4) { animation-delay: 0.15s; }
+.reveal:nth-child(5) { animation-delay: 0.2s; }
+
+.console-shell .badge { letter-spacing: 0.055em; }
+
+/* ==========================================================================
+   Reveal-on-scroll stays subtle inside the console
+   -------------------------------------------------------------------------- */
+.console-shell .reveal,
+.console-shell .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    animation: none !important;
+}
+
+@media (max-width: 640px) {
+    .dashboard-hero { align-items: stretch; flex-direction: column; padding: 1.25rem; }
+    .dashboard-hero__greeting h1 { font-size: 1.25rem; }
+    .dashboard-hero__actions { justify-content: flex-end; }
+    .dashboard-queue__head { display: none; }
+    .dashboard-queue__row { grid-template-columns: minmax(0, 1fr) 5rem; }
+    .dashboard-queue__row > div:nth-child(2) { display: none; }
+    .dashboard-stat { min-height: 9rem; padding: 1.25rem; }
+    .analytics-stat { min-height: 10rem; padding: 1.25rem; }
+    .analytics-panel__header { padding: 1.25rem 1.25rem 0; }
+    .analytics-chart { padding: 1rem 1.25rem 1.25rem; }
+    .analytics-legend { padding: 0 1.25rem 1.25rem; }
+    .dashboard-stat__value { font-size: 1.5rem; }
+    .analytics-stat__value { font-size: 1.5rem; }
+}
+
+.console-shell .badge {
+    letter-spacing: 0.055em;
+}
+
+/* Reveal-on-scroll stays subtle inside the console */
+.console-shell .reveal,
+.console-shell .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    filter: none;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Buttons                                                            */
+/* ------------------------------------------------------------------ */
+
+.console-shell .btn-primary,
+.console-shell .btn-accent {
+    border-radius: 999px;
+    background: linear-gradient(120deg, var(--m-accent), var(--m-blue));
+    color: var(--m-on-accent);
+    font-weight: 700;
+    box-shadow: 0 18px 40px -18px rgb(var(--m-accent-rgb) / 80%);
+    transition: transform 0.4s var(--m-ease), box-shadow 0.4s var(--m-ease), filter 0.4s var(--m-ease);
+}
+
+.console-shell .btn-primary:hover,
+.console-shell .btn-accent:hover {
+    transform: translateY(-2px);
+    filter: saturate(120%) brightness(106%);
+    box-shadow: 0 22px 50px -18px rgb(var(--m-accent-rgb) / 95%);
+}
+
+.console-shell .btn-secondary {
+    border-radius: 999px;
+    border: 1px solid var(--m-border-strong);
+    background: var(--m-panel);
+    color: var(--m-ink);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.console-shell .btn-secondary:hover {
+    background: var(--m-panel-2);
+    color: var(--m-ink);
+}
+
+.console-shell .btn-ghost {
+    color: var(--m-muted);
+}
+
+.console-shell .btn-ghost:hover {
+    background: var(--m-panel);
+    color: var(--m-ink);
+}
+
+.console-shell .btn-danger {
+    border-color: rgb(255 107 107 / 35%);
+    background: rgb(255 82 82 / 14%);
+    color: #ffb4b4;
+}
+
+.console-shell .btn-danger:hover {
+    background: rgb(255 82 82 / 22%);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Inputs                                                             */
+/* ------------------------------------------------------------------ */
+
+.console-shell .input {
+    border-radius: var(--m-radius-sm);
+    border: 1px solid var(--m-border);
+    background: var(--m-panel-soft);
+    color: var(--m-ink);
+    box-shadow: none;
+}
+
+.console-shell .input::placeholder {
+    color: var(--m-faint);
+}
+
+.console-shell .input:focus {
+    border-color: rgb(var(--m-accent-rgb) / 55%);
+    box-shadow: 0 0 0 4px rgb(var(--m-accent-rgb) / 14%);
+    background: var(--m-panel-2);
+}
+
+.console-shell .input-error {
+    border-color: rgb(255 107 107 / 55%);
+}
+
+.console-shell .label {
+    color: var(--m-ink-soft);
+}
+
+.console-shell .helper {
+    color: var(--m-muted);
+}
+
+.console-shell .kbd {
+    border-color: var(--m-border);
+    background: var(--m-panel);
+    color: var(--m-muted);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Text + border utility remaps                                       */
+/* ------------------------------------------------------------------ */
+
+.console-shell .text-brand-950,
+.console-shell .text-brand-900,
+.console-shell .text-slate-900,
+.console-shell .text-slate-800 {
+    color: var(--m-ink);
+}
+
+.console-shell .text-brand-800,
+.console-shell .text-brand-700,
+.console-shell .text-slate-700,
+.console-shell .text-slate-600 {
+    color: var(--m-ink-soft);
+}
+
+.console-shell .text-slate-500 {
+    color: var(--m-muted);
+}
+
+.console-shell .text-slate-400,
+.console-shell .text-slate-300 {
+    color: var(--m-faint);
+}
+
+.console-shell .text-brand-600,
+.console-shell .text-accent-600,
+.console-shell .text-accent-700 {
+    color: var(--m-accent);
+}
+
+.console-shell .text-red-800,
+.console-shell .text-red-700,
+.console-shell .text-red-600 {
+    color: #ffb4b4;
+}
+
+.console-shell .text-red-500,
+.console-shell .text-rose-600,
+.console-shell .text-rose-700 {
+    color: #fda4af;
+}
+
+.console-shell .border-slate-100,
+.console-shell .border-slate-100\/80,
+.console-shell .border-slate-200,
+.console-shell .border-slate-200\/80,
+.console-shell .border-brand-100,
+.console-shell .border-brand-200,
+.console-shell .border-slate-300 {
+    border-color: var(--m-border);
+}
+
+.console-shell .border-red-200,
+.console-shell .border-red-300 {
+    border-color: rgb(255 107 107 / 35%);
+}
+
+.console-shell .bg-white,
+.console-shell .bg-white\/80,
+.console-shell .bg-slate-50,
+.console-shell .bg-slate-100,
+.console-shell .bg-slate-200,
+.console-shell .bg-brand-50,
+.console-shell .bg-surface {
+    background-color: var(--m-panel-soft);
+}
+
+/* The console canvas should stay continuous; panels provide the contrast. */
+.console-shell .bg-surface {
+    background-color: transparent !important;
+}
+
+.console-shell .bg-red-50 {
+    background-color: rgb(255 82 82 / 12%);
+}
+
+.console-shell .bg-accent-50\/40,
+.console-shell .bg-brand-50\/40 {
+    background-color: rgb(var(--m-accent-rgb) / 8%);
+}
+
+.console-shell .hover\:bg-brand-50\/40:hover {
+    background-color: rgb(var(--m-accent-rgb) / 10%);
+}
+
+.console-shell .ring-slate-100,
+.console-shell .ring-slate-200,
+.console-shell .ring-brand-100 {
+    --tw-ring-color: var(--m-border-strong);
+}
+
+.console-shell .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+.console-shell .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+    border-color: var(--m-border);
+}
+
+.console-shell .bg-emerald-500 {
+    background-color: #34d399;
+}
+
+/* Tables */
+.console-shell table th {
+    color: var(--m-muted);
+    font-weight: 700;
+}
+
+.console-shell table td {
+    color: var(--m-ink-soft);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Status + urgency pills                                             */
+/* ------------------------------------------------------------------ */
+
+.console-shell .status-pill,
+.console-shell .urgency-pill {
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 6%) inset;
+}
+
+.console-shell .status-draft,
+.console-shell .status-cancelled {
+    background: rgb(255 255 255 / 6%);
+    color: var(--m-muted);
+}
+
+.console-shell .status-sent {
+    background: rgb(59 130 246 / 16%);
+    color: #93c5fd;
+}
+
+.console-shell .status-received {
+    background: rgb(34 211 238 / 14%);
+    color: #67e8f9;
+}
+
+.console-shell .status-under_review {
+    background: rgb(245 158 11 / 14%);
+    color: #fcd34d;
+}
+
+.console-shell .status-accepted,
+.console-shell .status-completed {
+    background: rgb(16 185 129 / 14%);
+    color: #6ee7b7;
+}
+
+.console-shell .status-transfer_in_progress {
+    background: rgb(249 115 22 / 14%);
+    color: #fdba74;
+}
+
+.console-shell .status-arrived {
+    background: rgb(139 92 246 / 14%);
+    color: #c4b5fd;
+}
+
+.console-shell .status-rejected {
+    background: rgb(239 68 68 / 14%);
+    color: #fca5a5;
+}
+
+.console-shell .urgency-critical {
+    background: rgb(239 68 68 / 14%);
+    color: #fca5a5;
+}
+
+.console-shell .urgency-emergent {
+    background: rgb(249 115 22 / 14%);
+    color: #fdba74;
+}
+
+.console-shell .urgency-urgent {
+    background: rgb(245 158 11 / 14%);
+    color: #fcd34d;
+}
+
+.console-shell .urgency-routine {
+    background: rgb(16 185 129 / 14%);
+    color: #6ee7b7;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Light theme refinements                                            */
+/* ------------------------------------------------------------------ */
+
+html.theme-light .console-shell {
+    color-scheme: light;
+}
+
+html.theme-light .console-shell .console-sidebar,
+html.theme-light .console-shell .console-topbar {
+    background: rgb(255 255 255 / 62%);
+}
+
+html.theme-light .console-shell .card,
+html.theme-light .console-shell .metric-card {
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 90%), var(--m-shadow);
+}
+
+html.theme-light .console-shell .text-red-800,
+html.theme-light .console-shell .text-red-700,
+html.theme-light .console-shell .text-red-600 {
+    color: #c53030;
+}
+
+html.theme-light .console-shell .text-red-500,
+html.theme-light .console-shell .text-rose-600,
+html.theme-light .console-shell .text-rose-700 {
+    color: #dc2626;
+}
+
+html.theme-light .console-shell .border-red-200,
+html.theme-light .console-shell .border-red-300 {
+    border-color: rgb(190 42 42 / 28%);
+}
+
+html.theme-light .console-shell .bg-red-50 {
+    background-color: rgb(190 42 42 / 7%);
+}
+
+html.theme-light .console-shell .status-pill,
+html.theme-light .console-shell .urgency-pill {
+    box-shadow: 0 0 0 1px rgb(8 47 88 / 8%) inset;
+}
+
+html.theme-light .console-shell .status-draft,
+html.theme-light .console-shell .status-cancelled {
+    background: #eef2f6;
+    color: #64748b;
+}
+
+html.theme-light .console-shell .status-sent {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+html.theme-light .console-shell .status-received {
+    background: #ecfeff;
+    color: #0891b2;
+}
+
+html.theme-light .console-shell .status-under_review {
+    background: #fffbeb;
+    color: #b45309;
+}
+
+html.theme-light .console-shell .status-accepted,
+html.theme-light .console-shell .status-completed {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+html.theme-light .console-shell .status-transfer_in_progress {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+html.theme-light .console-shell .status-arrived {
+    background: #f5f3ff;
+    color: #6d28d9;
+}
+
+html.theme-light .console-shell .status-rejected {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+html.theme-light .console-shell .urgency-critical {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+html.theme-light .console-shell .urgency-emergent {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+html.theme-light .console-shell .urgency-urgent {
+    background: #fffbeb;
+    color: #b45309;
+}
+
+html.theme-light .console-shell .urgency-routine {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+@media (min-width: 1024px) {
+    html.theme-light .console-shell .console-sidebar {
+        background: rgb(255 255 255 / 66%);
+    }
+}
+
+/* ==========================================================================
+   Command Center — platform operations layer
+   -------------------------------------------------------------------------- */
+
+/* Sidebar scroll region */
+.console-nav-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--m-border-strong) transparent;
+}
+
+.console-shell .console-nav-group {
+    color: var(--m-faint);
+}
+
+/* Dense operational tables */
+.console-shell .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8125rem;
+}
+
+.console-shell .data-table thead th {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--m-border);
+    background: var(--m-bg-soft);
+    color: var(--m-faint);
+    font-size: 0.6875rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.console-shell .data-table tbody td {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid var(--m-border);
+    vertical-align: middle;
+}
+
+.console-shell .data-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.console-shell .data-table tbody tr {
+    transition: background 0.2s ease;
+}
+
+.console-shell .data-table tbody tr:hover {
+    background: rgb(var(--m-accent-rgb) / 4%);
+}
+
+.console-shell .word { color: var(--m-ink); font-weight: 600; }
+.console-shell .soft { color: var(--m-muted); }
+.console-shell .faint { color: var(--m-faint); }
+.console-shell .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.75rem; font-variant-numeric: tabular-nums; }
+
+/* Toolbar / filter row */
+.console-shell .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.console-shell .filter-bar .input,
+.console-shell .filter-bar select.input {
+    min-width: 11rem;
+}
+
+/* Compact metric tiles for module rows */
+.console-shell .tile {
+    border: 1px solid var(--m-border);
+    border-radius: var(--m-radius-sm);
+    background: var(--m-card);
+    box-shadow: inset 0 1px 0 var(--m-card-inset);
+    padding: 1rem 1.1rem;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.console-shell .tile:hover {
+    transform: translateY(-2px);
+    border-color: var(--m-border-strong);
+}
+
+.console-shell .tile__label {
+    color: var(--m-muted);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+}
+
+.console-shell .tile__value {
+    margin-top: 0.35rem;
+    color: var(--m-ink);
+    font-size: 1.45rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+.console-shell .tile--accent { border-top: 2px solid var(--m-accent); }
+.console-shell .tile--blue { border-top: 2px solid var(--m-blue); }
+.console-shell .tile--red { border-top: 2px solid #fb7185; }
+.console-shell .tile--amber { border-top: 2px solid #fbbf24; }
+.console-shell .tile--green { border-top: 2px solid #34d399; }
+
+/* Health rows */
+.console-shell .health-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.9rem 1.15rem;
+    border-bottom: 1px solid var(--m-border);
+}
+
+.console-shell .health-row:last-child { border-bottom: 0; }
+
+.console-shell .health-dot {
+    width: 0.55rem;
+    height: 0.55rem;
+    flex: 0 0 auto;
+    border-radius: 50%;
+}
+
+.console-shell .health-dot--ok { background: #34d399; box-shadow: 0 0 8px rgb(52 211 153 / 60%); }
+.console-shell .health-dot--warn { background: #fbbf24; box-shadow: 0 0 8px rgb(251 191 36 / 60%); }
+.console-shell .health-dot--fail { background: #fb7185; box-shadow: 0 0 8px rgb(251 113 133 / 60%); }
+
+/* Timeline (audit / activity) */
+.console-shell .timeline { position: relative; margin-left: 0.75rem; padding-left: 1.5rem; }
+.console-shell .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.15rem;
+    bottom: 0.15rem;
+    width: 2px;
+    background: var(--m-border);
+    border-radius: 999px;
+}
+.console-shell .timeline-item { position: relative; padding: 0.75rem 0; }
+.console-shell .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1.5rem;
+    top: 1.05rem;
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 50%;
+    background: var(--m-panel-2);
+    border: 2px solid var(--m-accent);
+    transform: translateX(-50%);
+}
+.console-shell .timeline-item--danger::before { border-color: #fb7185; }
+.console-shell .timeline-item--warn::before { border-color: #fbbf24; }
+.console-shell .timeline-item--ok::before { border-color: #34d399; }
+
+/* Empty / loading states */
+.console-shell .empty-state {
+    padding: 3rem 1.5rem;
+    text-align: center;
+    color: var(--m-muted);
+}
+.console-shell .empty-state__icon {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    margin: 0 auto 0.8rem;
+    border-radius: 1rem;
+    background: rgb(var(--m-accent-rgb) / 12%);
+    color: var(--m-accent);
+    font-size: 1.25rem;
+    font-weight: 800;
+}
+
+/* Toast */
+.console-shell .toast-host {
+    position: fixed;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 80;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    pointer-events: none;
+}
+.console-shell .toast {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-width: 16rem;
+    max-width: 22rem;
+    padding: 0.8rem 1rem;
+    border-radius: var(--m-radius-sm);
+    background: var(--m-panel-2);
+    border: 1px solid var(--m-border-strong);
+    color: var(--m-ink);
+    box-shadow: var(--m-shadow);
+    font-size: 0.8125rem;
+    animation: fadeSlideUp 0.25s ease both;
+}
+.console-shell .toast--success { border-left: 3px solid #34d399; }
+.console-shell .toast--error { border-left: 3px solid #fb7185; }
+.console-shell .toast--info { border-left: 3px solid var(--m-accent); }
+
+/* Confirm dialog */
+.console-shell .dialog-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    display: grid;
+    place-items: center;
+    background: rgb(3 8 17 / 65%);
+    backdrop-filter: blur(4px);
+}
+html.theme-light .console-shell .dialog-backdrop { background: rgb(15 23 42 / 35%); }
+.console-shell .dialog {
+    width: min(92vw, 26rem);
+    padding: 1.5rem;
+    border-radius: var(--m-radius);
+    background: var(--m-card);
+    border: 1px solid var(--m-border-strong);
+    box-shadow: var(--m-shadow);
+    animation: fadeSlideUp 0.25s ease both;
+}
+.console-shell .dialog h3 { color: var(--m-ink); font-weight: 800; letter-spacing: -0.02em; }
+.console-shell .dialog p { color: var(--m-muted); font-size: 0.8125rem; line-height: 1.6; }
+
+/* Tab pills (CMS / config) */
+.console-shell .tab-pills {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+.console-shell .tab-pill {
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid var(--m-border);
+    background: transparent;
+    color: var(--m-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.console-shell .tab-pill:hover { border-color: var(--m-accent); color: var(--m-ink); }
+.console-shell .tab-pill.is-active {
+    background: rgb(var(--m-accent-rgb) / 14%);
+    border-color: rgb(var(--m-accent-rgb) / 40%);
+    color: var(--m-accent);
+}
+
+/* KV rows (config view) */
+.console-shell .kv-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--m-border);
+}
+.console-shell .kv-row:last-child { border-bottom: 0; }
+.console-shell .kv-row__key { color: var(--m-ink-soft); font-size: 0.8125rem; font-weight: 600; }
+.console-shell .kv-row__desc { color: var(--m-faint); font-size: 0.72rem; margin-top: 0.15rem; }
+
+/* Pagination */
+.console-shell .pager {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.console-shell .pager a,
+.console-shell .pager span {
+    display: inline-grid;
+    place-items: center;
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--m-border);
+    background: var(--m-panel-soft);
+    color: var(--m-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+.console-shell .pager a:hover { border-color: var(--m-accent); color: var(--m-accent); }
+.console-shell .pager .active { background: rgb(var(--m-accent-rgb) / 14%); border-color: rgb(var(--m-accent-rgb) / 40%); color: var(--m-accent); }
+.console-shell .pager .disabled { opacity: 0.4; pointer-events: none; }
+.console-shell .pager .ellipsis { border: 0; background: transparent; }
+
+/* Bar chart (mini, CSS only) */
+.console-shell .mini-bars {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.4rem;
+    height: 10rem;
+    padding-top: 0.5rem;
+}
+.console-shell .mini-bar {
+    flex: 1;
+    min-width: 0;
+    border-radius: 0.375rem 0.375rem 0 0;
+    background: linear-gradient(180deg, var(--m-accent), rgb(var(--m-accent-rgb) / 25%));
+    position: relative;
+    transition: filter 0.2s ease;
+}
+.console-shell .mini-bar:hover { filter: brightness(120%); }
+.console-shell .mini-bar--danger { background: linear-gradient(180deg, #fb7185, rgb(251 113 133 / 25%)); }
+.console-shell .mini-bars__labels {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.4rem;
+    margin-top: 0.4rem;
+}
+.console-shell .mini-bars__labels span {
+    flex: 1;
+    text-align: center;
+    color: var(--m-faint);
+    font-size: 0.625rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.console-shell .progress-track {
+    height: 0.5rem;
+    border-radius: 999px;
+    background: var(--m-panel-2);
+    overflow: hidden;
+}
+.console-shell .progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--m-blue), var(--m-accent));
+}
+
+/* ------------------------------------------------------------------ */
+/*  Mobile bottom navigation (tab bar + more sheet)                    */
+/* ------------------------------------------------------------------ */
+
+.console-shell .console-bottomnav {
+    background: color-mix(in srgb, var(--m-bg) 82%, transparent);
+    border-color: var(--m-border);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    box-shadow: 0 -1px 0 color-mix(in srgb, var(--m-border) 60%, transparent);
+    transition: transform 0.3s var(--m-ease);
+}
+
+.console-shell .console-bottomnav-item {
+    color: var(--m-faint);
+}
+
+.console-shell .console-bottomnav-item:hover {
+    color: var(--m-muted);
+}
+
+.console-shell .console-bottomnav-item.is-active {
+    color: var(--m-accent);
+}
+
+.console-shell .console-bottomnav-item.is-active::after {
+    content: '';
+    position: absolute;
+    bottom: 0.35rem;
+    left: 50%;
+    height: 3px;
+    width: 18px;
+    border-radius: 999px;
+    background: var(--m-accent);
+    transform: translateX(-50%);
+}
+
+/* More menu sheet */
+.console-shell .console-nav-backdrop {
+    background: rgb(3 8 17 / 65%);
+    backdrop-filter: blur(6px);
+}
+
+html.theme-light .console-shell .console-nav-backdrop {
+    background: rgb(15 23 42 / 35%);
+}
+
+.console-shell .console-nav-panel {
+    background: var(--m-card);
+    border-color: var(--m-border-strong);
+    box-shadow: inset 0 1px 0 var(--m-card-inset), var(--m-shadow);
+    animation: sheetSlideUp 0.32s var(--m-ease) both;
+}
+
+.console-shell .console-nav-panel .bg-white {
+    background: color-mix(in srgb, var(--m-bg) 88%, transparent);
+    border-color: var(--m-border);
+    backdrop-filter: blur(18px) saturate(150%) !important;
+}
+
+.console-shell .console-nav-panel .text-brand-950 {
+    color: var(--m-ink);
+}
+
+.console-shell .console-nav-panel .text-slate-400 {
+    color: var(--m-faint);
+}
+
+.console-shell .console-nav-panel .text-slate-600 {
+    color: var(--m-muted);
+}
+
+.console-shell .console-nav-panel .hover\:bg-slate-100:hover {
+    background: var(--m-card-inset);
+}
+
+.console-shell .console-nav-panel .bg-brand-50 {
+    background: rgb(var(--m-accent-rgb) / 13%);
+    color: var(--m-ink);
+}
+
+.console-shell .console-nav-panel .text-brand-700 {
+    color: var(--m-accent);
+}
+
+.console-shell .console-nav-panel .border-slate-200\/80 {
+    border-color: var(--m-border);
+}
+
+.console-shell .console-nav-panel .bg-red-50 {
+    background: rgb(var(--m-red-rgb) / 10%);
+}
+
+.console-shell .console-nav-panel .text-red-600 {
+    color: var(--m-accent);
+}
+
+@keyframes sheetSlideUp {
+    from {
+        transform: translateY(24px);
+        opacity: 0.6;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

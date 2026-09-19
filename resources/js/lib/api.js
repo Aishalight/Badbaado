@@ -1,23 +1,16 @@
-const TOKEN_KEY = 'badbaado_token';
+function getCsrfToken() {
+    const match = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]*)/);
 
-export function getToken() {
-    return sessionStorage.getItem(TOKEN_KEY);
-}
-
-export function setToken(token) {
-    sessionStorage.setItem(TOKEN_KEY, token);
-}
-
-export function clearToken() {
-    sessionStorage.removeItem(TOKEN_KEY);
+    return match ? decodeURIComponent(match[1]) : null;
 }
 
 async function raw(method, path, body) {
     const isFormData = body instanceof FormData;
     const headers = { Accept: 'application/json' };
     if (!isFormData) headers['Content-Type'] = 'application/json';
-    const token = getToken();
-    if (token) headers.Authorization = `Bearer ${token}`;
+
+    const csrfToken = getCsrfToken();
+    if (method !== 'GET' && csrfToken) headers['X-XSRF-TOKEN'] = csrfToken;
 
     const response = await fetch(`/api${path}`, {
         method,
@@ -33,7 +26,6 @@ async function raw(method, path, body) {
     }
 
     if (response.status === 401) {
-        clearToken();
         window.location.href = '/login';
         throw new Error('Your session has expired. Please sign in again.');
     }
@@ -52,11 +44,5 @@ export const api = {
     put: (path, body) => raw('PUT', path, body),
     patch: (path, body) => raw('PATCH', path, body),
     delete: (path) => raw('DELETE', path),
-    download: (path) => {
-        const headers = { Accept: 'application/octet-stream' };
-        const token = getToken();
-        if (token) headers.Authorization = `Bearer ${token}`;
-
-        return fetch(`/api${path}`, { headers });
-    },
+    download: (path) => fetch(`/api${path}`, { headers: { Accept: 'application/octet-stream' } }),
 };

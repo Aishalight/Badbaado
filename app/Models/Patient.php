@@ -20,6 +20,11 @@ class Patient extends Model
         'blood_group',
     ];
 
+    public function getFullNameAttribute(): string
+    {
+        return $this->name;
+    }
+
     public function referrals(): HasMany
     {
         return $this->hasMany(Referral::class);

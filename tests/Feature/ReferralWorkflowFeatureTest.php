@@ -45,7 +45,8 @@ class ReferralWorkflowFeatureTest extends TestCase
 
         $response->assertCreated()
             ->assertJsonPath('data.status', 'draft')
-            ->assertJsonPath('data.is_emergency', true);
+            ->assertJsonPath('data.is_emergency', true)
+            ->assertJsonPath('data.ai_suggestion.urgency', 'emergent');
 
         $this->assertDatabaseHas('patients', ['name' => 'Test Patient', 'age' => 61]);
         $this->assertDatabaseHas('referrals', [
@@ -58,6 +59,10 @@ class ReferralWorkflowFeatureTest extends TestCase
             'action' => 'referral_created',
             'user_id' => $worker->getKey(),
         ]);
+        $this->assertDatabaseHas('audit_logs', [
+            'action' => 'ai_urgency_suggested',
+            'user_id' => $worker->getKey(),
+        ]);
     }
 
     public function test_user_without_a_hospital_cannot_create_referral(): void
@@ -68,6 +73,23 @@ class ReferralWorkflowFeatureTest extends TestCase
         Sanctum::actingAs($admin);
 
         $this->postJson('/api/referrals', $this->validPayload())
+            ->assertForbidden();
+    }
+
+    public function test_hospital_admin_cannot_transition_a_referral(): void
+    {
+        $referring = Hospital::factory()->create();
+        $receiving = Hospital::factory()->create();
+        $admin = $this->staff($referring, 'hospital_admin');
+        $referral = Referral::factory()->create([
+            'referring_hospital_id' => $referring->getKey(),
+            'receiving_hospital_id' => $receiving->getKey(),
+            'status' => 'draft',
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $this->postJson("/api/referrals/{$referral->id}/transition", ['status' => 'sent'])
             ->assertForbidden();
     }
 
@@ -112,6 +134,31 @@ class ReferralWorkflowFeatureTest extends TestCase
             'user_id' => $receivingCoordinator->getKey(),
             'referral_id' => $created['id'],
             'type' => 'referral_sent',
+        ]);
+    }
+
+    public function test_sent_referral_is_assigned_to_a_receiving_hospital_healthcare_worker(): void
+    {
+        $referring = Hospital::factory()->create();
+        $receiving = Hospital::factory()->create();
+        $worker = $this->staff($referring, 'healthcare_worker');
+        $receivingWorker = $this->staff($receiving, 'healthcare_worker');
+
+        Sanctum::actingAs($worker);
+
+        $id = $this->postJson('/api/referrals', $this->validPayload([
+            'receiving_hospital_id' => $receiving->getKey(),
+        ]))->assertCreated()->json('data.id');
+
+        $this->postJson("/api/referrals/{$id}/transition", ['status' => 'sent'])
+            ->assertOk()
+            ->assertJsonPath('data.assigned_to.id', $receivingWorker->getKey())
+            ->assertJsonPath('data.assigned_to.hospital_id', $receiving->getKey())
+            ->assertJsonPath('data.assigned_to.role.slug', 'healthcare_worker');
+
+        $this->assertDatabaseHas('referrals', [
+            'id' => $id,
+            'assigned_to_user_id' => $receivingWorker->getKey(),
         ]);
     }
 

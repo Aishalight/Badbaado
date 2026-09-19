@@ -125,18 +125,19 @@ class AdminDashboardFeatureTest extends TestCase
         ])->assertForbidden();
     }
 
-    public function test_hospital_admin_list_sees_only_own_hospital_users(): void
+    public function test_hospital_admin_list_sees_only_own_hospital_users_without_admins(): void
     {
         $own = Hospital::factory()->create();
         $other = Hospital::factory()->create();
         $admin = $this->staff($own, 'hospital_admin');
-        $this->staff($own, 'healthcare_worker');
+        $worker = $this->staff($own, 'healthcare_worker');
         $this->staff($other, 'healthcare_worker');
 
         Sanctum::actingAs($admin);
 
         $response = $this->getJson('/api/admin/users')->assertOk();
-        $this->assertCount(2, $response->json('data'));
+        $this->assertCount(1, $response->json('data'));
+        $this->assertEquals($worker->id, $response->json('data.0.id'));
     }
 
     public function test_system_admin_can_create_hospital_but_hospital_admin_cannot(): void

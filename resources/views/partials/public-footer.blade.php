@@ -1,4 +1,4 @@
-<footer class="border-t border-slate-200/70 bg-white">
+<footer class="public-footer border-t border-slate-200/70">
     <div class="mx-auto max-w-6xl px-5 py-14 sm:px-6">
         <div class="grid gap-10 md:grid-cols-12">
             <div class="md:col-span-5">
@@ -14,7 +14,7 @@
                 </p>
                 <p class="mt-2 max-w-sm text-sm leading-relaxed text-slate-500">
                     A coordinated channel for inter-hospital referral, emergency pre-alert and safe
-                    transfer — so care continues across hospitals, without interruption.
+                    transfer, so care continues across hospitals, without interruption.
                 </p>
             </div>
 
@@ -47,7 +47,7 @@
         </div>
 
         <div class="mt-12 flex flex-col items-center justify-between gap-3 border-t border-slate-100 pt-6 text-xs text-slate-400 sm:flex-row">
-            <span>© {{ now()->year }} BADBAADO — Inter-hospital referral coordination. Demo build.</span>
+            <span>© {{ now()->year }} BADBAADO: Inter-hospital referral coordination. Demo build.</span>
             <span class="flex items-center gap-2">
                 <span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span>
                 Built for the space between healthcare facilities

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureHospitalAssignment;
+use App\Http\Middleware\EnsurePlatformOperational;
 use App\Http\Middleware\EnsureRole;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -15,6 +16,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->statefulApi();
+
+        $middleware->web(append: [
+            EnsurePlatformOperational::class,
+        ]);
+
         $middleware->alias([
             'role' => EnsureRole::class,
             'hospital' => EnsureHospitalAssignment::class,

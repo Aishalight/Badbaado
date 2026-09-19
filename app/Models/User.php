@@ -13,7 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password', 'hospital_id', 'role_id', 'title', 'phone', 'is_active'])]
+#[Fillable(['name', 'email', 'password', 'hospital_id', 'role_id', 'title', 'phone', 'avatar_path', 'is_active'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -47,6 +47,11 @@ class User extends Authenticatable
     public function referralsCreated(): HasMany
     {
         return $this->hasMany(Referral::class, 'referring_user_id');
+    }
+
+    public function referralsAssigned(): HasMany
+    {
+        return $this->hasMany(Referral::class, 'assigned_to_user_id');
     }
 
     public function referralsCoordinated(): HasMany

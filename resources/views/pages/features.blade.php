@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Features — BADBAADO')
+@section('title', 'Features: BADBAADO')
 
 @section('public')
 <main>
@@ -20,11 +20,11 @@
     {{-- FEATURE ROWS --}}
     <section class="mx-auto max-w-6xl space-y-6 px-5 pb-24 pt-6 sm:px-6">
         @foreach ([
-            ['Emergency pre-alert', 'When a clinician flags a referral as an emergency, a pre-alert fires to the receiving team immediately — before transport is even booked. The team briefs, books capacity, and prepares to receive.', null],
+            ['Emergency pre-alert', 'When a clinician flags a referral as an emergency, a pre-alert fires to the receiving team immediately, before transport is even booked. The team briefs, books capacity, and prepares to receive.', null],
             ['Structured handover', 'Vitals, consciousness, trauma indicators, existing conditions, current interventions, and symptoms arrive in one fixed format. Nothing important is left to memory or repeated phone calls.', 'shared'],
-            ['Referral-scoped messaging', 'Every referral carries its own discussion thread. Both hospitals ask, clarify, and update on the same record — context stays with the patient the whole way.', null],
+            ['Referral-scoped messaging', 'Every referral carries its own discussion thread. Both hospitals ask, clarify, and update on the same record, and context stays with the patient the whole way.', null],
             ['AI-assisted urgency suggestion', 'A suggestion calibrates urgency from the captured observations. It informs; it never decides. The human clinical decision is always shown with greater authority.', 'ai'],
-            ['Role-specific access', 'Health care workers, referral coordinators, and hospital admins each get an interface matched to their responsibility — enforced on every request.', 'shared'],
+            ['Role-specific access', 'Health care workers, referral coordinators, and hospital admins each get an interface matched to their responsibility, enforced on every request.', 'shared'],
             ['Audit-ready by design', 'Every creation, transition, and decision is written to an append-only audit log, giving administrators an exact record of what happened and when.', null],
         ] as $feat)
         <div class="card reveal p-8 sm:p-10">
@@ -42,7 +42,7 @@
                             <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">T-minus 14 min to arrival</span>
                         </div>
                         <div class="mt-3 text-sm text-slate-600">
-                            <span class="font-semibold text-slate-800">STEMI · 62/M</span> — cath-lab unlocked for Al-Hilal
+                            <span class="font-semibold text-slate-800">STEMI · 62/M</span>: cath-lab unlocked for Al-Hilal
                         </div>
                         <div class="mt-3 flex gap-2">
                             <span class="rounded-md bg-emerald-50 px-2 py-1 text-[11px] font-semibold text-emerald-700">Team briefed</span>
@@ -60,7 +60,7 @@
                         <p class="mt-1 text-xs text-slate-500">Structured observations indicate elevated urgency.</p>
                         <div class="mt-3 border-t border-slate-100 pt-3">
                             <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Human clinical decision</div>
-                            <div class="mt-2"><span class="urgency-pill bg-brand-50 text-brand-700">Critical</span> <span class="ml-1 text-xs font-medium text-slate-600">— overrides suggestion</span></div>
+                            <div class="mt-2"><span class="urgency-pill bg-brand-50 text-brand-700">Critical</span> <span class="ml-1 text-xs font-medium text-slate-600">overrides suggestion</span></div>
                         </div>
                     </div>
                     @else
@@ -98,7 +98,7 @@
             <div class="reveal reveal-delay-1 mt-12 grid gap-6 md:grid-cols-3">
                 @foreach ([
                     ['Authentication', 'Token-based sessions for every user; hospital staff can only reach data their own role and facility allow.'],
-                    ['Hospital isolation', 'Referrals are visible only to the referring and receiving hospitals — plus system administration. No cross-tenant leaks.'],
+                    ['Hospital isolation', 'Referrals are visible only to the referring and receiving hospitals, plus system administration. No cross-tenant leaks.'],
                     ['Accountability', 'Every action is logged with actor, timestamp and metadata in an append-only audit trail.'],
                 ] as $s)
                 <div class="card card-hover p-6">

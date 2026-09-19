@@ -31,6 +31,9 @@ class StoreHospitalRequest extends FormRequest
             'email' => ['nullable', 'email', 'max:255'],
             'level' => ['nullable', 'string', 'max:50'],
             'is_active' => ['sometimes', 'boolean'],
+            'admin_name' => ['nullable', 'string', 'max:255'],
+            'admin_email' => ['nullable', 'email', 'max:255', Rule::unique('users', 'email')],
+            'admin_password' => ['nullable', 'string', 'min:8'],
         ];
     }
 }

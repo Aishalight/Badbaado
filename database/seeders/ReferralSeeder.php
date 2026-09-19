@@ -83,8 +83,13 @@ class ReferralSeeder extends Seeder
                     $patient = $patients->random();
                     $hcw = User::where('hospital_id', $hospital->id)->whereRelation('role', 'slug', 'healthcare_worker')->first()
                         ?? User::where('hospital_id', $hospital->id)->first();
+                    $receivingUser = User::where('hospital_id', $targetHospital->id)
+                        ->where('is_active', true)
+                        ->whereRelation('role', 'slug', 'healthcare_worker')
+                        ->first()
+                        ?? User::where('hospital_id', $targetHospital->id)->where('is_active', true)->first();
 
-                    if (! $hcw) {
+                    if (! $hcw || ! $receivingUser) {
                         continue;
                     }
 
@@ -95,6 +100,7 @@ class ReferralSeeder extends Seeder
                         'referring_hospital_id' => $hospital->id,
                         'receiving_hospital_id' => $targetHospital->id,
                         'referring_user_id' => $hcw->id,
+                        'assigned_to_user_id' => $status === ReferralStatus::DRAFT ? null : $receivingUser->id,
                         'patient_id' => $patient->id,
                         'status' => $status,
                         'urgency' => $urgencies[array_rand($urgencies)],

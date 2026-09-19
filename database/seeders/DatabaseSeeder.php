@@ -19,6 +19,8 @@ class DatabaseSeeder extends Seeder
             HospitalSeeder::class,
             UserSeeder::class,
             ReferralSeeder::class,
+            CmsContentSeeder::class,
+            SystemSettingsSeeder::class,
         ]);
     }
 }

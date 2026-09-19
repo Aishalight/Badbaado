@@ -26,18 +26,13 @@ class ReferralController extends Controller
         $user = request()->user();
 
         $referrals = Referral::query()
-            ->when($user->hasRole('system_admin'), function ($query) {
-                return $query;
-            }, function ($query) use ($user) {
-                $query->where(function ($sub) use ($user) {
-                    $sub->where('referring_hospital_id', $user->hospital_id)
-                        ->orWhere('receiving_hospital_id', $user->hospital_id);
-                });
-            })
+            ->visibleTo($user)
             ->with([
                 'referringHospital',
                 'receivingHospital',
                 'referringUser:id,name,title',
+                'assignedTo:id,name,title,email,role_id',
+                'assignedTo.role',
                 'coordinator:id,name,title',
                 'patient',
             ])
@@ -68,6 +63,8 @@ class ReferralController extends Controller
             'referringHospital',
             'receivingHospital',
             'referringUser:id,name,title,email',
+            'assignedTo:id,name,title,email,role_id',
+            'assignedTo.role',
             'coordinator:id,name,title,email',
             'patient',
             'messages.sender:id,name,title',
@@ -94,6 +91,7 @@ class ReferralController extends Controller
             'referringHospital',
             'receivingHospital',
             'referringUser',
+            'assignedTo.role',
             'coordinator',
             'patient',
         ]));

@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'How it works — BADBAADO')
+@section('title', 'How it works: BADBAADO')
 
 @section('public')
 <main>
@@ -12,7 +12,7 @@
             </h1>
             <p class="reveal reveal-delay-2 mt-5 max-w-2xl text-lg leading-relaxed text-slate-600">
                 Every BADBAADO referral moves through the same structured pipeline. Each step is
-                visible to both hospitals, so everyone always knows where a patient stands — and
+                visible to both hospitals, so everyone always knows where a patient stands, and
                 what happens next.
             </p>
         </div>
@@ -25,7 +25,7 @@
             @foreach ([
                 ['Draft', 'The referring clinician starts a structured referral: patient details, clinical picture, vital signs, and what is being done right now.', 'Created by the referring hospital'],
                 ['Sent', 'The referral is transmitted to the destination hospital with the chosen urgency level. If flagged, an emergency pre-alert fires immediately.', 'Referring hospital → Receiving hospital'],
-                ['Received', 'The receiving team acknowledges the referral. The countdown begins — teams are now preparing in parallel with transport.', 'Receiving hospital'],
+                ['Received', 'The receiving team acknowledges the referral. The countdown begins, and teams are now preparing in parallel with transport.', 'Receiving hospital'],
                 ['Under review', 'The receiving clinician reviews the full clinical picture and the urgency suggestion before making a decision.', 'Receiving hospital'],
                 ['Accepted', 'The referral is accepted for admission. Bed, team and equipment are assigned, and both sides can see the plan.', 'Receiving hospital'],
                 ['Transfer in progress', 'The patient is en route. Ambulance status, handover notes and any clinical updates travel on the same thread.', 'Both hospitals'],
@@ -54,7 +54,7 @@
                 </div>
                 <p class="mt-3 text-sm leading-relaxed text-slate-600">
                     If the receiving team cannot accept, the referral is declined with a clear reason
-                    — so the referring team immediately knows why and can redirect without delay.
+                    , so the referring team immediately knows why and can redirect without delay.
                 </p>
             </div>
             <div class="card p-5">
@@ -80,7 +80,7 @@
                     </h2>
                     <p class="reveal reveal-delay-2 mt-4 max-w-lg leading-relaxed text-slate-600">
                         Every referral carries an urgency level that the receiving team sees instantly.
-                        A suggestion helps calibrate it from the vitals and clinical picture — but the
+                        A suggestion helps calibrate it from the vitals and clinical picture, but the
                         decision is always the clinician’s, with far more authority than any AI.
                     </p>
                 </div>

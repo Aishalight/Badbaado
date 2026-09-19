@@ -1,0 +1,127 @@
+/* ==========================================================================
+   BADBAADO: Cinematic theme tokens
+   --------------------------------------------------------------------------
+   One token set powers the whole experience: marketing site, sign-in and
+   the signed-in console. Dark is the default; a light "white paper" theme
+   is enabled by toggling `html.theme-light`, chosen via the header toggle
+   and persisted in localStorage.
+   ========================================================================== */
+
+:root {
+    --m-bg: #040b15;
+    --m-bg-2: #071a30;
+
+    --m-panel: rgb(255 255 255 / 4.5%);
+    --m-panel-2: rgb(255 255 255 / 8%);
+    --m-panel-soft: rgb(255 255 255 / 5%);
+    --m-border: rgb(255 255 255 / 9%);
+    --m-border-strong: rgb(255 255 255 / 18%);
+
+    --m-ink: #edf4fc;
+    --m-ink-soft: #c3d4e8;
+    --m-muted: #8a9cb5;
+    --m-faint: #61748d;
+
+    --m-accent: #4fd1e0;
+    --m-accent-2: #28b8cc;
+    --m-blue: #3b8fd4;
+    --m-violet: #7c7cf2;
+    --m-on-accent: #03121f;
+    --m-cyan-bright: #79b8ff;
+
+    --m-accent-rgb: 79 209 224;
+    --m-blue-rgb: 59 143 212;
+    --m-violet-rgb: 124 124 242;
+    --m-red-rgb: 239 68 68;
+
+    --m-radius: 20px;
+    --m-radius-sm: 12px;
+    --m-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --m-ease-soft: cubic-bezier(0.65, 0, 0.35, 1);
+
+    --m-card: linear-gradient(180deg, rgb(255 255 255 / 7%), rgb(255 255 255 / 2.5%));
+    --m-card-inset: rgb(255 255 255 / 7%);
+    --m-marker: rgb(5 15 28 / 90%);
+    --m-header: rgb(4 11 21 / 45%);
+    --m-header-scrolled: rgb(4 11 21 / 82%);
+    --m-footer: rgb(3 9 17 / 70%);
+    --m-menu: rgb(4 11 21 / 95%);
+    --m-shadow: 0 40px 90px -50px rgb(0 0 0 / 90%);
+
+    --m-grid-line: rgb(255 255 255 / 4%);
+    --m-grain-opacity: 0.5;
+    --m-orb-1: radial-gradient(circle, rgb(40 184 204 / 45%), transparent 62%);
+    --m-orb-2: radial-gradient(circle, rgb(59 143 212 / 40%), transparent 64%);
+    --m-orb-3: radial-gradient(circle, rgb(124 124 242 / 26%), transparent 66%);
+
+    color-scheme: dark;
+}
+
+html.theme-light {
+    --m-bg: #e9f1fa;
+    --m-bg-2: #d9e8f6;
+
+    --m-panel: rgb(255 255 255 / 72%);
+    --m-panel-2: rgb(255 255 255 / 92%);
+    --m-panel-soft: rgb(8 47 88 / 5%);
+    --m-border: rgb(8 47 88 / 12%);
+    --m-border-strong: rgb(8 47 88 / 22%);
+
+    --m-ink: #0a2138;
+    --m-ink-soft: #27466a;
+    --m-muted: #55708f;
+    --m-faint: #7d92ab;
+
+    --m-accent: #0c86a3;
+    --m-accent-2: #0e9bb5;
+    --m-blue: #1f6fc2;
+    --m-violet: #5d5bd6;
+    --m-on-accent: #05233c;
+    --m-cyan-bright: #3f78c8;
+
+    --m-accent-rgb: 12 134 163;
+    --m-blue-rgb: 44 96 178;
+    --m-violet-rgb: 112 110 216;
+    --m-red-rgb: 190 42 42;
+
+    --m-card: linear-gradient(180deg, rgb(255 255 255 / 96%), rgb(255 255 255 / 82%));
+    --m-card-inset: rgb(255 255 255 / 90%);
+    --m-marker: rgb(255 255 255 / 94%);
+    --m-header: rgb(233 241 250 / 55%);
+    --m-header-scrolled: rgb(239 245 252 / 86%);
+    --m-footer: rgb(255 255 255 / 72%);
+    --m-menu: rgb(248 251 254 / 96%);
+    --m-shadow: 0 40px 90px -50px rgb(8 47 88 / 32%);
+
+    --m-grid-line: rgb(8 47 88 / 6%);
+    --m-grain-opacity: 0.22;
+    --m-orb-1: radial-gradient(circle, rgb(24 158 187 / 24%), transparent 62%);
+    --m-orb-2: radial-gradient(circle, rgb(59 128 200 / 22%), transparent 64%);
+    --m-orb-3: radial-gradient(circle, rgb(150 120 240 / 16%), transparent 66%);
+
+    color-scheme: light;
+}
+
+/* Theme toggle icons: the moon shows in dark, the sun in light */
+[data-theme-icon='sun'] {
+    display: none;
+}
+
+html.theme-light [data-theme-icon='sun'] {
+    display: inline-flex;
+}
+
+html.theme-light [data-theme-icon='moon'] {
+    display: none;
+}
+
+/* Smooth transition when the theme flips (skipped for reduced motion) */
+@media (prefers-reduced-motion: no-preference) {
+    html.theme-ready body,
+    html.theme-ready .public-shell,
+    html.theme-ready .auth-shell,
+    html.theme-ready .console-shell {
+        transition: background-color 0.5s var(--m-ease), color 0.5s var(--m-ease),
+            border-color 0.5s var(--m-ease);
+    }
+}

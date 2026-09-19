@@ -62,7 +62,7 @@ export function statusLabel(status) {
 }
 
 export function formatDate(value) {
-    if (!value) return '—';
+    if (!value) return '-';
     return new Date(value).toLocaleString(undefined, {
         month: 'short',
         day: 'numeric',

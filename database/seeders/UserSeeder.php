@@ -76,9 +76,31 @@ class UserSeeder extends Seeder
                 continue;
             }
 
-            User::factory()->atHospital($hospital->id)->withRole('healthcare_worker')->count(3)->create();
-            User::factory()->atHospital($hospital->id)->withRole('referral_coordinator')->count(1)->create();
-            User::factory()->atHospital($hospital->id)->withRole('hospital_admin')->count(1)->create();
+            $emailPrefix = strtolower($hospital->code);
+
+            User::updateOrCreate(
+                ['email' => "admin@{$emailPrefix}.badbaado.bd"],
+                [
+                    'name' => "{$hospital->short_name} Hospital Admin",
+                    'title' => 'Hospital Administrator',
+                    'password' => Hash::make('password'),
+                    'hospital_id' => $hospital->id,
+                    'role_id' => $hospitalAdmin->id,
+                    'is_active' => true,
+                ]
+            );
+
+            User::updateOrCreate(
+                ['email' => "worker@{$emailPrefix}.badbaado.bd"],
+                [
+                    'name' => "{$hospital->short_name} Healthcare Worker",
+                    'title' => 'Healthcare Worker',
+                    'password' => Hash::make('password'),
+                    'hospital_id' => $hospital->id,
+                    'role_id' => $hcw->id,
+                    'is_active' => true,
+                ]
+            );
         }
     }
 }

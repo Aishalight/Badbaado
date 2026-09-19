@@ -18,6 +18,8 @@ class ReferralWorkflowService
         private readonly AuditLogger $auditLogger,
         private readonly ReferralNumberGenerator $referralNumberGenerator,
         private readonly ReferralNotifier $notifier,
+        private readonly UrgencySuggestionService $urgencySuggestion,
+        private readonly ReceivingOwnerAssigner $ownerAssigner,
     ) {}
 
     public function createReferral(User $user, array $data): Referral
@@ -51,11 +53,19 @@ class ReferralWorkflowService
                 'notes' => $data['notes'] ?? null,
             ]);
 
+            $referral->refresh();
+            $referral->update([
+                'ai_suggestion' => $this->urgencySuggestion->suggest($referral),
+            ]);
+
             $this->storeAttachments($user, $referral, $data['attachments'] ?? []);
 
             $this->auditLogger->record($user, 'referral_created', $referral, [
                 'referral_number' => $referral->referral_number,
                 'receiving_hospital_id' => $referral->receiving_hospital_id,
+            ]);
+            $this->auditLogger->record($user, 'ai_urgency_suggested', $referral, [
+                'suggestion' => $referral->ai_suggestion,
             ]);
 
             return $referral;
@@ -115,6 +125,17 @@ class ReferralWorkflowService
                 'status' => $next,
                 'rejection_reason' => $next === ReferralStatus::REJECTED ? $rejectionReason : null,
             ]);
+
+            if ($next === ReferralStatus::SENT) {
+                $owner = $this->ownerAssigner->assign($referral);
+
+                if ($owner !== null) {
+                    $this->auditLogger->record($user, 'referral_assigned', $referral, [
+                        'assigned_to_user_id' => $owner->getKey(),
+                        'assigned_to_hospital_id' => $owner->hospital_id,
+                    ]);
+                }
+            }
 
             $this->auditLogger->record($user, 'referral_status_changed', $referral, [
                 'from' => $previous->value,

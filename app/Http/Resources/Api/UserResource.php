@@ -20,6 +20,7 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'title' => $this->title,
             'phone' => $this->phone,
+            'avatar_url' => $this->avatar_path ? asset('storage/'.$this->avatar_path) : null,
             'is_active' => $this->is_active,
             'hospital_id' => $this->hospital_id,
             'role' => $this->whenLoaded('role', fn () => [

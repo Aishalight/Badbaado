@@ -22,10 +22,9 @@ class StoreAdminUserRequest extends FormRequest
      */
     public function rules(): array
     {
-        $allowedRoles = ['healthcare_worker', 'referral_coordinator', 'hospital_admin'];
-        if ($this->user()?->hasRole('system_admin')) {
-            $allowedRoles[] = 'system_admin';
-        }
+        $allowedRoles = $this->user()?->hasRole('system_admin')
+            ? ['hospital_admin']
+            : ['healthcare_worker', 'referral_coordinator'];
 
         return [
             'name' => ['required', 'string', 'max:255'],

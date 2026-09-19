@@ -54,29 +54,44 @@ class ReferralPolicy
 
     private function canSend(User $user, Referral $referral): bool
     {
-        return $user->hospital_id === $referral->referring_hospital_id
+        return $this->isReferralStaff($user)
+            && $user->hospital_id === $referral->referring_hospital_id
             && $referral->status === ReferralStatus::DRAFT;
     }
 
     private function canReceive(User $user, Referral $referral): bool
     {
-        return $user->hospital_id === $referral->receiving_hospital_id
+        return $this->isReferralStaff($user)
+            && $user->hospital_id === $referral->receiving_hospital_id
             && $referral->status === ReferralStatus::SENT;
     }
 
     private function isReceivingHospitalStaff(User $user, Referral $referral): bool
     {
-        return $user->hospital_id === $referral->receiving_hospital_id;
+        return $this->isReferralParticipant($user)
+            && $user->hospital_id === $referral->receiving_hospital_id;
     }
 
     private function isReferringHospitalStaff(User $user, Referral $referral): bool
     {
-        return $user->hospital_id === $referral->referring_hospital_id;
+        return $this->isReferralParticipant($user)
+            && $user->hospital_id === $referral->referring_hospital_id;
     }
 
     private function isInvolvedHospitalStaff(User $user, Referral $referral): bool
     {
-        return $user->hospital_id === $referral->referring_hospital_id
-            || $user->hospital_id === $referral->receiving_hospital_id;
+        return $this->isReferralParticipant($user)
+            && ($user->hospital_id === $referral->referring_hospital_id
+            || $user->hospital_id === $referral->receiving_hospital_id);
+    }
+
+    private function isReferralStaff(User $user): bool
+    {
+        return in_array($user->role?->slug, ['healthcare_worker', 'referral_coordinator'], true);
+    }
+
+    private function isReferralParticipant(User $user): bool
+    {
+        return in_array($user->role?->slug, ['healthcare_worker', 'referral_coordinator', 'hospital_admin'], true);
     }
 }

@@ -1,34 +1,26 @@
 import '../css/app.css';
-import { api } from './lib/api';
+import '../css/theme.css';
+import '../css/marketing.css';
 import { loginPage } from './pages/login';
-import { appShell } from './app-shell';
 import { renderToast } from './lib/toast';
 import { initReveal } from './lib/reveal';
+import { initCinematic } from './lib/cinematic';
 
 const boot = () => {
-    const hasToken = Boolean(sessionStorage.getItem('badbaado_token'));
+    const page = window.BADBAADO ?? {};
 
-    if (window.BADBAADO.loginOnly) {
+    if (page.loginOnly) {
         loginPage.init();
+        initCinematic();
         return;
     }
 
-    if (window.BADBAADO.publicPage) {
+    if (page.publicPage) {
         initReveal();
+        initCinematic();
         return;
     }
 
-    if (!hasToken) {
-        window.location.href = '/login';
-        return;
-    }
-
-    api.get('/me')
-        .then((user) => appShell.mount(user))
-        .catch(() => {
-            sessionStorage.removeItem('badbaado_token');
-            window.location.href = '/login';
-        });
 };
 
 document.addEventListener('DOMContentLoaded', boot);

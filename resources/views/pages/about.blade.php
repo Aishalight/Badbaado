@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'About — BADBAADO')
+@section('title', 'About: BADBAADO')
 
 @section('public')
 <main>
@@ -19,13 +19,13 @@
 
     {{-- STORY --}}
     <section class="mx-auto max-w-6xl px-5 pb-24 pt-6 sm:px-6">
-        <div class="relative overflow-hidden rounded-3xl border border-brand-100 bg-gradient-to-br from-brand-50 via-white to-accent-50 p-8 sm:p-12">
+        <div class="m-card relative overflow-hidden p-8 sm:p-12">
             <div class="brand-glow pointer-events-none absolute -bottom-32 -right-24 h-96 w-96 opacity-70"></div>
             <div class="relative max-w-2xl space-y-6">
                 @foreach ([
-                    ['The problem', 'Severe cases are still transferred between hospitals over phone calls, faxes, and paper. The clinical picture is repeated, fragmented, or lost — and the receiving team starts working blind.'],
+                    ['The problem', 'Severe cases are still transferred between hospitals over phone calls, faxes, and paper. The clinical picture is repeated, fragmented, or lost, and the receiving team starts working blind.'],
                     ['The idea', 'What if the information travelled ahead of the patient? What if every referral was structured, every urgency was explicit, and every hospital could see the same live picture?'],
-                    ['The build', 'That is what the BADBAADO team built: a coordinated referral and emergency pre-alert gateway — "Information arrives before the patient."'],
+                    ['The build', 'That is what the BADBAADO team built: a coordinated referral and emergency pre-alert gateway. "Information arrives before the patient."'],
                 ] as $i => $p)
                 <div class="flex gap-4 sm:gap-6">
                     <span class="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-xs font-extrabold text-brand-600 shadow-card ring-1 ring-brand-100">{{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }}</span>
@@ -69,7 +69,7 @@
             </h2>
             <p class="reveal reveal-delay-2 mt-4 text-slate-600">
                 A hackathon-born project built with full-stack precision: Laravel behind the API,
-                a modern JavaScript console in front, and a design language built around one idea —
+                a modern JavaScript console in front, and a design language built around one idea:
                 connection.
             </p>
         </div>
@@ -79,7 +79,7 @@
                 <h3 class="mt-5 text-lg font-extrabold text-brand-950">BADBAADO Team</h3>
                 <p class="mt-1 text-sm text-slate-500">Platform engineers &amp; designers</p>
                 <p class="mt-4 text-sm leading-relaxed text-slate-600">
-                    Architecture and product driven by the people who will actually use it —
+                    Architecture and product driven by the people who will actually use it.
                     clinicians coordinating care across the country’s hospitals.
                 </p>
                 <div class="mt-5 flex items-center justify-center gap-2">

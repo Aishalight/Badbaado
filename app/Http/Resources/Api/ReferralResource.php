@@ -39,6 +39,7 @@ class ReferralResource extends JsonResource
             'referring_hospital' => new HospitalResource($this->whenLoaded('referringHospital')),
             'receiving_hospital' => new HospitalResource($this->whenLoaded('receivingHospital')),
             'referring_user' => new UserResource($this->whenLoaded('referringUser')),
+            'assigned_to' => new UserResource($this->whenLoaded('assignedTo')),
             'coordinator' => new UserResource($this->whenLoaded('coordinator')),
             'patient' => $this->whenLoaded('patient'),
             'attachments' => $this->whenLoaded('attachments', fn () => $this->attachments->map(fn ($attachment) => [

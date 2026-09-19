@@ -11,10 +11,12 @@ class ReferralNotifier
 {
     public function notifyOnTransition(Referral $referral): void
     {
-        $referral->loadMissing(['referringHospital', 'receivingHospital']);
+        $referral->loadMissing(['assignedTo', 'referringHospital', 'receivingHospital']);
 
         match ($referral->status) {
-            ReferralStatus::SENT => $this->notifyReceivingStaff($referral, 'referral_sent', 'New referral received', $referral->referral_number.' — '.$referral->receivingHospital->short_name.' was referred'),
+            ReferralStatus::SENT => $referral->assignedTo
+                ? $this->notifyAssignee($referral, 'referral_sent', 'New referral assigned to you', $referral->referral_number.' was referred to '.$referral->receivingHospital->short_name.' and assigned to you')
+                : $this->notifyReceivingStaff($referral, 'referral_sent', 'New referral received', $referral->referral_number.' from '.$referral->referringHospital->short_name),
             ReferralStatus::RECEIVED => $this->notifyReferringStaff($referral, 'referral_received', 'Referral received', $referral->referral_number.' was acknowledged by '.$referral->receivingHospital->short_name),
             ReferralStatus::UNDER_REVIEW => $this->notifyCoordinator($referral, 'referral_under_review', 'Referral under review', $referral->referral_number.' is being reviewed by '.$referral->receivingHospital->short_name),
             ReferralStatus::ACCEPTED => $this->notifyReferringStaff($referral, 'referral_accepted', 'Referral accepted', $referral->referral_number.' was accepted for admission'),
@@ -38,6 +40,11 @@ class ReferralNotifier
             $title,
             $body,
         );
+    }
+
+    private function notifyAssignee(Referral $referral, string $type, string $title, string $body): void
+    {
+        $this->notifyUsers([$referral->assignedTo], $referral, $type, $title, $body);
     }
 
     private function notifyReferringStaff(Referral $referral, string $type, string $title, string $body): void
