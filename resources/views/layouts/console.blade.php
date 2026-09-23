@@ -130,7 +130,7 @@
 </head>
 <body class="console-shell min-h-full font-sans antialiased">
     <div class="flex min-h-screen">
-        <aside class="console-sidebar fixed inset-y-0 left-0 z-40 hidden h-screen w-64 shrink-0 flex-col border-r border-slate-200/80 bg-white lg:flex">
+        <aside class="console-sidebar fixed inset-y-0 left-0 z-40 hidden h-screen w-64 shrink-0 flex-col border-r border-slate-200/80 lg:flex">
             <a href="{{ route('dashboard') }}" class="flex items-center gap-3 border-b border-slate-100 px-6 py-5">
                 <img src="{{ asset('images/badbaado-logo.jpg') }}" alt="BADBAADO logo" class="h-9 w-9 rounded-[10px] ring-1 ring-slate-200">
                 <div><div class="text-sm font-extrabold tracking-tight text-brand-950">BADBAADO</div><div class="text-[10px] font-semibold uppercase tracking-[0.14em] text-accent-600">Connecting care</div></div>
@@ -155,7 +155,7 @@
             </div>
         </aside>
         <div class="flex min-w-0 flex-1 flex-col lg:pl-64">
-            <header class="console-topbar flex items-center justify-between border-b border-slate-200/80 bg-white px-4 py-3 lg:hidden">
+            <header class="console-topbar flex items-center justify-between border-b border-slate-200/80 px-4 py-3 lg:hidden">
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-2"><img src="{{ asset('images/badbaado-logo.jpg') }}" alt="BADBAADO logo" class="h-8 w-8 rounded-lg ring-1 ring-slate-200"><span class="text-sm font-extrabold text-brand-950">BADBAADO</span></a>
                 <div class="flex items-center gap-2">
                     <button type="button" data-theme-toggle aria-label="Toggle light and dark theme" class="console-icon-btn inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 text-brand-950 transition hover:bg-white/10">
@@ -168,9 +168,9 @@
                     </a>
                 </div>
             </header>
-            <header class="console-topbar hidden h-20 items-center justify-between border-b border-slate-200/80 bg-white px-8 lg:flex">
+            <header class="console-topbar hidden h-20 items-center justify-between border-b border-slate-200/80 px-8 lg:-ml-[16px] lg:-mt-px lg:flex">
                 <div><p class="text-[11px] font-bold uppercase tracking-[0.16em] text-accent-600">{{ $me->hospital?->name ?? 'National network' }}</p><h1 class="mt-1 text-lg font-extrabold tracking-tight text-brand-950">@yield('heading', 'Care console')</h1></div>
-                <div class="flex items-center gap-2"><button type="button" data-theme-toggle aria-label="Toggle light and dark theme" class="console-icon-btn inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-brand-950 transition hover:bg-white/10"><svg data-theme-icon="moon" viewBox="0 0 24 24" fill="none" class="h-4.5 w-4.5"><path d="M12 3a7.5 7.5 0 0 0 9 9 8.5 8.5 0 1 1-9-9Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg><svg data-theme-icon="sun" viewBox="0 0 24 24" fill="none" class="h-4.5 w-4.5"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button><a href="{{ route('settings.edit') }}" class="btn-ghost">Settings</a><a href="{{ route('notifications.index') }}" class="btn-ghost">Notifications @if($unread > 0)<span class="rounded-full bg-accent-100 px-1.5 text-[11px] text-accent-700">{{ $unread }}</span>@endif</a><a href="{{ route('referrals.create') }}" class="btn-accent">New referral</a></div>
+                <div class="flex items-center gap-2"><button type="button" data-theme-toggle aria-label="Toggle light and dark theme" class="console-icon-btn inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-brand-950 transition hover:bg-white/10"><svg data-theme-icon="moon" viewBox="0 0 24 24" fill="none" class="h-4.5 w-4.5"><path d="M12 3a7.5 7.5 0 0 0 9 9 8.5 8.5 0 1 1-9-9Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg><svg data-theme-icon="sun" viewBox="0 0 24 24" fill="none" class="h-4.5 w-4.5"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button><a href="{{ route('settings.edit') }}" class="btn-ghost">Settings</a><a href="{{ route('notifications.index') }}" class="btn-ghost">Notifications @if($unread > 0)<span class="rounded-full bg-accent-100 px-1.5 text-[11px] text-accent-700">{{ $unread }}</span>@endif</a>@can('create', \App\Models\Referral::class)<a href="{{ route('referrals.create') }}" class="btn-accent">New referral</a>@endcan</div>
             </header>
             <main class="min-w-0 flex-1 px-4 pt-6 pb-24 sm:px-6 lg:px-10 lg:pt-8 lg:pb-8"><div class="mx-auto w-full max-w-[1400px]">@yield('content')</div></main>
         </div>

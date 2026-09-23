@@ -26,7 +26,8 @@ class ReferralPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hospital_id !== null;
+        return $user->hospital_id !== null
+            && in_array($user->role?->slug, ['healthcare_worker', 'referral_coordinator'], true);
     }
 
     /**

@@ -36,6 +36,8 @@ class ReferralPageController extends Controller
 
     public function create(): View
     {
+        $this->authorize('create', Referral::class);
+
         $me = auth()->user();
         $hospitals = Hospital::query()
             ->where('is_active', true)

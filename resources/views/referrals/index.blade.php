@@ -18,10 +18,12 @@
                 <div class="section-eyebrow">Referrals</div>
                 <h1 class="page-heading mt-1">All referrals</h1>
             </div>
+            @can('create', \App\Models\Referral::class)
             <a href="{{ route('referrals.create') }}" class="btn btn-primary">
                 <svg viewBox="0 0 20 20" fill="none" class="h-4 w-4"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
                 New referral
             </a>
+            @endcan
         </div>
 
         <form method="GET" action="{{ route('referrals.index') }}" class="mt-5 flex flex-wrap items-center gap-3">

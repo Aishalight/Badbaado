@@ -41,7 +41,7 @@ class ReferralPolicyTest extends TestCase
         $this->assertTrue(Gate::forUser($admin)->allows('view', $referral));
     }
 
-    public function test_create_requires_a_hospital_assignment(): void
+    public function test_create_requires_a_hospital_assignment_and_referral_staff_role(): void
     {
         $this->role('system_admin');
         $admin = User::factory()->withRole('system_admin')->create();
@@ -50,6 +50,7 @@ class ReferralPolicyTest extends TestCase
 
         $hospital = Hospital::factory()->create();
         $this->assertTrue(Gate::forUser($this->staff($hospital, 'healthcare_worker'))->allows('create', Referral::class));
+        $this->assertFalse(Gate::forUser($this->staff($hospital, 'hospital_admin'))->allows('create', Referral::class));
     }
 
     public function test_send_and_cancel_require_the_referring_hospital(): void
