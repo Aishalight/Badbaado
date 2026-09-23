@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\StoreAdminUserRequest;
 use App\Http\Requests\Api\UpdateAdminUserRequest;
 use App\Http\Resources\Api\UserResource;
+use App\Models\Message;
+use App\Models\Referral;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\AuditLogger;
@@ -91,6 +93,15 @@ class AdminUserController extends Controller
 
         if ($user->is($actor)) {
             abort(422, 'You cannot delete your own account.');
+        }
+
+        $historyCount = Referral::where('referring_user_id', $user->id)
+            ->orWhere('coordinator_user_id', $user->id)
+            ->count()
+            + Message::where('sender_user_id', $user->id)->count();
+
+        if ($historyCount > 0) {
+            abort(422, 'This user has referral or message history and cannot be deleted. Deactivate them instead.');
         }
 
         $this->auditLogger->record($actor, 'user_deleted', $user, ['email' => $user->email]);

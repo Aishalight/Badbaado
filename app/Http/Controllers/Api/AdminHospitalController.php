@@ -7,6 +7,7 @@ use App\Http\Requests\Api\StoreHospitalRequest;
 use App\Http\Requests\Api\UpdateHospitalRequest;
 use App\Http\Resources\Api\HospitalResource;
 use App\Models\Hospital;
+use App\Models\Referral;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\AuditLogger;
@@ -57,6 +58,14 @@ class AdminHospitalController extends Controller
 
     public function destroy(Hospital $hospital): JsonResponse
     {
+        $referralCount = Referral::where('referring_hospital_id', $hospital->id)
+            ->orWhere('receiving_hospital_id', $hospital->id)
+            ->count();
+
+        if ($referralCount > 0) {
+            abort(422, 'This hospital has referral history and cannot be deleted. Deactivate it instead.');
+        }
+
         $this->auditLogger->record(request()->user(), 'hospital_deleted', $hospital, ['code' => $hospital->code]);
         $hospital->delete();
 

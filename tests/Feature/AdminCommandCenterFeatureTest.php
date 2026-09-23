@@ -8,6 +8,7 @@ use App\Models\Backup;
 use App\Models\CmsContent;
 use App\Models\Faq;
 use App\Models\Hospital;
+use App\Models\Message;
 use App\Models\Notification;
 use App\Models\Referral;
 use App\Models\SystemSetting;
@@ -332,5 +333,102 @@ class AdminCommandCenterFeatureTest extends TestCase
             ->get('/admin/alerts')
             ->assertOk()
             ->assertSee('Notice');
+    }
+
+    public function test_user_with_referral_history_cannot_be_deleted(): void
+    {
+        $admin = $this->systemAdmin();
+        $hospital = Hospital::factory()->create();
+        $target = $this->staff($hospital, 'hospital_admin');
+
+        Referral::factory()->create([
+            'referring_hospital_id' => $hospital->getKey(),
+            'receiving_hospital_id' => Hospital::factory()->create()->getKey(),
+            'referring_user_id' => $target->getKey(),
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $this->deleteJson("/api/admin/users/{$target->getKey()}")
+            ->assertStatus(422)
+            ->assertJsonPath('message', 'This user has referral or message history and cannot be deleted. Deactivate them instead.');
+
+        $this->assertDatabaseHas('users', ['id' => $target->getKey()]);
+        $this->assertDatabaseMissing('audit_logs', ['action' => 'user_deleted']);
+    }
+
+    public function test_user_who_sent_messages_cannot_be_deleted(): void
+    {
+        $admin = $this->systemAdmin();
+        $hospital = Hospital::factory()->create();
+        $target = $this->staff($hospital, 'hospital_admin');
+
+        $referral = Referral::factory()->create([
+            'referring_hospital_id' => $hospital->getKey(),
+            'receiving_hospital_id' => Hospital::factory()->create()->getKey(),
+            'referring_user_id' => $admin->getKey(),
+        ]);
+
+        Message::create([
+            'referral_id' => $referral->getKey(),
+            'sender_user_id' => $target->getKey(),
+            'body' => 'Please clarify the diagnosis.',
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $this->deleteJson("/api/admin/users/{$target->getKey()}")->assertStatus(422);
+        $this->assertDatabaseHas('users', ['id' => $target->getKey()]);
+    }
+
+    public function test_user_without_history_can_be_deleted_and_is_audited(): void
+    {
+        $admin = $this->systemAdmin();
+        $hospital = Hospital::factory()->create();
+        $target = $this->staff($hospital, 'hospital_admin');
+
+        Sanctum::actingAs($admin);
+
+        $this->deleteJson("/api/admin/users/{$target->getKey()}")
+            ->assertOk()
+            ->assertJsonPath('message', 'User deleted successfully');
+
+        $this->assertDatabaseMissing('users', ['id' => $target->getKey()]);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'user_deleted']);
+    }
+
+    public function test_hospital_with_referral_history_cannot_be_deleted(): void
+    {
+        $admin = $this->systemAdmin();
+        $hospital = Hospital::factory()->create();
+
+        Referral::factory()->create([
+            'referring_hospital_id' => $hospital->getKey(),
+            'receiving_hospital_id' => Hospital::factory()->create()->getKey(),
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $this->deleteJson("/api/admin/hospitals/{$hospital->getKey()}")
+            ->assertStatus(422)
+            ->assertJsonPath('message', 'This hospital has referral history and cannot be deleted. Deactivate it instead.');
+
+        $this->assertDatabaseHas('hospitals', ['id' => $hospital->getKey()]);
+        $this->assertDatabaseMissing('audit_logs', ['action' => 'hospital_deleted']);
+    }
+
+    public function test_hospital_without_history_can_be_deleted_and_is_audited(): void
+    {
+        $admin = $this->systemAdmin();
+        $hospital = Hospital::factory()->create();
+
+        Sanctum::actingAs($admin);
+
+        $this->deleteJson("/api/admin/hospitals/{$hospital->getKey()}")
+            ->assertOk()
+            ->assertJsonPath('message', 'Hospital deleted successfully');
+
+        $this->assertDatabaseMissing('hospitals', ['id' => $hospital->getKey()]);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'hospital_deleted']);
     }
 }
