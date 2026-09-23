@@ -44,6 +44,7 @@
     --m-marker: rgb(5 15 28 / 90%);
     --m-header: rgb(4 11 21 / 45%);
     --m-header-scrolled: rgb(4 11 21 / 82%);
+    --m-chrome: #081322;
     --m-footer: rgb(3 9 17 / 70%);
     --m-menu: rgb(4 11 21 / 95%);
     --m-shadow: 0 40px 90px -50px rgb(0 0 0 / 90%);
@@ -89,6 +90,7 @@ html.theme-light {
     --m-marker: rgb(255 255 255 / 94%);
     --m-header: rgb(233 241 250 / 55%);
     --m-header-scrolled: rgb(239 245 252 / 86%);
+    --m-chrome: #eef4fb;
     --m-footer: rgb(255 255 255 / 72%);
     --m-menu: rgb(248 251 254 / 96%);
     --m-shadow: 0 40px 90px -50px rgb(8 47 88 / 32%);

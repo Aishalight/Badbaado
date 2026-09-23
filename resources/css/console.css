@@ -74,10 +74,8 @@
 /* ------------------------------------------------------------------ */
 
 .console-shell .console-sidebar {
-    background: var(--m-header);
+    background: var(--m-chrome);
     border-color: var(--m-border);
-    backdrop-filter: blur(24px) saturate(150%);
-    -webkit-backdrop-filter: blur(24px) saturate(150%);
 }
 
 .console-shell .console-sidebar .text-brand-950,
@@ -190,10 +188,8 @@
 /* ------------------------------------------------------------------ */
 
 .console-shell .console-topbar {
-    background: var(--m-header);
+    background: var(--m-chrome);
     border-color: var(--m-border);
-    backdrop-filter: blur(20px) saturate(150%);
-    -webkit-backdrop-filter: blur(20px) saturate(150%);
 }
 
 .console-shell .console-topbar .text-brand-950 {
@@ -814,7 +810,7 @@ html.theme-light .console-shell {
 
 html.theme-light .console-shell .console-sidebar,
 html.theme-light .console-shell .console-topbar {
-    background: rgb(255 255 255 / 62%);
+    background: var(--m-chrome);
 }
 
 html.theme-light .console-shell .card,
@@ -908,12 +904,6 @@ html.theme-light .console-shell .urgency-urgent {
 html.theme-light .console-shell .urgency-routine {
     background: #ecfdf5;
     color: #047857;
-}
-
-@media (min-width: 1024px) {
-    html.theme-light .console-shell .console-sidebar {
-        background: rgb(255 255 255 / 66%);
-    }
 }
 
 /* ==========================================================================
