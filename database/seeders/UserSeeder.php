@@ -35,6 +35,10 @@ class UserSeeder extends Seeder
 
         $demoref = Hospital::where('code', 'AHL')->first();
 
+        if ($demoref === null) {
+            return;
+        }
+
         User::updateOrCreate(
             ['email' => 'dr.rahman@alhilal.bd'],
             [
