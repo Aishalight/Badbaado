@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Services\AuditLogger;
 use App\Services\SettingsService;
 use App\Support\AuditActions;
+use App\Support\EqualizesPasswordCheckTime;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -18,6 +19,8 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    use EqualizesPasswordCheckTime;
+
     public function __construct(
         private readonly AuditLogger $auditLogger,
         private readonly SettingsService $settingsService,
@@ -25,7 +28,7 @@ class AuthController extends Controller
 
     public function register(RegisterRequest $request): JsonResponse
     {
-        if (! $this->settingsService->get('auth.registration_enabled', true)) {
+        if (! $this->settingsService->get('auth.registration_enabled', false)) {
             throw ValidationException::withMessages([
                 'email' => ['Registration is currently disabled on the platform.'],
             ]);
@@ -57,6 +60,10 @@ class AuthController extends Controller
             ->first();
 
         if (! $user || ! Hash::check($request->validated('password'), $user->password)) {
+            if (! $user) {
+                $this->burnPasswordVerificationTime($request->validated('password'));
+            }
+
             $this->auditLogger->record(null, AuditActions::AUTH_LOGIN_FAILED, null, [
                 'email' => $request->validated('email'),
                 'reason' => 'invalid_credentials',

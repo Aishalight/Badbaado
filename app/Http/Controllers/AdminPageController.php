@@ -11,6 +11,7 @@ use App\Models\Notification;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\AnalyticsService;
+use App\Services\AuditLogger;
 use App\Services\BackupService;
 use App\Services\CmsService;
 use App\Services\ReferralMonitoringService;
@@ -19,7 +20,9 @@ use App\Services\SecurityService;
 use App\Services\SettingsService;
 use App\Services\SystemHealthService;
 use App\Support\AuditActions;
+use App\Support\DatabaseExpressions;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -34,6 +37,7 @@ class AdminPageController extends Controller
         private readonly BackupService $backups,
         private readonly CmsService $cms,
         private readonly SettingsService $settings,
+        private readonly AuditLogger $auditLogger,
     ) {}
 
     public function analytics(): View
@@ -180,11 +184,13 @@ class AdminPageController extends Controller
             ->when($filters['user_id'], fn ($query, int $userId) => $query->where('user_id', $userId))
             ->when($filters['from'], fn ($query, string $from) => $query->whereDate('created_at', '>=', $from))
             ->when($filters['to'], fn ($query, string $to) => $query->whereDate('created_at', '<=', $to))
-            ->when($filters['q'], fn ($query, string $q) => $query->where(function ($scope) use ($q) {
+            ->when($filters['q'], fn ($query, string $q) => $query->where(function ($scope) use ($q, $query) {
+                $metadata = DatabaseExpressions::jsonAsText($query, 'metadata');
+
                 $scope->where('action', 'like', "%{$q}%")
                     ->orWhere('entity_type', 'like', "%{$q}%")
                     ->orWhere('ip_address', 'like', "%{$q}%")
-                    ->orWhere('metadata', 'like', "%{$q}%");
+                    ->orWhere(DB::raw($metadata), 'like', "%{$q}%");
             }))
             ->with('user:id,name,title')
             ->orderByDesc('created_at')
@@ -238,14 +244,21 @@ class AdminPageController extends Controller
     {
         abort_unless(array_key_exists($report, $this->reports->available()), 404, 'Unknown report.');
 
-        return $this->reports->download($report, [
+        $filters = [
             'status' => $request->string('status')->toString() ?: null,
             'urgency' => $request->string('urgency')->toString() ?: null,
             'action' => $request->string('action')->toString() ?: null,
             'entity' => $request->string('entity')->toString() ?: null,
             'from' => $request->string('from')->toString() ?: null,
             'to' => $request->string('to')->toString() ?: null,
+        ];
+
+        $this->auditLogger->record($request->user(), AuditActions::REPORT_EXPORTED, null, [
+            'report' => $report,
+            'filters' => array_filter($filters),
         ]);
+
+        return $this->reports->download($report, $filters);
     }
 
     public function backups(): View
@@ -259,6 +272,10 @@ class AdminPageController extends Controller
     public function backupDownload(Backup $backup): StreamedResponse
     {
         $this->authorize('download', Backup::class);
+
+        $this->auditLogger->record(auth()->user(), AuditActions::BACKUP_DOWNLOADED, $backup, [
+            'file_name' => $backup->file_name,
+        ]);
 
         return $this->backups->download($backup);
     }

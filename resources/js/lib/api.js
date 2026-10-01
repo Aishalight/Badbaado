@@ -32,7 +32,14 @@ async function raw(method, path, body) {
 
     if (!response.ok) {
         const message = data?.message ?? `Request failed (${response.status})`;
-        throw new Error(message);
+        const error = new Error(message);
+
+        // Keep the per-field messages so forms can highlight the inputs that
+        // actually failed instead of showing one opaque banner.
+        error.errors = data?.errors ?? null;
+        error.status = response.status;
+
+        throw error;
     }
 
     return data;

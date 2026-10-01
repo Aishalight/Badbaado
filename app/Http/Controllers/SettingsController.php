@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UpdatePasswordRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Services\AuditLogger;
+use App\Services\SessionInvalidator;
 use App\Support\AuditActions;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
@@ -37,7 +38,7 @@ class SettingsController extends Controller
         return back()->with('status', 'Profile updated.');
     }
 
-    public function updatePassword(UpdatePasswordRequest $request): RedirectResponse
+    public function updatePassword(UpdatePasswordRequest $request, SessionInvalidator $sessions): RedirectResponse
     {
         $user = $request->user();
         $user->update(['password' => $request->validated('password')]);
@@ -47,6 +48,8 @@ class SettingsController extends Controller
             'source' => 'profile',
         ]);
 
-        return back()->with('status', 'Password updated.');
+        $sessions->invalidateOthers($request, $user);
+
+        return back()->with('status', 'Password updated. Other sessions have been signed out.');
     }
 }

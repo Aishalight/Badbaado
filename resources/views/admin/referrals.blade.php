@@ -44,7 +44,7 @@
             <div class="mt-5 space-y-4">
                 @foreach ($overview['urgency'] as $urgency => $count)
                     <div>
-                        <div class="flex items-center justify-between text-sm"><span class="soft">{{ \App\Enums\Urgency::tryFrom($urgency)?->label() ?? ucfirst($urgency) }}</span><span class="word mono">{{ $count }}</span></div>
+                        <div class="flex items-center justify-between text-sm"><span class="soft">{{ ReferralFormat::urgencyLabel($urgency) }}</span><span class="word mono">{{ $count }}</span></div>
                         <div class="progress-track mt-2"><div class="progress-fill" style="width: {{ round($count / max(1, collect($overview['urgency'])->max()) * 100) }}%"></div></div>
                     </div>
                 @endforeach
@@ -77,10 +77,14 @@
     <section class="card overflow-hidden">
         <div class="px-6 pt-6 flex flex-wrap items-end justify-between gap-4"><div><p class="section-eyebrow">Registry</p><h3 class="dashboard-section-title mt-1.5">All referrals</h3></div>
             <form class="filter-bar" method="GET">
-                <select class="input" name="status"><option value="">Any status</option>@foreach($statuses as $s)<option value="{{ $s }}" @selected($filters['status'] === $s)>{{ ReferralFormat::statusLabel($s) }}</option>@endforeach</select>
-                <select class="input" name="urgency"><option value="">Any urgency</option>@foreach($urgencies as $u)<option value="{{ $u }}" @selected($filters['urgency'] === $u)>{{ ucfirst($u) }}</option>@endforeach</select>
-                <select class="input" name="hospital_id"><option value="">Any hospital</option>@foreach($hospitals as $h)<option value="{{ $h->id }}" @selected($filters['hospital_id'] == $h->id)>{{ $h->name }}</option>@endforeach</select>
-                <input class="input" name="q" value="{{ $filters['q'] }}" placeholder="Search number or patient">
+                <label class="sr-only" for="admin-referral-status">Status</label>
+                <select id="admin-referral-status" class="input" name="status"><option value="">Any status</option>@foreach($statuses as $s)<option value="{{ $s }}" @selected($filters['status'] === $s)>{{ ReferralFormat::statusLabel($s) }}</option>@endforeach</select>
+                <label class="sr-only" for="admin-referral-urgency">Urgency</label>
+                <select id="admin-referral-urgency" class="input" name="urgency"><option value="">Any urgency</option>@foreach($urgencies as $u)<option value="{{ $u }}" @selected($filters['urgency'] === $u)>{{ ReferralFormat::urgencyLabel($u) }}</option>@endforeach</select>
+                <label class="sr-only" for="admin-referral-hospital">Hospital</label>
+                <select id="admin-referral-hospital" class="input" name="hospital_id"><option value="">Any hospital</option>@foreach($hospitals as $h)<option value="{{ $h->id }}" @selected($filters['hospital_id'] == $h->id)>{{ $h->name }}</option>@endforeach</select>
+                <label class="sr-only" for="admin-referral-search">Search</label>
+                <input id="admin-referral-search" class="input" name="q" value="{{ $filters['q'] }}" placeholder="Search number or patient">
                 <button class="btn-secondary btn-sm" type="submit">Filter</button>
                 @if($filters['status'] || $filters['urgency'] || $filters['hospital_id'] || $filters['q'])<a href="{{ route('admin.referrals') }}" class="btn-ghost btn-sm">Reset</a>@endif
             </form>

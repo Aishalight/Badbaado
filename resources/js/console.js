@@ -6,19 +6,28 @@ import { initThemeToggle } from './lib/cinematic';
 import { initDashboardCharts } from './pages/dashboard';
 
 const formData = (form) => new FormData(form);
-const showError = (error) => window.alert(error.message);
 
-function toast(message, type = 'info') {
+function toastHost() {
     let host = document.querySelector('.toast-host');
+
     if (! host) {
         host = document.createElement('div');
         host.className = 'toast-host';
         document.body.appendChild(host);
     }
+
+    host.setAttribute('role', 'status');
+    host.setAttribute('aria-live', 'polite');
+    host.setAttribute('aria-atomic', 'false');
+
+    return host;
+}
+
+function toast(message, type = 'info') {
     const el = document.createElement('div');
     el.className = `toast toast--${type}`;
     el.textContent = message;
-    host.appendChild(el);
+    toastHost().appendChild(el);
     window.setTimeout(() => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(4px)';
@@ -26,52 +35,264 @@ function toast(message, type = 'info') {
     }, 3500);
 }
 
-function confirmDialog(message, { title = 'Please confirm' } = {}) {
+const showError = (error) => toast(error.message, 'error');
+
+/**
+ * Laravel reports nested keys as `patient.name` / `attachments.0` while the
+ * matching control may be named `patient[name]`, `attachments[0]`, or
+ * `settings[auth.registration_enabled]`, so every plausible spelling is tried.
+ */
+const fieldSelectors = (field) => {
+    const root = field.split('.')[0];
+    const dotted = `[${field.replace(/\./g, '][')}]`;
+    const indexed = field.replace(/\.(\d+)/g, '[$1]');
+    const rootWrapped = field.replace(/\.(.+)/, '[$1]');
+
+    return [
+        `[name=${JSON.stringify(field)}]`,
+        `[name=${JSON.stringify(rootWrapped)}]`,
+        `[name=${JSON.stringify(indexed)}]`,
+        `[name=${JSON.stringify(`${root}[]`)}]`,
+        `[name=${JSON.stringify(dotted)}]`,
+        `[name=${JSON.stringify(`${dotted}[]`)}]`,
+    ];
+};
+
+/**
+ * Paints 422 field errors next to their inputs and returns the first offender so
+ * the caller can move focus there.
+ */
+function showFieldErrors(form, errors) {
+    form.querySelectorAll('[data-field-error]').forEach((node) => {
+        node.textContent = '';
+        node.removeAttribute('id');
+    });
+    form.querySelectorAll('[aria-invalid="true"]').forEach((node) => node.removeAttribute('aria-invalid'));
+    form.querySelectorAll('[aria-describedby]').forEach((node) => {
+        if (node.dataset.errorDescribedBy) node.removeAttribute('aria-describedby');
+    });
+
+    if (! errors) return null;
+
+    let first = null;
+
+    Object.entries(errors).forEach(([field, messages]) => {
+        if (field === 'message') return;
+
+        const input = fieldSelectors(field)
+            .map((selector) => form.querySelector(selector))
+            .find((node) => node);
+
+        if (! input) return;
+
+        input.setAttribute('aria-invalid', 'true');
+
+        const key = `field-error-${field.replace(/[^\w-]/g, '-')}`;
+        let holder = form.querySelector(`[data-field-error=${JSON.stringify(field)}]`);
+
+        if (! holder) {
+            holder = input.parentElement?.querySelector('[data-field-error]') ?? null;
+        }
+
+        if (! holder) {
+            holder = Object.assign(document.createElement('small'), {
+                className: 'field-error',
+                dataset: { fieldError: field },
+            });
+            input.insertAdjacentElement('afterend', holder);
+        }
+
+        holder.id = key;
+        holder.textContent = [].concat(messages).join(' ');
+
+        const describedBy = (input.getAttribute('aria-describedby') ?? '').split(/\s+/).filter(Boolean);
+        if (! describedBy.includes(key)) {
+            describedBy.push(key);
+            input.setAttribute('aria-describedby', describedBy.join(' '));
+            input.dataset.errorDescribedBy = 'true';
+        }
+
+        first ??= input;
+    });
+
+    return first;
+}
+
+const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+/**
+ * Accessible modal: focus moves in, Tab is trapped, Escape cancels, and focus
+ * returns to whatever opened it.
+ */
+function openDialog({ title, body, confirmLabel = 'Confirm', danger = false, input = null }) {
     return new Promise((resolve) => {
+        const opener = document.activeElement;
+        const titleId = `dialog-title-${Date.now()}`;
+
         const backdrop = document.createElement('div');
         backdrop.className = 'dialog-backdrop';
-        backdrop.innerHTML = `
-            <div class="dialog" role="dialog" aria-modal="true">
-                <h3>${title}</h3>
-                <p class="mt-2">${message}</p>
-                <div class="mt-5 flex justify-end gap-2">
-                    <button type="button" class="btn-ghost btn-sm" data-dialog-cancel>Cancel</button>
-                    <button type="button" class="btn-danger btn-sm" data-dialog-confirm>Confirm</button>
-                </div>
-            </div>`;
-        backdrop.addEventListener('click', (event) => {
-            if (event.target === backdrop) {
-                close(false);
-            }
+
+        const dialog = document.createElement('div');
+        dialog.className = 'dialog';
+        dialog.setAttribute('role', 'dialog');
+        dialog.setAttribute('aria-modal', 'true');
+        dialog.setAttribute('aria-labelledby', titleId);
+
+        const heading = document.createElement('h3');
+        heading.id = titleId;
+        heading.textContent = title;
+
+        const text = document.createElement('p');
+        text.className = 'mt-2';
+        text.textContent = body;
+
+        const actions = document.createElement('div');
+        actions.className = 'mt-5 flex justify-end gap-2';
+
+        const cancel = Object.assign(document.createElement('button'), {
+            type: 'button',
+            className: 'btn-ghost btn-sm',
+            textContent: 'Cancel',
         });
-        backdrop.querySelector('[data-dialog-cancel]').addEventListener('click', () => close(false));
-        backdrop.querySelector('[data-dialog-confirm]').addEventListener('click', () => close(true));
+
+        const confirm = Object.assign(document.createElement('button'), {
+            type: 'button',
+            className: danger ? 'btn-danger btn-sm' : 'btn-accent btn-sm',
+            textContent: confirmLabel,
+        });
+
+        let field = null;
+
+        if (input) {
+            const fieldId = `dialog-field-${Date.now()}`;
+
+            text.id = `${titleId}-body`;
+            dialog.setAttribute('aria-describedby', text.id);
+            dialog.append(heading, text);
+
+            dialog.append(heading, text);
+
+            const label = Object.assign(document.createElement('label'), {
+                htmlFor: fieldId,
+                className: 'mt-4 block text-sm font-semibold text-slate-700',
+                textContent: input.label ?? '',
+            });
+
+            field = Object.assign(document.createElement('textarea'), {
+                id: fieldId,
+                className: 'form-input mt-1 w-full',
+                rows: 3,
+                placeholder: input.placeholder ?? '',
+                name: 'dialog-input',
+            });
+
+            dialog.append(label, field);
+
+            if (input.hint) {
+                const hint = Object.assign(document.createElement('p'), {
+                    id: `${fieldId}-hint`,
+                    className: 'mt-1 text-xs text-slate-500',
+                    textContent: input.hint,
+                });
+
+                dialog.appendChild(hint);
+                dialog.setAttribute('aria-describedby', hint.id);
+            }
+
+            dialog.appendChild(actions);
+        } else {
+            text.id = `${titleId}-body`;
+            dialog.append(heading, text, actions);
+            dialog.setAttribute('aria-describedby', text.id);
+        }
+
+        actions.append(cancel, confirm);
+        backdrop.appendChild(dialog);
+
+        function onKeydown(event) {
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                close(input ? null : false);
+
+                return;
+            }
+
+            if (event.key !== 'Tab') return;
+
+            const focusable = [...dialog.querySelectorAll(FOCUSABLE)].filter((node) => ! node.disabled);
+            if (focusable.length === 0) return;
+
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (! event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        }
+
+        function close(value) {
+            document.removeEventListener('keydown', onKeydown);
+            backdrop.remove();
+            if (opener instanceof HTMLElement) opener.focus();
+            resolve(value);
+        }
+
+        cancel.addEventListener('click', () => close(input ? null : false));
+        confirm.addEventListener('click', () => close(input ? (field.value.trim() || null) : true));
+        backdrop.addEventListener('click', (event) => {
+            if (event.target === backdrop) close(input ? null : false);
+        });
+        document.addEventListener('keydown', onKeydown);
         document.body.appendChild(backdrop);
 
-        function close(confirmed) {
-            backdrop.remove();
-            resolve(confirmed);
-        }
+        (field ?? confirm).focus();
     });
 }
 
+const confirmDialog = (message, { title = 'Please confirm', confirmLabel = 'Confirm' } = {}) =>
+    openDialog({ title, body: message, confirmLabel, danger: true });
+
 async function submitReferral(form) {
     const button = document.querySelector('#referral-submit');
+    const banner = document.querySelector('#referral-error');
     button.disabled = true;
+    banner.classList.add('hidden');
     try {
         const result = await api.post('/referrals', formData(form));
         await api.post(`/referrals/${result.data.id}/transition`, { status: 'sent' });
         window.location.href = `/referrals/${result.data.id}`;
     } catch (error) {
-        document.querySelector('#referral-error').textContent = error.message;
-        document.querySelector('#referral-error').classList.remove('hidden');
+        const firstInvalid = showFieldErrors(form, error.errors);
+        banner.textContent = error.message;
+        banner.classList.remove('hidden');
         button.disabled = false;
+        if (firstInvalid) firstInvalid.focus();
     }
 }
 
+const DESTRUCTIVE_TRANSITIONS = {
+    rejected: 'Decline this referral? The referring hospital will be told it was not accepted.',
+    withdrawn: 'Withdraw this referral? The receiving team will lose it from their queue.',
+};
+
 async function transition(button) {
+    const next = button.dataset.transition;
+
+    if (DESTRUCTIVE_TRANSITIONS[next]) {
+        const confirmed = await confirmDialog(DESTRUCTIVE_TRANSITIONS[next], {
+            title: 'This cannot be undone',
+            confirmLabel: next === 'withdrawn' ? 'Withdraw referral' : 'Decline referral',
+        });
+
+        if (! confirmed) return;
+    }
+
     button.disabled = true;
-    try { await api.post(`/referrals/${button.dataset.referralId}/transition`, { status: button.dataset.transition }); window.location.reload(); } catch (error) { showError(error); button.disabled = false; }
+    try { await api.post(`/referrals/${button.dataset.referralId}/transition`, { status: next }); window.location.reload(); } catch (error) { showError(error); button.disabled = false; }
 }
 
 async function sendMessage(form) {
@@ -82,16 +303,32 @@ async function sendMessage(form) {
 }
 
 async function requestInformation(button) {
-    const body = window.prompt('What information should the referring hospital provide?');
-    if (!body?.trim()) return;
+    const body = await openDialog({
+        title: 'Request more information',
+        body: 'Describe what the referring hospital should send back before you can proceed.',
+        confirmLabel: 'Send request',
+        input: {
+            label: 'What do you need from the referring hospital?',
+            hint: 'Be specific so the receiving team can act on this quickly.',
+            placeholder: 'e.g. Latest ECG and troponin result',
+        },
+    });
+
+    if (! body) return;
+
     button.disabled = true;
-    try { await api.post(`/referrals/${button.dataset.referralId}/messages`, { body: `Information requested: ${body.trim()}` }); window.location.reload(); } catch (error) { showError(error); button.disabled = false; }
+    try { await api.post(`/referrals/${button.dataset.referralId}/messages`, { body: `Information requested: ${body}` }); window.location.reload(); } catch (error) { showError(error); button.disabled = false; }
 }
 
 async function submitAdminForm(form, endpoint) {
     const button = form.querySelector('button[type="submit"]');
     button.disabled = true;
-    try { await api.post(endpoint, formData(form)); window.location.reload(); } catch (error) { showError(error); button.disabled = false; }
+    try { await api.post(endpoint, formData(form)); window.location.reload(); } catch (error) {
+        const firstInvalid = showFieldErrors(form, error.errors);
+        toast(error.message, 'error');
+        button.disabled = false;
+        if (firstInvalid) firstInvalid.focus();
+    }
 }
 
 async function updateAdminResource(button, endpoint, payload) {
@@ -116,6 +353,67 @@ async function markAllNotificationsRead(button) {
     try { await api.post('/notifications/read-all'); window.location.reload(); } catch (error) { showError(error); button.disabled = false; }
 }
 
+function imagePreview(input) {
+    const target = input.parentElement.querySelector('[data-image-preview]');
+    if (! target || ! input.files?.length) return;
+    const url = URL.createObjectURL(input.files[0]);
+    target.replaceChildren(Object.assign(new Image(), { src: url, alt: '', class: 'h-full w-full object-cover' }));
+}
+
+async function uploadRowImage(button, endpoint, field) {
+    const row = button.closest('tr');
+    const input = row.querySelector(`input[type="file"][name="${field}"]`);
+    if (! input?.files?.length) {
+        toast('Choose an image first', 'error');
+        input?.focus();
+
+        return;
+    }
+
+    const original = button.textContent;
+    button.disabled = true;
+    button.textContent = 'Uploading…';
+    const payload = new FormData();
+    payload.append(field, input.files[0]);
+    try {
+        await api.patch(endpoint, payload);
+        toast('Image saved', 'success');
+        window.location.reload();
+    } catch (error) {
+        showError(error);
+        button.disabled = false;
+        button.textContent = original;
+    }
+}
+
+function initIntendedDoctorPicker() {
+    const hospital = document.querySelector('#hospital');
+    const doctor = document.querySelector('#intended-doctor');
+    const source = document.querySelector('#hospital-directory');
+    if (! hospital || ! doctor || ! source) return;
+
+    const directory = JSON.parse(source.textContent);
+
+    function render() {
+        const option = hospital.selectedOptions[0];
+        const entry = directory.find((item) => String(item.id) === option?.value);
+        doctor.replaceChildren(new Option("Leave unassigned — we'll auto-assign a care team", ''));
+
+        if (! entry) {
+            doctor.disabled = true;
+            return;
+        }
+
+        doctor.disabled = entry.doctors.length === 0;
+        entry.doctors.forEach((item) => {
+            doctor.append(new Option(item.title ? `${item.name} — ${item.title}` : item.name, String(item.id)));
+        });
+    }
+
+    hospital.addEventListener('change', render);
+    render();
+}
+
 function initAdminTabs() {
     document.querySelectorAll('[data-admin-tab]').forEach((pill) => {
         pill.addEventListener('click', () => {
@@ -129,13 +427,19 @@ function initAdminTabs() {
 async function createInlineResource(form, endpoint) {
     const button = form.querySelector('button[type="submit"]');
     button.disabled = true;
-    try { await api.post(endpoint, formData(form)); window.location.reload(); } catch (error) { showError(error); button.disabled = false; }
+    try { await api.post(endpoint, formData(form)); window.location.reload(); } catch (error) {
+        const firstInvalid = showFieldErrors(form, error.errors);
+        toast(error.message, 'error');
+        button.disabled = false;
+        if (firstInvalid) firstInvalid.focus();
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     initThemeToggle();
     initDashboardCharts();
     initAdminTabs();
+    initIntendedDoctorPicker();
     document.querySelector('#referral-form')?.addEventListener('submit', (event) => { event.preventDefault(); submitReferral(event.currentTarget); });
     document.querySelector('#is-emergency')?.addEventListener('change', (event) => {
         if (event.currentTarget.checked) {
@@ -154,7 +458,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const inputs = row.querySelectorAll('input, select');
         const data = {};
         inputs.forEach((input) => {
-            if (input.name) {
+            if (input.name && input.type !== 'file') {
                 if (input.type === 'checkbox') {
                     data[input.name] = input.checked;
                 } else {
@@ -171,6 +475,10 @@ document.addEventListener('DOMContentLoaded', () => {
         updateAdminResource(button, `/admin/users/${id}`, payload);
     }));
     document.querySelectorAll('[data-delete-user]').forEach((button) => button.addEventListener('click', () => deleteAdminResource(button, `/admin/users/${button.dataset.deleteUser}`)));
+    document.querySelectorAll('[data-upload-user-photo]').forEach((button) => button.addEventListener('click', () => uploadRowImage(button, `/admin/users/${button.dataset.uploadUserPhoto}`, 'avatar')));
+    document.querySelectorAll('[data-upload-hospital-logo]').forEach((button) => button.addEventListener('click', () => uploadRowImage(button, `/admin/hospitals/${button.dataset.uploadHospitalLogo}`, 'logo')));
+    document.querySelectorAll('#admin-user-form [data-image-input]').forEach((input) => input.addEventListener('change', () => imagePreview(input)));
+    document.querySelectorAll('#admin-hospital-form [data-image-input]').forEach((input) => input.addEventListener('change', () => imagePreview(input)));
     document.querySelectorAll('[data-update-hospital]').forEach((button) => button.addEventListener('click', () => {
         const row = button.closest('tr');
         const id = button.dataset.updateHospital;

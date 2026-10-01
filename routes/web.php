@@ -18,7 +18,7 @@ Route::get('/about', [PageController::class, 'about'])->name('about');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', LoginPageController::class)->name('login');
-    Route::post('/login', [SessionAuthController::class, 'login'])->name('login.attempt');
+    Route::post('/login', [SessionAuthController::class, 'login'])->middleware('throttle:login')->name('login.attempt');
 });
 
 Route::middleware('auth')->group(function () {
@@ -28,9 +28,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/settings/profile', [SettingsController::class, 'updateProfile'])->name('settings.profile.update');
     Route::patch('/settings/password', [SettingsController::class, 'updatePassword'])->name('settings.password.update');
 
-    Route::get('/referrals', [ReferralPageController::class, 'index'])->name('referrals.index');
-    Route::get('/referrals/new', [ReferralPageController::class, 'create'])->name('referrals.create');
-    Route::get('/referrals/{referral}', [ReferralPageController::class, 'show'])->name('referrals.show');
+    Route::get('/referrals', [ReferralPageController::class, 'index'])->middleware('hospital')->name('referrals.index');
+    Route::get('/referrals/new', [ReferralPageController::class, 'create'])->middleware('hospital')->name('referrals.create');
+    Route::get('/referrals/{referral}', [ReferralPageController::class, 'show'])->middleware('hospital')->name('referrals.show');
 
     Route::get('/notifications', NotificationPageController::class)->name('notifications.index');
 

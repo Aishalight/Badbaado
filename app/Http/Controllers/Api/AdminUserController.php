@@ -13,6 +13,8 @@ use App\Models\User;
 use App\Services\AuditLogger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class AdminUserController extends Controller
@@ -21,6 +23,8 @@ class AdminUserController extends Controller
 
     public function index(): AnonymousResourceCollection
     {
+        $this->authorize('viewAny', User::class);
+
         $user = request()->user();
         $isSystem = $user->hasRole('system_admin');
         $hospitalAdminRoleId = Role::where('slug', 'hospital_admin')->value('id');
@@ -42,14 +46,11 @@ class AdminUserController extends Controller
 
     public function store(StoreAdminUserRequest $request): UserResource
     {
+        $this->authorize('create', User::class);
+
         $actor = $request->user();
         $roleSlug = $request->validated('role_slug');
         $isSystem = $actor->hasRole('system_admin');
-        $hospitalAdminRoleId = Role::where('slug', 'hospital_admin')->value('id');
-
-        $role = Role::firstOrCreate(['slug' => $roleSlug], [
-            'name' => Str::title(str_replace('_', ' ', $roleSlug)),
-        ]);
 
         if ($isSystem && $roleSlug !== 'hospital_admin') {
             abort(403, 'System administrators can only create hospital administrators.');
@@ -57,6 +58,10 @@ class AdminUserController extends Controller
         if (! $isSystem && $roleSlug === 'hospital_admin') {
             abort(403, 'Hospital administrators cannot create other administrators.');
         }
+
+        $role = Role::firstOrCreate(['slug' => $roleSlug], [
+            'name' => Str::title(str_replace('_', ' ', $roleSlug)),
+        ]);
 
         $hospitalId = $actor->hasRole('system_admin')
             ? $request->validated('hospital_id')
@@ -66,6 +71,7 @@ class AdminUserController extends Controller
             'name' => $request->validated('name'),
             'email' => $request->validated('email'),
             'password' => $request->validated('password'),
+            'avatar_path' => $this->storeAvatar($request),
             'title' => $request->validated('title'),
             'phone' => $request->validated('phone'),
             'role_id' => $role->id,
@@ -84,16 +90,12 @@ class AdminUserController extends Controller
     public function destroy(User $user): JsonResponse
     {
         $actor = request()->user();
-        $isSystem = $actor->hasRole('system_admin');
-        $hospitalAdminRoleId = Role::where('slug', 'hospital_admin')->value('id');
-
-        if (! $isSystem && ($user->hasRole('system_admin') || $user->hospital_id !== $actor->hospital_id || $user->role_id === $hospitalAdminRoleId)) {
-            abort(403, 'You can only delete users of your own hospital.');
-        }
 
         if ($user->is($actor)) {
             abort(422, 'You cannot delete your own account.');
         }
+
+        $this->authorize('delete', $user);
 
         $historyCount = Referral::where('referring_user_id', $user->id)
             ->orWhere('coordinator_user_id', $user->id)
@@ -114,13 +116,8 @@ class AdminUserController extends Controller
     {
         $actor = $request->user();
         $isSystem = $actor->hasRole('system_admin');
-        $hospitalAdminRoleId = Role::where('slug', 'hospital_admin')->value('id');
 
-        if (! $isSystem) {
-            if ($user->hasRole('system_admin') || $user->hospital_id !== $actor->hospital_id || $user->role_id === $hospitalAdminRoleId) {
-                abort(403, 'You can only manage users of your own hospital.');
-            }
-        }
+        $this->authorize('update', $user);
 
         if ($user->is($actor) && $request->filled('is_active') && ! $request->boolean('is_active')) {
             abort(422, 'You cannot deactivate your own account.');
@@ -143,16 +140,17 @@ class AdminUserController extends Controller
 
         if ($request->filled('role_slug')) {
             $roleSlug = $request->validated('role_slug');
-            $role = Role::firstOrCreate(['slug' => $roleSlug], [
-                'name' => Str::title(str_replace('_', ' ', $roleSlug)),
-            ]);
+
             if ($isSystem && $roleSlug !== 'hospital_admin') {
                 abort(403, 'System administrators can only assign the hospital administrator role.');
             }
             if (! $isSystem && ($roleSlug === 'hospital_admin' || $roleSlug === 'system_admin')) {
                 abort(403, 'You cannot assign administrator roles.');
             }
-            $updates['role_id'] = $role->id;
+
+            $updates['role_id'] = Role::firstOrCreate(['slug' => $roleSlug], [
+                'name' => Str::title(str_replace('_', ' ', $roleSlug)),
+            ])->id;
         }
 
         if ($request->exists('hospital_id')) {
@@ -163,10 +161,33 @@ class AdminUserController extends Controller
             $updates['is_active'] = $request->boolean('is_active');
         }
 
+        if ($request->hasFile('avatar')) {
+            $this->deleteAvatar($user);
+            $updates['avatar_path'] = $this->storeAvatar($request);
+        }
+
         $user->update($updates);
 
         $this->auditLogger->record($request->user(), 'user_updated', $user, array_keys($updates));
 
         return new UserResource($user->fresh(['role', 'hospital']));
+    }
+
+    private function storeAvatar(StoreAdminUserRequest|UpdateAdminUserRequest $request): ?string
+    {
+        $avatar = $request->file('avatar');
+
+        if (! $avatar instanceof UploadedFile) {
+            return null;
+        }
+
+        return $avatar->store('avatars', 'public') ?: null;
+    }
+
+    private function deleteAvatar(User $user): void
+    {
+        if ($user->avatar_path !== null) {
+            Storage::disk('public')->delete($user->avatar_path);
+        }
     }
 }

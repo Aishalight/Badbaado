@@ -30,5 +30,13 @@ class AppServiceProvider extends ServiceProvider
                 Str::lower($request->string('email')).'|'.$request->ip()
             ));
         });
+
+        RateLimiter::for('api', function ($request) {
+            return Limit::perMinute(120)->by($request->user()?->getAuthIdentifier() ?: $request->ip());
+        });
+
+        RateLimiter::for('backups', function ($request) {
+            return Limit::perHour(6)->by($request->user()?->getAuthIdentifier() ?: $request->ip());
+        });
     }
 }

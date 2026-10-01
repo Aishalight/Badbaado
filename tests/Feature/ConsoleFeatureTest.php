@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Hospital;
 use App\Models\User;
+use App\Services\SettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Concerns\CreatesReferralStaff;
 use Tests\TestCase;
@@ -17,6 +18,7 @@ class ConsoleFeatureTest extends TestCase
     {
         $this->role('healthcare_worker');
         $this->role('system_admin');
+        app(SettingsService::class)->set('auth.registration_enabled', true, 'boolean');
 
         $this->postJson('/api/register', [
             'name' => 'Attempted Admin',
@@ -24,7 +26,8 @@ class ConsoleFeatureTest extends TestCase
             'password' => 'password',
             'password_confirmation' => 'password',
             'role_slug' => 'system_admin',
-        ])->assertUnprocessable();
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors('role_slug');
 
         $this->assertDatabaseMissing('users', ['email' => 'attempted.admin@example.com']);
     }

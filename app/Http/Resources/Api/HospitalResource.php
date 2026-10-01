@@ -20,6 +20,7 @@ class HospitalResource extends JsonResource
             'short_name' => $this->short_name,
             'code' => $this->code,
             'location' => $this->location,
+            'logo_url' => $this->logo_url,
             'phone' => $this->phone,
             'email' => $this->email,
             'level' => $this->level,

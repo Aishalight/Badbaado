@@ -10,13 +10,24 @@ use App\Models\ReferralAttachment;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Throwable;
 
 class ReferralWorkflowService
 {
+    /**
+     * Attachment paths written during the current createReferral() call, so a
+     * failed transaction does not leave unreferenced clinical files on disk.
+     *
+     * @var array<int, string>
+     */
+    private array $storedAttachmentPaths = [];
+
     public function __construct(
         private readonly AuditLogger $auditLogger,
         private readonly ReferralNumberGenerator $referralNumberGenerator,
+        private readonly PatientReferenceGenerator $patientReferenceGenerator,
         private readonly ReferralNotifier $notifier,
         private readonly UrgencySuggestionService $urgencySuggestion,
         private readonly ReceivingOwnerAssigner $ownerAssigner,
@@ -24,52 +35,75 @@ class ReferralWorkflowService
 
     public function createReferral(User $user, array $data): Referral
     {
-        return DB::transaction(function () use ($user, $data) {
-            $patient = Patient::create([
-                'name' => $data['patient']['name'],
-                'age' => $data['patient']['age'] ?? null,
-                'gender' => $data['patient']['gender'] ?? null,
-                'blood_group' => $data['patient']['blood_group'] ?? null,
-                'reference' => $this->generatePatientReference(),
-            ]);
+        $this->storedAttachmentPaths = [];
 
-            $referral = Referral::create([
-                'referral_number' => $this->referralNumberGenerator->generate(),
-                'referring_hospital_id' => $user->hospital_id,
-                'receiving_hospital_id' => $data['receiving_hospital_id'],
-                'referring_user_id' => $user->id,
-                'patient_id' => $patient->id,
-                'status' => ReferralStatus::DRAFT,
-                'urgency' => $data['urgency'] ?? null,
-                'is_emergency' => $data['is_emergency'] ?? false,
-                'department' => $data['department'],
-                'referral_reason' => $data['referral_reason'],
-                'symptoms' => $data['symptoms'] ?? null,
-                'vitals' => $data['vitals'] ?? null,
-                'consciousness' => $data['consciousness'] ?? null,
-                'trauma_indicator' => $data['trauma_indicator'] ?? false,
-                'existing_conditions' => $data['existing_conditions'] ?? null,
-                'current_interventions' => $data['current_interventions'] ?? null,
-                'notes' => $data['notes'] ?? null,
-            ]);
+        try {
+            return DB::transaction(function () use ($user, $data) {
+                $patient = Patient::create([
+                    'name' => $data['patient']['name'],
+                    'age' => $data['patient']['age'] ?? null,
+                    'gender' => $data['patient']['gender'] ?? null,
+                    'blood_group' => $data['patient']['blood_group'] ?? null,
+                    'reference' => $this->patientReferenceGenerator->generate(),
+                ]);
 
-            $referral->refresh();
-            $referral->update([
-                'ai_suggestion' => $this->urgencySuggestion->suggest($referral),
-            ]);
+                $referral = Referral::create([
+                    'referral_number' => $this->referralNumberGenerator->generate(),
+                    'referring_hospital_id' => $user->hospital_id,
+                    'receiving_hospital_id' => $data['receiving_hospital_id'],
+                    'intended_user_id' => $data['intended_user_id'] ?? null,
+                    'referring_user_id' => $user->id,
+                    'patient_id' => $patient->id,
+                    'status' => ReferralStatus::DRAFT,
+                    'urgency' => $data['urgency'] ?? null,
+                    'is_emergency' => $data['is_emergency'] ?? false,
+                    'department' => $data['department'],
+                    'referral_reason' => $data['referral_reason'],
+                    'symptoms' => $data['symptoms'] ?? null,
+                    'vitals' => $data['vitals'] ?? null,
+                    'consciousness' => $data['consciousness'] ?? null,
+                    'trauma_indicator' => $data['trauma_indicator'] ?? false,
+                    'existing_conditions' => $data['existing_conditions'] ?? null,
+                    'current_interventions' => $data['current_interventions'] ?? null,
+                    'notes' => $data['notes'] ?? null,
+                ]);
 
-            $this->storeAttachments($user, $referral, $data['attachments'] ?? []);
+                $referral->refresh();
+                $referral->update([
+                    'ai_suggestion' => $this->urgencySuggestion->suggest($referral),
+                ]);
 
-            $this->auditLogger->record($user, 'referral_created', $referral, [
-                'referral_number' => $referral->referral_number,
-                'receiving_hospital_id' => $referral->receiving_hospital_id,
-            ]);
-            $this->auditLogger->record($user, 'ai_urgency_suggested', $referral, [
-                'suggestion' => $referral->ai_suggestion,
-            ]);
+                $this->storeAttachments($user, $referral, $data['attachments'] ?? []);
 
-            return $referral;
-        });
+                $this->auditLogger->record($user, 'referral_created', $referral, [
+                    'referral_number' => $referral->referral_number,
+                    'receiving_hospital_id' => $referral->receiving_hospital_id,
+                    'intended_user_id' => $referral->intended_user_id,
+                ]);
+                $this->auditLogger->record($user, 'ai_urgency_suggested', $referral, [
+                    'suggestion' => $referral->ai_suggestion,
+                ]);
+
+                return $referral;
+            });
+        } catch (Throwable $exception) {
+            $this->discardStoredAttachmentFiles();
+
+            throw $exception;
+        } finally {
+            $this->storedAttachmentPaths = [];
+        }
+    }
+
+    /**
+     * Removes attachment files written for a referral that never committed, so a
+     * failed submission cannot leak clinical documents onto disk.
+     */
+    private function discardStoredAttachmentFiles(): void
+    {
+        foreach ($this->storedAttachmentPaths as $path) {
+            Storage::disk('local')->delete($path);
+        }
     }
 
     /**
@@ -85,6 +119,8 @@ class ReferralWorkflowService
             $storedName = $this->generateStoredFileName($file);
 
             $file->storeAs("referrals/{$referral->id}", $storedName, 'local');
+
+            $this->storedAttachmentPaths[] = "referrals/{$referral->id}/{$storedName}";
 
             ReferralAttachment::create([
                 'referral_id' => $referral->id,
@@ -111,7 +147,7 @@ class ReferralWorkflowService
     public function transition(User $user, Referral $referral, ReferralStatus $next, ?string $rejectionReason = null): Referral
     {
         return DB::transaction(function () use ($user, $referral, $next, $rejectionReason) {
-            $referral->lockForUpdate();
+            $referral = Referral::whereKey($referral->getKey())->lockForUpdate()->firstOrFail();
 
             if (! $referral->status->canTransitionTo($next)) {
                 throw new InvalidReferralTransitionException(
@@ -146,10 +182,5 @@ class ReferralWorkflowService
 
             return $referral;
         });
-    }
-
-    private function generatePatientReference(): string
-    {
-        return 'PT-'.strtoupper(Str::random(6));
     }
 }

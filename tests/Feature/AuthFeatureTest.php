@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Services\SettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Tests\Concerns\CreatesReferralStaff;
@@ -44,9 +45,25 @@ class AuthFeatureTest extends TestCase
             ->assertJsonPath('errors.email.0', 'The provided credentials are incorrect.');
     }
 
+    public function test_registration_is_closed_by_default(): void
+    {
+        $this->role('healthcare_worker');
+
+        $this->postJson('/api/register', [
+            'name' => 'New Clinician',
+            'email' => 'new.clinician@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ])->assertUnprocessable()
+            ->assertJsonPath('errors.email.0', 'Registration is currently disabled on the platform.');
+
+        $this->assertDatabaseMissing('users', ['email' => 'new.clinician@example.com']);
+    }
+
     public function test_register_creates_healthcare_worker_and_returns_201(): void
     {
         $role = $this->role('healthcare_worker');
+        $this->enableRegistration();
 
         $response = $this->postJson('/api/register', [
             'name' => 'New Clinician',
@@ -91,5 +108,10 @@ class AuthFeatureTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.role.slug', 'referral_coordinator')
             ->assertJsonStructure(['data' => ['id', 'name', 'email', 'role', 'hospital']]);
+    }
+
+    private function enableRegistration(): void
+    {
+        app(SettingsService::class)->set('auth.registration_enabled', true, 'boolean');
     }
 }

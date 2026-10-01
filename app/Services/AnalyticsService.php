@@ -2,10 +2,13 @@
 
 namespace App\Services;
 
+use App\Enums\ReferralStatus;
 use App\Models\Hospital;
 use App\Models\Referral;
 use App\Models\User;
+use App\Support\DatabaseExpressions;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 class AnalyticsService
 {
@@ -17,18 +20,18 @@ class AnalyticsService
         $isSystem = $user->hasRole('system_admin');
         $hospitalId = $isSystem ? null : $user->hospital_id;
 
-        $referrals = $this->scopedReferrals($user)
-            ->get(['id', 'status', 'urgency', 'is_emergency', 'created_at']);
+        $statusCounts = $this->countBy($this->scopedReferrals($user), 'status');
+        $urgencyCounts = $this->countBy($this->scopedReferrals($user), 'urgency', whereNotNull: true);
 
-        $statusCounts = $referrals->groupBy('status')->map->count()->sortDesc();
-        $urgencyCounts = $referrals->groupBy('urgency')->map->count();
-        $monthly = $referrals
-            ->groupBy(fn (Referral $referral) => $referral->created_at?->format('Y-m'))
-            ->map->count()
+        $monthQuery = $this->scopedReferrals($user);
+        $monthly = $monthQuery
+            ->selectRaw(DatabaseExpressions::yearMonth($monthQuery, 'created_at').' as month')
+            ->selectRaw('COUNT(*) as aggregate')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->pluck('aggregate', 'month')
             ->sortKeys()
             ->slice(-6);
-
-        $activeStatuses = ['sent', 'received', 'under_review', 'accepted', 'transfer_in_progress', 'arrived'];
 
         $users = User::query()
             ->when($isSystem, fn ($query) => $query, fn ($query) => $query->where('hospital_id', $hospitalId))
@@ -43,19 +46,38 @@ class AnalyticsService
         return [
             'user' => $user,
             'scope' => $isSystem ? 'system' : 'hospital',
-            'total_referrals' => $referrals->count(),
-            'emergency_count' => $referrals->where('is_emergency', true)->count(),
-            'active_transfers' => $referrals->whereIn('status', $activeStatuses)->count(),
+            'total_referrals' => $this->scopedReferrals($user)->count(),
+            'emergency_count' => $this->scopedReferrals($user)->where('is_emergency', true)->count(),
+            'active_transfers' => $this->scopedReferrals($user)
+                ->whereIn('status', ReferralStatus::inMotion())
+                ->count(),
             'users_count' => $users,
             'hospitals_count' => Hospital::where('is_active', true)->count(),
             'total_hospitals' => $isSystem ? Hospital::count() : null,
             'status_counts' => $statusCounts,
             'urgency_counts' => $urgencyCounts,
             'monthly' => $monthly
-                ->map(fn (int $count, string $month) => ['month' => $month, 'count' => $count])
+                ->map(fn (int|string $count, string $month) => ['month' => $month, 'count' => (int) $count])
                 ->values(),
             'recent' => $recent,
         ];
+    }
+
+    /**
+     * Groups in the database rather than loading every referral into memory.
+     *
+     * @return Collection<string, int>
+     */
+    private function countBy(Builder $query, string $column, bool $whereNotNull = false): Collection
+    {
+        $grouped = $query
+            ->selectRaw("{$column} as bucket")
+            ->selectRaw('COUNT(*) as aggregate')
+            ->when($whereNotNull, fn (Builder $builder) => $builder->whereNotNull($column))
+            ->groupBy($column)
+            ->pluck('aggregate', 'bucket');
+
+        return $grouped->map(fn (int|string $count): int => (int) $count);
     }
 
     /**
@@ -67,6 +89,10 @@ class AnalyticsService
 
         if ($user->hasRole('system_admin')) {
             return $query;
+        }
+
+        if ($user->hospital_id === null) {
+            return $query->whereRaw('0 = 1');
         }
 
         return $query->where(function ($sub) use ($user) {

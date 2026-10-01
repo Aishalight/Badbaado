@@ -25,17 +25,18 @@
                 <div><p class="section-eyebrow">Group</p><h3 class="dashboard-section-title mt-1.5">{{ $group }}</h3><p class="faint mt-1 text-xs">{{ $descriptions[$group] ?? 'Platform configuration.' }}</p></div>
                 <div class="mt-4">
                     @foreach ($settings as $setting)
+                        @php($fieldId = 'setting-'.str_replace(['.', '_', ':'], '-', $setting->key))
                         <div class="kv-row">
-                            <div><label class="kv-row__key">{{ $setting->label }}</label><p class="kv-row__desc">{{ $setting->description }}</p></div>
+                            <div><p class="kv-row__key">{{ $setting->label }}</p><p class="kv-row__desc">{{ $setting->description }}</p></div>
                             @if ($setting->type === 'boolean')
-                                <label class="flex items-center gap-2 text-sm shrink-0">
-                                    <input type="checkbox" name="settings[{{ $setting->key }}]" value="1" data-setting="boolean" data-key="{{ $setting->key }}" @checked($setting->typedValue())>
+                                <label for="{{ $fieldId }}" class="flex items-center gap-2 text-sm shrink-0">
+                                    <input id="{{ $fieldId }}" type="checkbox" name="settings[{{ $setting->key }}]" value="1" data-setting="boolean" data-key="{{ $setting->key }}" @checked($setting->typedValue())>
                                     <span class="soft text-xs">{{ $setting->typedValue() ? 'Enabled' : 'Disabled' }}</span>
                                 </label>
                             @elseif ($setting->type === 'integer')
-                                <input class="input w-28 text-right" type="number" name="settings[{{ $setting->key }}]" value="{{ $setting->typedValue() }}" data-key="{{ $setting->key }}">
+                                <input id="{{ $fieldId }}" class="input w-28 text-right" type="number" name="settings[{{ $setting->key }}]" value="{{ $setting->typedValue() }}" data-key="{{ $setting->key }}">
                             @else
-                                <input class="input w-64 max-w-full text-right" type="text" name="settings[{{ $setting->key }}]" value="{{ $setting->typedValue() }}" data-key="{{ $setting->key }}">
+                                <input id="{{ $fieldId }}" class="input w-64 max-w-full text-right" type="text" name="settings[{{ $setting->key }}]" value="{{ $setting->typedValue() }}" data-key="{{ $setting->key }}">
                             @endif
                         </div>
                     @endforeach

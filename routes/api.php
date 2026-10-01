@@ -21,23 +21,23 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:login');
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
 
     Route::middleware('role:healthcare_worker,referral_coordinator')->post(
         'referrals',
         [ReferralController::class, 'store']
-    );
+    )->middleware('hospital');
 
-    Route::get('referrals', [ReferralController::class, 'index']);
-    Route::get('referrals/{referral}', [ReferralController::class, 'show']);
-    Route::post('referrals/{referral}/transition', [ReferralController::class, 'transition']);
+    Route::get('referrals', [ReferralController::class, 'index'])->middleware('hospital');
+    Route::get('referrals/{referral}', [ReferralController::class, 'show'])->middleware('hospital');
+    Route::post('referrals/{referral}/transition', [ReferralController::class, 'transition'])->middleware('hospital');
 
-    Route::get('referrals/{referral}/messages', [MessageController::class, 'index']);
-    Route::post('referrals/{referral}/messages', [MessageController::class, 'store']);
+    Route::get('referrals/{referral}/messages', [MessageController::class, 'index'])->middleware('hospital');
+    Route::post('referrals/{referral}/messages', [MessageController::class, 'store'])->middleware('hospital');
 
-    Route::get('referrals/{referral}/attachments/{attachment}', [ReferralAttachmentController::class, 'download']);
+    Route::get('referrals/{referral}/attachments/{attachment}', [ReferralAttachmentController::class, 'download'])->middleware('hospital');
 
     Route::get('notifications', [NotificationController::class, 'index']);
     Route::post('notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
@@ -70,7 +70,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('admin/faqs/{faq}', [FaqController::class, 'update']);
         Route::delete('admin/faqs/{faq}', [FaqController::class, 'destroy']);
         Route::patch('admin/settings', [SystemSettingController::class, 'update']);
-        Route::post('admin/backups', [BackupController::class, 'store']);
+        Route::post('admin/backups', [BackupController::class, 'store'])->middleware('throttle:backups');
         Route::delete('admin/backups/{backup}', [BackupController::class, 'destroy']);
         Route::post('admin/alerts', [PlatformAlertController::class, 'store']);
     });

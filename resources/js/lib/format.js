@@ -1,8 +1,8 @@
 const urgencyMeta = {
     critical: { label: 'Critical', klass: 'bg-red-50 text-red-600' },
-    emergent: { label: 'High', klass: 'bg-orange-50 text-orange-600' },
-    urgent: { label: 'Medium', klass: 'bg-amber-50 text-amber-700' },
-    routine: { label: 'Normal', klass: 'bg-emerald-50 text-emerald-600' },
+    emergent: { label: 'Emergent', klass: 'bg-orange-50 text-orange-600' },
+    urgent: { label: 'Urgent', klass: 'bg-amber-50 text-amber-700' },
+    routine: { label: 'Routine', klass: 'bg-emerald-50 text-emerald-600' },
 };
 
 const urgencyDotColors = {

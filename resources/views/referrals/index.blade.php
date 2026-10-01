@@ -3,20 +3,17 @@
 @php
     $statusFilter = request()->string('status')->toString();
     $urgencyFilter = request()->string('urgency')->toString();
-    $statusOptions = [
-        '' => 'All statuses', 'draft' => 'Draft', 'sent' => 'Sent', 'received' => 'Received',
-        'under_review' => 'Under review', 'accepted' => 'Accepted', 'transfer_in_progress' => 'Transfer in progress',
-        'arrived' => 'Arrived', 'completed' => 'Completed', 'rejected' => 'Rejected', 'cancelled' => 'Cancelled',
-    ];
-    $urgencyOptions = ['' => 'All urgency', 'critical' => 'Critical', 'emergent' => 'High', 'urgent' => 'Medium', 'routine' => 'Normal'];
+    $statusOptions = \App\Support\ReferralFormat::statusOptions();
+    $urgencyOptions = \App\Support\ReferralFormat::urgencyOptions();
 @endphp
 
+@section('heading', 'Referrals')
 @section('content')
     <div class="mx-auto max-w-6xl">
         <div class="flex flex-wrap items-end justify-between gap-4">
             <div>
                 <div class="section-eyebrow">Referrals</div>
-                <h1 class="page-heading mt-1">All referrals</h1>
+                <h2 class="page-heading mt-1">All referrals</h2>
             </div>
             @can('create', \App\Models\Referral::class)
             <a href="{{ route('referrals.create') }}" class="btn btn-primary">
@@ -26,17 +23,24 @@
             @endcan
         </div>
 
-        <form method="GET" action="{{ route('referrals.index') }}" class="mt-5 flex flex-wrap items-center gap-3">
-            <select name="status" class="input sm:w-52" onchange="this.form.submit()">
-                @foreach ($statusOptions as $value => $label)
-                    <option value="{{ $value }}" @selected($statusFilter === $value)>{{ $label }}</option>
-                @endforeach
-            </select>
-            <select name="urgency" class="input sm:w-44" onchange="this.form.submit()">
-                @foreach ($urgencyOptions as $value => $label)
-                    <option value="{{ $value }}" @selected($urgencyFilter === $value)>{{ $label }}</option>
-                @endforeach
-            </select>
+        <form method="GET" action="{{ route('referrals.index') }}" class="mt-5 flex flex-wrap items-end gap-3">
+            <div>
+                <label for="filter-status" class="mb-1 block text-xs font-semibold text-slate-600">Status</label>
+                <select id="filter-status" name="status" class="input sm:w-52" onchange="this.form.submit()">
+                    @foreach ($statusOptions as $value => $label)
+                        <option value="{{ $value }}" @selected($statusFilter === $value)>{{ $label }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label for="filter-urgency" class="mb-1 block text-xs font-semibold text-slate-600">Urgency</label>
+                <select id="filter-urgency" name="urgency" class="input sm:w-44" onchange="this.form.submit()">
+                    @foreach ($urgencyOptions as $value => $label)
+                        <option value="{{ $value }}" @selected($urgencyFilter === $value)>{{ $label }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <button type="submit" class="sr-only">Apply filters</button>
             @if ($statusFilter || $urgencyFilter)
                 <a href="{{ route('referrals.index') }}" class="btn btn-ghost btn-sm">Clear filters</a>
             @endif
@@ -55,6 +59,9 @@
                     @foreach ($referrals as $referral)
                         <li>
                             <a href="{{ route('referrals.show', $referral) }}" class="flex items-center gap-4 px-5 py-4 transition hover:bg-brand-50/40">
+                                @if ($referral->receivingHospital)
+                                    @include('partials.hospital-logo', ['hospital' => $referral->receivingHospital, 'size' => 'h-9 w-9'])
+                                @endif
                                 <div class="min-w-0 flex-1">
                                     <div class="flex flex-wrap items-center gap-2">
                                         <span class="font-mono text-xs text-slate-400">{{ $referral->referral_number }}</span>
@@ -65,19 +72,23 @@
                                             <span class="badge bg-red-50 text-red-600">Emergency</span>
                                         @endif
                                     </div>
-                                    <div class="mt-0.5 truncate text-xs text-slate-500">
-                                        {{ $referral->referringHospital?->short_name ?? $referral->referringHospital?->name ?? '-' }}
-                                        <span class="mx-1 text-slate-300">→</span>
-                                        {{ $referral->receivingHospital?->short_name ?? $referral->receivingHospital?->name ?? '-' }}
-                                        <span class="mx-1.5 text-slate-300">·</span>
-                                        {{ $referral->department ?? 'General' }}
-                                        <span class="mx-1.5 text-slate-300">·</span>
-                                        {{ $referral->assignedTo?->name ?? $referral->referringUser?->name ?? '-' }}
+                                    <div class="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-slate-500">
+                                        <span class="truncate">{{ $referral->referringHospital?->short_name ?? $referral->referringHospital?->name ?? '-' }}</span>
+                                        <span class="text-slate-300">→</span>
+                                        <span class="truncate">{{ $referral->receivingHospital?->short_name ?? $referral->receivingHospital?->name ?? '-' }}</span>
+                                        <span class="text-slate-300">·</span>
+                                        <span class="truncate">{{ $referral->department ?? 'General' }}</span>
+                                        @if ($referral->intendedUser)
+                                            <span class="text-slate-300">·</span>
+                                            <span class="badge bg-accent-50 text-accent-700">for {{ $referral->intendedUser->name }}</span>
+                                        @endif
+                                        <span class="text-slate-300">·</span>
+                                        <span class="truncate">{{ $referral->assignedTo?->name ?? $referral->referringUser?->name ?? '-' }}</span>
                                     </div>
                                 </div>
                                 <div class="hidden items-center gap-2 md:flex">
-                                    {!! \App\Support\ReferralFormat::urgencyPill($referral->urgency->value) !!}
-                                    {!! \App\Support\ReferralFormat::statusPill($referral->status->value) !!}
+                                    {!! \App\Support\ReferralFormat::urgencyPill($referral->urgency?->value) !!}
+                                    {!! \App\Support\ReferralFormat::statusPill($referral->status?->value) !!}
                                 </div>
                                 <div class="text-xs tabular-nums text-slate-400">{{ $referral->created_at?->format('M j, H:i') }}</div>
                             </a>

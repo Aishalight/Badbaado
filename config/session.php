@@ -167,9 +167,16 @@ return [
     | to the server if the browser has a HTTPS connection. This will keep
     | the cookie from being sent to you when it can't be done securely.
     |
+    | When SESSION_SECURE_COOKIE is not set the value is derived from APP_URL so
+    | an https deployment is hardened automatically while plain http local
+    | development keeps working.
+    |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE'),
+    'secure' => env(
+        'SESSION_SECURE_COOKIE',
+        str_starts_with((string) env('APP_URL', 'http://localhost'), 'https://'),
+    ),
 
     /*
     |--------------------------------------------------------------------------

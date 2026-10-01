@@ -10,6 +10,7 @@ use App\Models\Referral;
 use App\Services\AuditLogger;
 use App\Support\AuditActions;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\DB;
 
 class MessageController extends Controller
 {
@@ -28,15 +29,19 @@ class MessageController extends Controller
     {
         $this->authorize('view', $referral);
 
-        $message = Message::create([
-            'referral_id' => $referral->id,
-            'sender_user_id' => $request->user()->id,
-            'body' => $request->validated('body'),
-        ]);
+        $message = DB::transaction(function () use ($request, $referral) {
+            $message = Message::create([
+                'referral_id' => $referral->id,
+                'sender_user_id' => $request->user()->id,
+                'body' => $request->validated('body'),
+            ]);
 
-        $this->auditLogger->record($request->user(), AuditActions::MESSAGE_SENT, $message, [
-            'referral_id' => $referral->id,
-        ]);
+            $this->auditLogger->record($request->user(), AuditActions::MESSAGE_SENT, $message, [
+                'referral_id' => $referral->id,
+            ]);
+
+            return $message;
+        });
 
         return new MessageResource($message->load('sender:id,name,title'));
     }

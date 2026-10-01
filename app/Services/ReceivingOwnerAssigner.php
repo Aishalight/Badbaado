@@ -16,7 +16,8 @@ class ReceivingOwnerAssigner
             return $referral->assignedTo;
         }
 
-        $owner = $this->preferredOwner($referral)
+        $owner = $this->intendedOwner($referral)
+            ?? $this->preferredOwner($referral)
             ?? $this->fallbackOwner($referral, 'hospital_admin')
             ?? $this->fallbackOwner($referral, 'referral_coordinator');
 
@@ -27,6 +28,22 @@ class ReceivingOwnerAssigner
         $referral->update(['assigned_to_user_id' => $owner->getKey()]);
 
         return $owner;
+    }
+
+    /**
+     * The doctor the referring hospital explicitly addressed, if still eligible.
+     */
+    private function intendedOwner(Referral $referral): ?User
+    {
+        if ($referral->intended_user_id === null) {
+            return null;
+        }
+
+        return User::query()
+            ->whereKey($referral->intended_user_id)
+            ->where('hospital_id', $referral->receiving_hospital_id)
+            ->where('is_active', true)
+            ->first();
     }
 
     private function preferredOwner(Referral $referral): ?User

@@ -37,18 +37,60 @@ final class ReferralFormat
     ];
 
     /**
+     * Severity colours keyed by urgency value.
+     *
      * @var array<string, array{label: string, klass: string}>
      */
     private const URGENCY = [
         'critical' => ['label' => 'Critical', 'klass' => 'bg-red-50 text-red-600'],
-        'emergent' => ['label' => 'High', 'klass' => 'bg-orange-50 text-orange-600'],
-        'urgent' => ['label' => 'Medium', 'klass' => 'bg-amber-50 text-amber-700'],
-        'routine' => ['label' => 'Normal', 'klass' => 'bg-emerald-50 text-emerald-600'],
+        'emergent' => ['label' => 'Emergent', 'klass' => 'bg-orange-50 text-orange-600'],
+        'urgent' => ['label' => 'Urgent', 'klass' => 'bg-amber-50 text-amber-700'],
+        'routine' => ['label' => 'Routine', 'klass' => 'bg-emerald-50 text-emerald-600'],
     ];
 
     public static function statusLabel(?string $status): string
     {
         return self::STATUS_LABELS[$status ?? ''] ?? ucfirst((string) $status);
+    }
+
+    public static function urgencyLabel(?string $urgency): string
+    {
+        if (! $urgency) {
+            return '';
+        }
+
+        return self::URGENCY[$urgency]['label'] ?? ucfirst($urgency);
+    }
+
+    /**
+     * Filter options for the referral status select, ordered by workflow.
+     *
+     * The blank entry always keeps the `''` key so it renders as
+     * `<option value="">` and keeps matching an empty query string.
+     *
+     * @return array<string, string>
+     */
+    public static function statusOptions(?string $blankLabel = 'All statuses'): array
+    {
+        $options = self::STATUS_LABELS;
+
+        return $blankLabel === null ? $options : ['' => $blankLabel] + $options;
+    }
+
+    /**
+     * Filter options for the urgency select, most acute first.
+     *
+     * @return array<string, string>
+     */
+    public static function urgencyOptions(?string $blankLabel = 'All urgencies'): array
+    {
+        $options = [];
+
+        foreach (self::URGENCY as $value => $meta) {
+            $options[$value] = $meta['label'];
+        }
+
+        return $blankLabel === null ? $options : ['' => $blankLabel] + $options;
     }
 
     public static function statusPill(?string $status): string

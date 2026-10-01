@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Throwable;
 use ZipArchive;
 
 class BackupService
@@ -74,15 +75,21 @@ class BackupService
             $this->disk()->put($filename, file_get_contents($tempPath), 'private');
             $size = filesize($tempPath);
 
-            /** @var Backup $backup */
-            $backup = Backup::create([
-                'filename' => $filename,
-                'disk' => 'backups',
-                'size' => $size,
-                'status' => 'completed',
-                'notes' => $notes ? implode("\n", $notes) : null,
-                'created_by' => $actor?->id,
-            ]);
+            try {
+                /** @var Backup $backup */
+                $backup = Backup::create([
+                    'filename' => $filename,
+                    'disk' => 'backups',
+                    'size' => $size,
+                    'status' => 'completed',
+                    'notes' => $notes ? implode("\n", $notes) : null,
+                    'created_by' => $actor?->id,
+                ]);
+            } catch (Throwable $exception) {
+                $this->disk()->delete($filename);
+
+                throw $exception;
+            }
 
             $this->auditLogger->record($actor, 'backup_created', $backup, [
                 'filename' => $filename,
@@ -90,7 +97,7 @@ class BackupService
             ]);
 
             return $backup;
-        } catch (\Throwable $exception) {
+        } catch (Throwable $exception) {
             /** @var Backup $backup */
             $backup = Backup::create([
                 'filename' => $filename,

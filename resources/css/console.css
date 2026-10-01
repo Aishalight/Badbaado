@@ -1084,6 +1084,41 @@ html.theme-light .console-shell .urgency-routine {
     font-weight: 800;
 }
 
+/* Skip link: hidden until a keyboard user tabs into it */
+.skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 200;
+    padding: 0.75rem 1.25rem;
+    background: var(--m-panel, #fff);
+    color: var(--m-ink, #0f172a);
+    border: 2px solid var(--m-accent, #0ea5e9);
+    border-radius: 0 0 0.5rem 0;
+    font-weight: 700;
+    font-size: 0.875rem;
+}
+.skip-link:focus {
+    left: 0;
+}
+#main-content:focus {
+    outline: none;
+}
+
+/* Inline validation messaging */
+.console-shell .field-error {
+    display: block;
+    margin-top: 0.35rem;
+    color: #b91c1c;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+html.theme-light .console-shell .field-error { color: #b91c1c; }
+.console-shell [aria-invalid='true'] {
+    outline: 2px solid #ef4444;
+    outline-offset: 1px;
+}
+
 /* Toast */
 .console-shell .toast-host {
     position: fixed;

@@ -13,7 +13,9 @@ use App\Models\User;
 use App\Services\AuditLogger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class AdminHospitalController extends Controller
 {
@@ -33,7 +35,7 @@ class AdminHospitalController extends Controller
 
     public function store(StoreHospitalRequest $request): HospitalResource
     {
-        $hospital = Hospital::create($request->validated());
+        $hospital = Hospital::create($this->hospitalAttributes($request));
 
         if ($request->filled('admin_name') && $request->filled('admin_email') && $request->filled('admin_password')) {
             $hospitalAdminRole = Role::where('slug', 'hospital_admin')->firstOrFail();
@@ -67,6 +69,11 @@ class AdminHospitalController extends Controller
         }
 
         $this->auditLogger->record(request()->user(), 'hospital_deleted', $hospital, ['code' => $hospital->code]);
+
+        if ($hospital->logo_path !== null) {
+            Storage::disk('public')->delete($hospital->logo_path);
+        }
+
         $hospital->delete();
 
         return response()->json(['message' => 'Hospital deleted successfully']);
@@ -74,12 +81,34 @@ class AdminHospitalController extends Controller
 
     public function update(UpdateHospitalRequest $request, Hospital $hospital): HospitalResource
     {
-        $hospital->update($request->validated());
+        $hospital->update($this->hospitalAttributes($request, $hospital));
 
         $this->auditLogger->record($request->user(), 'hospital_updated', $hospital, [
             'fields' => array_keys($request->validated()),
         ]);
 
         return new HospitalResource($hospital->fresh());
+    }
+
+    /**
+     * Hospital columns safe to mass-assign, including a freshly uploaded logo.
+     *
+     * @return array<string, mixed>
+     */
+    private function hospitalAttributes(StoreHospitalRequest|UpdateHospitalRequest $request, ?Hospital $hospital = null): array
+    {
+        $attributes = $request->safe()->except(['logo', 'admin_name', 'admin_email', 'admin_password']);
+
+        $logo = $request->file('logo');
+
+        if ($logo instanceof UploadedFile) {
+            if ($hospital?->logo_path !== null) {
+                Storage::disk('public')->delete($hospital->logo_path);
+            }
+
+            $attributes['logo_path'] = $logo->store('hospital-logos', 'public') ?: null;
+        }
+
+        return $attributes;
     }
 }

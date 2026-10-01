@@ -23,7 +23,7 @@ class SettingsService
             'contact.support_email' => ['value' => null, 'type' => 'string', 'group' => 'Contact', 'label' => 'Support email', 'description' => 'Public contact / support email address.', 'is_protected' => false],
             'contact.support_phone' => ['value' => null, 'type' => 'string', 'group' => 'Contact', 'label' => 'Support phone', 'description' => 'Public contact / support phone number.', 'is_protected' => false],
             'contact.address' => ['value' => null, 'type' => 'string', 'group' => 'Contact', 'label' => 'Operations address', 'description' => 'Public operational address.', 'is_protected' => false],
-            'auth.registration_enabled' => ['value' => true, 'type' => 'boolean', 'group' => 'Access & security', 'label' => 'Open registration', 'description' => 'When disabled, the public registration endpoint refuses new accounts.', 'is_protected' => false],
+            'auth.registration_enabled' => ['value' => false, 'type' => 'boolean', 'group' => 'Access & security', 'label' => 'Open registration', 'description' => 'When disabled, the public registration endpoint refuses new accounts.', 'is_protected' => false],
             'auth.session_timeout_minutes' => ['value' => 720, 'type' => 'integer', 'group' => 'Access & security', 'label' => 'Session timeout (minutes)', 'description' => 'Idle session lifetime used by the platform.', 'is_protected' => false],
             'backups.retention_days' => ['value' => 30, 'type' => 'integer', 'group' => 'Operations', 'label' => 'Backup retention (days)', 'description' => 'Archives older than this are pruned automatically.', 'is_protected' => false],
         ];

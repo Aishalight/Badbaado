@@ -27,6 +27,7 @@ class UpdateHospitalRequest extends FormRequest
             'short_name' => ['sometimes', 'string', 'max:50'],
             'code' => ['sometimes', 'string', 'max:20', Rule::unique('hospitals', 'code')->ignore($this->route('hospital'))],
             'location' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'logo' => ['sometimes', 'nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
             'phone' => ['sometimes', 'nullable', 'string', 'max:50'],
             'email' => ['sometimes', 'nullable', 'email', 'max:255'],
             'level' => ['sometimes', 'nullable', 'string', 'max:50'],

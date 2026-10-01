@@ -2,18 +2,19 @@
 
 @php
     $me = auth()->user();
-    $total = $referrals->count();
-    $active = $referrals->whereIn('status', ['sent', 'received', 'under_review', 'accepted', 'transfer_in_progress', 'arrived'])->count();
-    $emergencies = $referrals->where('is_emergency', true)->count();
-    $urgent = $referrals->whereIn('urgency', ['critical', 'emergent'])->count();
+    $total = $counts['total'];
+    $active = $counts['active'];
+    $emergencies = $counts['emergencies'];
+    $urgent = $counts['urgent'];
     $isCoordinator = $me->hasRole('referral_coordinator');
-    $incoming = $referrals->where('receiving_hospital_id', $me->hospital_id)->whereIn('status', ['sent', 'received', 'under_review'])->count();
+    $incoming = $counts['incoming'];
 @endphp
 
+@section('heading', $isCoordinator ? 'Coordination desk' : 'Care team workspace')
 @section('content')
 <div class="dashboard-page mx-auto max-w-7xl space-y-8">
     <div class="dashboard-hero">
-        <div><p class="section-eyebrow">{{ $isCoordinator ? 'Coordination desk' : 'Care team workspace' }}</p><h1 class="page-heading mt-2 text-3xl">{{ $isCoordinator ? 'Keep every handover moving.' : 'Good to see you, '.$me->name.'.' }}</h1><p class="mt-2 max-w-2xl text-sm text-slate-500">{{ $isCoordinator ? 'Prioritize incoming referrals and keep receiving teams ready.' : 'Your latest patient transfers, referrals, and care activity in one place.' }}</p></div>
+        <div><p class="section-eyebrow">{{ $isCoordinator ? 'Coordination desk' : 'Care team workspace' }}</p><h2 class="page-heading mt-2 text-3xl">{{ $isCoordinator ? 'Keep every handover moving.' : 'Good to see you, '.$me->name.'.' }}</h2><p class="mt-2 max-w-2xl text-sm text-slate-500">{{ $isCoordinator ? 'Prioritize incoming referrals and keep receiving teams ready.' : 'Your latest patient transfers, referrals, and care activity in one place.' }}</p></div>
 @can('create', \App\Models\Referral::class)<a href="{{ route('referrals.create') }}" class="btn-accent"><span class="text-lg leading-none">+</span> New referral</a>@endcan
     </div>
 

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\HospitalFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,6 +18,7 @@ class Hospital extends Model
         'short_name',
         'code',
         'location',
+        'logo_path',
         'phone',
         'email',
         'level',
@@ -43,5 +45,38 @@ class Hospital extends Model
     public function incomingReferrals(): HasMany
     {
         return $this->hasMany(Referral::class, 'receiving_hospital_id');
+    }
+
+    /**
+     * Active clinical staff a referral may be addressed to at this hospital.
+     */
+    public function referralStaff(): HasMany
+    {
+        return $this->users()
+            ->where('is_active', true)
+            ->whereHas('role', fn (Builder $query) => $query->whereIn('slug', ['healthcare_worker', 'referral_coordinator']))
+            ->with('role:id,slug,name')
+            ->orderBy('name');
+    }
+
+    /**
+     * Publicly reachable URL for the stored logo, or null when none is set.
+     */
+    public function getLogoUrlAttribute(): ?string
+    {
+        return $this->logo_path ? asset('storage/'.$this->logo_path) : null;
+    }
+
+    /**
+     * Up to two letters used when a hospital has no logo.
+     */
+    public function getInitialsAttribute(): string
+    {
+        $words = preg_split('/\s+/', trim($this->short_name ?: $this->name), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+
+        return strtoupper(implode('', array_map(
+            static fn (string $word): string => mb_substr($word, 0, 1),
+            array_slice($words, 0, 2),
+        ))) ?: '?';
     }
 }

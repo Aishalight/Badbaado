@@ -21,6 +21,7 @@ class Referral extends Model
         'referring_hospital_id',
         'receiving_hospital_id',
         'referring_user_id',
+        'intended_user_id',
         'assigned_to_user_id',
         'coordinator_user_id',
         'patient_id',
@@ -77,6 +78,14 @@ class Referral extends Model
         return $this->belongsTo(User::class, 'coordinator_user_id');
     }
 
+    /**
+     * The specific doctor at the receiving hospital the referral was addressed to.
+     */
+    public function intendedUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'intended_user_id');
+    }
+
     public function patient(): BelongsTo
     {
         return $this->belongsTo(Patient::class);
@@ -86,6 +95,10 @@ class Referral extends Model
     {
         if ($user->hasRole('system_admin')) {
             return $query;
+        }
+
+        if ($user->hospital_id === null) {
+            return $query->whereRaw('0 = 1');
         }
 
         return $query->where(function (Builder $q) use ($user) {

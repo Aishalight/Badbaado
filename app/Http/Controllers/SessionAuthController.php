@@ -6,6 +6,7 @@ use App\Http\Requests\Api\LoginRequest;
 use App\Models\User;
 use App\Services\AuditLogger;
 use App\Support\AuditActions;
+use App\Support\EqualizesPasswordCheckTime;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +15,8 @@ use Illuminate\Validation\ValidationException;
 
 class SessionAuthController extends Controller
 {
+    use EqualizesPasswordCheckTime;
+
     public function __construct(private readonly AuditLogger $auditLogger) {}
 
     public function login(LoginRequest $request): RedirectResponse|JsonResponse
@@ -21,6 +24,10 @@ class SessionAuthController extends Controller
         $user = User::query()->with(['role', 'hospital'])->where('email', $request->validated('email'))->first();
 
         if (! $user || ! Hash::check($request->validated('password'), $user->password)) {
+            if (! $user) {
+                $this->burnPasswordVerificationTime($request->validated('password'));
+            }
+
             $this->auditLogger->record(null, AuditActions::AUTH_LOGIN_FAILED, null, [
                 'email' => $request->validated('email'),
                 'reason' => 'invalid_credentials',

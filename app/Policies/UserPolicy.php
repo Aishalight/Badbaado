@@ -35,7 +35,9 @@ class UserPolicy
             return false;
         }
 
-        return $target->hospital_id === $actor->hospital_id && ! $target->hasRole('system_admin');
+        return $target->hospital_id === $actor->hospital_id
+            && ! $target->hasRole('system_admin')
+            && ! $target->hasRole('hospital_admin');
     }
 
     /**

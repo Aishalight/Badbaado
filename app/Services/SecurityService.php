@@ -6,6 +6,7 @@ use App\Models\AuditLog;
 use App\Models\Role;
 use App\Models\User;
 use App\Support\AuditActions;
+use App\Support\DatabaseExpressions;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -186,10 +187,12 @@ class SecurityService
     {
         $start = now()->startOfDay()->subDays($days - 1);
 
-        $rows = AuditLog::query()
+        $query = AuditLog::query()
             ->where('action', $action)
-            ->where('created_at', '>=', $start)
-            ->select(DB::raw('DATE(created_at) as day'), DB::raw('COUNT(*) as count'))
+            ->where('created_at', '>=', $start);
+
+        $rows = $query
+            ->select(DB::raw(DatabaseExpressions::day($query, 'created_at').' as day'), DB::raw('COUNT(*) as count'))
             ->groupBy('day')
             ->orderBy('day')
             ->pluck('count', 'day');

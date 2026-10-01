@@ -70,6 +70,10 @@ final class AuditActions
 
     public const BACKUP_FAILED = 'backup_failed';
 
+    public const BACKUP_DOWNLOADED = 'backup_downloaded';
+
+    public const REPORT_EXPORTED = 'report_exported';
+
     /**
      * Actions that the Security & SOC module treats as security-sensitive.
      *
@@ -96,6 +100,8 @@ final class AuditActions
             self::PLATFORM_ALERT_SENT,
             self::BACKUP_CREATED,
             self::BACKUP_DELETED,
+            self::BACKUP_DOWNLOADED,
+            self::REPORT_EXPORTED,
         ];
     }
 
@@ -136,6 +142,8 @@ final class AuditActions
             self::BACKUP_CREATED => 'Backup created',
             self::BACKUP_DELETED => 'Backup deleted',
             self::BACKUP_FAILED => 'Backup failed',
+            self::BACKUP_DOWNLOADED => 'Backup downloaded',
+            self::REPORT_EXPORTED => 'Report exported',
         ];
     }
 }

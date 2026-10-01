@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnforceIdleSessionTimeout;
 use App\Http\Middleware\EnsureHospitalAssignment;
 use App\Http\Middleware\EnsurePlatformOperational;
 use App\Http\Middleware\EnsureRole;
@@ -20,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(append: [
             EnsurePlatformOperational::class,
+            EnforceIdleSessionTimeout::class,
         ]);
 
         $middleware->alias([

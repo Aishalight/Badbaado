@@ -74,8 +74,34 @@ class User extends Authenticatable
         return $this->hasMany(AuditLog::class);
     }
 
+    public function referralsIntended(): HasMany
+    {
+        return $this->hasMany(Referral::class, 'intended_user_id');
+    }
+
     public function hasRole(string $slug): bool
     {
         return $this->role?->slug === $slug;
+    }
+
+    /**
+     * Publicly reachable URL for the stored avatar, or null when none is set.
+     */
+    public function getAvatarUrlAttribute(): ?string
+    {
+        return $this->avatar_path ? asset('storage/'.$this->avatar_path) : null;
+    }
+
+    /**
+     * Up to two letters used when a user has no photo.
+     */
+    public function getInitialsAttribute(): string
+    {
+        $words = preg_split('/\s+/', trim($this->name), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+
+        return strtoupper(implode('', array_map(
+            static fn (string $word): string => mb_substr($word, 0, 1),
+            array_slice($words, 0, 2),
+        ))) ?: '?';
     }
 }

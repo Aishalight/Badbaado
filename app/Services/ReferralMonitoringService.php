@@ -32,18 +32,7 @@ class ReferralMonitoringService
             ->groupBy('urgency')
             ->pluck('count', 'urgency');
 
-        $activeStatuses = [
-            ReferralStatus::SENT,
-            ReferralStatus::RECEIVED,
-            ReferralStatus::UNDER_REVIEW,
-            ReferralStatus::ACCEPTED,
-            ReferralStatus::TRANSFER_IN_PROGRESS,
-            ReferralStatus::ARRIVED,
-        ];
-
-        $inMotion = Referral::whereIn('status', array_map(fn ($status) => $status->value, $activeStatuses));
-
-        $oldest = Referral::orderByDesc('created_at')->limit(1)->value('created_at');
+        $inMotion = Referral::whereIn('status', ReferralStatus::inMotionValues());
 
         return [
             'total_referrals' => Referral::count(),
@@ -51,8 +40,8 @@ class ReferralMonitoringService
             'completed_referrals' => Referral::where('status', ReferralStatus::COMPLETED)->count(),
             'pre_alerts' => Referral::where('is_emergency', true)->count(),
             'funnel' => $funnel,
-            'urgency' => $urgent->sortByDesc('count'),
-            'avg_age_hours' => $oldest ? $this->averageAgeHours() : 0,
+            'urgency' => $urgent->sortByDesc(fn (int $count) => $count),
+            'avg_age_hours' => (clone $inMotion)->exists() ? $this->averageAgeHours() : 0,
             'referrals_today' => Referral::where('created_at', '>=', now()->startOfDay())->count(),
             'references_last_7d' => Referral::where('created_at', '>=', now()->subDays(7))->count(),
         ];
@@ -127,7 +116,10 @@ class ReferralMonitoringService
             default => 'EXTRACT(EPOCH FROM (NOW() - created_at)) / 3600',
         };
 
-        return (int) round((float) (Referral::avg(DB::raw($expression)) ?? 0));
+        $average = Referral::whereIn('status', ReferralStatus::inMotionValues())
+            ->avg(DB::raw($expression));
+
+        return (int) round((float) ($average ?? 0));
     }
 
     private function openWhere($query, string $column): void

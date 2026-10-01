@@ -7,11 +7,13 @@ use App\Models\Hospital;
 use App\Models\Referral;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\LazyCollection;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
- * Real, downloadable reports. Each export streams from the database — nothing
- * is pre-generated or cached, so reports always reflect current data.
+ * Real, downloadable reports. Each export streams straight from the database —
+ * nothing is pre-generated, cached, or buffered in memory, so reports always
+ * reflect current data and never scale with table size.
  */
 class ReportService
 {
@@ -48,7 +50,7 @@ class ReportService
     }
 
     /**
-     * @return array{headers: array<int, string>, rows: array<int, array<int, string>>, filename: string}
+     * @return array{headers: array<int, string>, rows: LazyCollection<int, array<int, string>>, filename: string}
      */
     private function payloadFor(string $report, array $filters): array
     {
@@ -63,7 +65,7 @@ class ReportService
     }
 
     /**
-     * @return array{headers: array<int, string>, rows: array<int, array<int, string>>, filename: string}
+     * @return array{headers: array<int, string>, rows: LazyCollection<int, array<int, string>>, filename: string}
      */
     private function referrals(array $filters): array
     {
@@ -74,7 +76,7 @@ class ReportService
             ->when($filters['from'] ?? null, fn ($query, string $from) => $query->whereDate('created_at', '>=', $from))
             ->when($filters['to'] ?? null, fn ($query, string $to) => $query->whereDate('created_at', '<=', $to))
             ->orderByDesc('created_at')
-            ->get();
+            ->cursor();
 
         return [
             'headers' => ['Referral', 'Status', 'Urgency', 'Emergency', 'Department', 'From', 'To', 'Created by', 'Assigned to', 'Patient', 'Created at'],
@@ -90,20 +92,20 @@ class ReportService
                 $referral->assignedTo?->name ?? '',
                 $referral->patient?->name ?? '',
                 $referral->created_at?->toDateTimeString() ?? '',
-            ])->all(),
+            ]),
             'filename' => 'badbaado-referrals-'.now()->format('Y-m-d-Hi').'.csv',
         ];
     }
 
     /**
-     * @return array{headers: array<int, string>, rows: array<int, array<int, string>>, filename: string}
+     * @return array{headers: array<int, string>, rows: LazyCollection<int, array<int, string>>, filename: string}
      */
     private function users(): array
     {
         $users = User::query()
             ->with(['role:id,slug', 'hospital:id,name'])
             ->orderBy('name')
-            ->get();
+            ->cursor();
 
         return [
             'headers' => ['Name', 'Email', 'Title', 'Phone', 'Role', 'Hospital', 'Active', 'Created at'],
@@ -116,20 +118,20 @@ class ReportService
                 $user->hospital?->name ?? 'Platform',
                 $user->is_active ? 'Yes' : 'No',
                 $user->created_at?->toDateTimeString() ?? '',
-            ])->all(),
+            ]),
             'filename' => 'badbaado-users-'.now()->format('Y-m-d-Hi').'.csv',
         ];
     }
 
     /**
-     * @return array{headers: array<int, string>, rows: array<int, array<int, string>>, filename: string}
+     * @return array{headers: array<int, string>, rows: LazyCollection<int, array<int, string>>, filename: string}
      */
     private function hospitals(): array
     {
         $hospitals = Hospital::query()
             ->withCount(['users', 'outgoingReferrals', 'incomingReferrals'])
             ->orderBy('name')
-            ->get();
+            ->cursor();
 
         return [
             'headers' => ['Name', 'Short name', 'Code', 'Level', 'Location', 'Active', 'Users', 'Outgoing referrals', 'Incoming referrals', 'Created at'],
@@ -144,13 +146,13 @@ class ReportService
                 (string) $hospital->outgoing_referrals_count,
                 (string) $hospital->incoming_referrals_count,
                 $hospital->created_at?->toDateTimeString() ?? '',
-            ])->all(),
+            ]),
             'filename' => 'badbaado-hospitals-'.now()->format('Y-m-d-Hi').'.csv',
         ];
     }
 
     /**
-     * @return array{headers: array<int, string>, rows: array<int, array<int, string>>, filename: string}
+     * @return array{headers: array<int, string>, rows: LazyCollection<int, array<int, string>>, filename: string}
      */
     private function audit(array $filters): array
     {
@@ -162,8 +164,7 @@ class ReportService
             ->when($filters['from'] ?? null, fn ($q, string $from) => $q->whereDate('created_at', '>=', $from))
             ->when($filters['to'] ?? null, fn ($q, string $to) => $q->whereDate('created_at', '<=', $to))
             ->orderByDesc('created_at')
-            ->limit(2000)
-            ->get();
+            ->cursor();
 
         return [
             'headers' => ['Action', 'User', 'Entity', 'Entity ID', 'IP address', 'Metadata', 'At'],
@@ -175,13 +176,13 @@ class ReportService
                 $log->ip_address ?? '',
                 json_encode($log->metadata ?? [], JSON_UNESCAPED_SLASHES),
                 $log->created_at?->toDateTimeString() ?? '',
-            ])->all(),
+            ]),
             'filename' => 'badbaado-audit-'.now()->format('Y-m-d-Hi').'.csv',
         ];
     }
 
     /**
-     * @return array{headers: array<int, string>, rows: array<int, array<int, string>>, filename: string}
+     * @return array{headers: array<int, string>, rows: LazyCollection<int, array<int, string>>, filename: string}
      */
     private function signins(): array
     {
@@ -189,8 +190,7 @@ class ReportService
             ->whereIn('action', ['auth.login', 'auth.login_failed'])
             ->with('user:id,name,title')
             ->orderByDesc('created_at')
-            ->limit(2000)
-            ->get();
+            ->cursor();
 
         return [
             'headers' => ['Outcome', 'User', 'Email', 'IP address', 'At'],
@@ -200,7 +200,7 @@ class ReportService
                 $log->metadata['email'] ?? $log->user?->email ?? '',
                 $log->ip_address ?? '',
                 $log->created_at?->toDateTimeString() ?? '',
-            ])->all(),
+            ]),
             'filename' => 'badbaado-signins-'.now()->format('Y-m-d-Hi').'.csv',
         ];
     }

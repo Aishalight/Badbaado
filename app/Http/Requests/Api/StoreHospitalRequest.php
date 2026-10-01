@@ -27,6 +27,7 @@ class StoreHospitalRequest extends FormRequest
             'short_name' => ['required', 'string', 'max:50'],
             'code' => ['required', 'string', 'max:20', Rule::unique('hospitals', 'code')],
             'location' => ['nullable', 'string', 'max:255'],
+            'logo' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
             'phone' => ['nullable', 'string', 'max:50'],
             'email' => ['nullable', 'email', 'max:255'],
             'level' => ['nullable', 'string', 'max:50'],

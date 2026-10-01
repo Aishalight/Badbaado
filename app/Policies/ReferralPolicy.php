@@ -17,6 +17,10 @@ class ReferralPolicy
             return true;
         }
 
+        if ($user->hospital_id === null) {
+            return false;
+        }
+
         return $user->hospital_id === $referral->referring_hospital_id
             || $user->hospital_id === $referral->receiving_hospital_id;
     }

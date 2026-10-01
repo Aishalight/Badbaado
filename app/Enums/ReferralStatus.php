@@ -52,6 +52,33 @@ enum ReferralStatus: string
         return in_array($this, [self::COMPLETED, self::REJECTED, self::CANCELLED]);
     }
 
+    /**
+     * Statuses for a referral that is still moving through the network.
+     *
+     * @return array<int, self>
+     */
+    public static function inMotion(): array
+    {
+        return [
+            self::SENT,
+            self::RECEIVED,
+            self::UNDER_REVIEW,
+            self::ACCEPTED,
+            self::TRANSFER_IN_PROGRESS,
+            self::ARRIVED,
+        ];
+    }
+
+    /**
+     * The in-motion statuses as raw database values, for query constraints.
+     *
+     * @return array<int, string>
+     */
+    public static function inMotionValues(): array
+    {
+        return array_map(fn (self $status): string => $status->value, self::inMotion());
+    }
+
     public function canTransitionTo(self $next): bool
     {
         return match ($this) {
