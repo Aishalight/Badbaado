@@ -38,9 +38,16 @@
             "composer install",
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php artisan key:generate",
+            "@php artisan storage:link --force",
             "@php artisan migrate --force",
             "npm install --ignore-scripts",
             "npm run build"
+        ],
+        "fix-storage": [
+            "bash scripts/fix-storage.sh"
+        ],
+        "check-storage": [
+            "bash scripts/fix-storage.sh --check"
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
