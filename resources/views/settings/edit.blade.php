@@ -43,6 +43,32 @@
         </form>
     </section>
 
+    <section class="card p-6 sm:p-8" data-alarm-settings>
+        <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+                <h3 class="font-bold text-brand-950">Alarm notifications</h3>
+                <p class="mt-1 max-w-xl text-sm text-slate-500">
+                    Raise an operating-system notification, tone, and badge when a referral needs you —
+                    even when BADBAADO is in another tab.
+                </p>
+            </div>
+            <label class="inline-flex shrink-0 cursor-pointer items-center gap-3">
+                <span class="text-sm font-medium text-slate-700" data-alarm-state>Off</span>
+                <input type="checkbox" class="form-input h-0 w-0 opacity-0 sr-only" data-alarm-toggle aria-describedby="alarm-support-note">
+                <span class="alarm-switch" aria-hidden="true"><span class="alarm-switch__dot"></span></span>
+            </label>
+        </div>
+
+        <p id="alarm-support-note" class="helper mt-4" data-alarm-note>
+            Off by default. Nothing is requested from your browser until you turn this on.
+        </p>
+
+        <div class="mt-5 flex flex-wrap items-center gap-3">
+            <button type="button" class="btn-secondary btn-sm" data-alarm-test>Test alarm</button>
+            <span class="text-xs text-slate-400" data-alarm-test-result></span>
+        </div>
+    </section>
+
     <section class="card p-6 sm:p-8">
         <div><h3 class="font-bold text-brand-950">Password</h3><p class="mt-1 text-sm text-slate-500">Use a unique password you do not reuse elsewhere.</p></div>
         <form method="POST" action="{{ route('settings.password.update') }}" class="mt-6 grid gap-5 sm:max-w-xl">

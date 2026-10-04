@@ -29,3 +29,11 @@ Thumbs.db
 /Test_Credentials.txt
 /admintests.php
 /check.php
+
+# Local database dumps and credential notes: these carry real user rows and
+# password hashes and must never reach the repository.
+/database/*.sql
+/passwords.txt
+
+# Source image kept at the repo root; the served copy lives in public/images.
+/E-Referral.webp

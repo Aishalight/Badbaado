@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\NotificationSeverity;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\StorePlatformAlertRequest;
 use App\Models\Notification;
@@ -28,6 +29,8 @@ class PlatformAlertController extends Controller
 
         $payload = [
             'type' => 'platform_alert',
+            // insert() bypasses casts, so the raw enum value is required here.
+            'severity' => NotificationSeverity::ANNOUNCEMENT->value,
             'title' => $request->validated('title'),
             'body' => $request->validated('body'),
             'created_at' => now(),
@@ -36,7 +39,9 @@ class PlatformAlertController extends Controller
 
         $rows = $users->map(fn (int $userId) => ['user_id' => $userId] + $payload)->all();
 
-        Notification::insert($rows);
+        if ($rows !== []) {
+            Notification::insert($rows);
+        }
 
         $this->auditLogger->record($request->user(), AuditActions::PLATFORM_ALERT_SENT, Notification::latest('id')->first() ?? Notification::make(), [
             'audience' => $audience,

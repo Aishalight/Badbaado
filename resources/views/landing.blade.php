@@ -6,24 +6,30 @@
 <main>
     {{-- HERO --}}
     <section class="m-hero relative overflow-hidden">
-        <div class="relative z-10 mx-auto grid max-w-7xl items-center gap-16 px-5 pb-16 pt-16 sm:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:pb-20 lg:pt-24">
-            <div>
-                <span class="m-rise inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/5 px-3.5 py-1.5 text-xs font-semibold text-slate-400 backdrop-blur" style="--d:.05s">
+        <div class="m-hero__media" aria-hidden="true">
+            <img class="m-hero__image" src="{{ asset('images/e-referral-banner.webp') }}" alt=""
+                 width="1482" height="635" fetchpriority="high" decoding="async">
+            <span class="m-hero__scrim"></span>
+        </div>
+
+        <div class="relative z-10 mx-auto max-w-7xl px-5 pb-24 pt-20 sm:px-8 lg:pb-32 lg:pt-28">
+            <div class="max-w-2xl">
+                <span class="m-rise inline-flex items-center gap-2 rounded-full border border-[color:var(--m-border-strong)] bg-[color:var(--m-panel)] px-4 py-1.5 text-xs font-semibold text-[color:var(--m-ink-soft)] backdrop-blur" style="--d:.05s">
                     <span class="m-live"><span class="m-live__dot"></span>Live</span>
                     {{ $heroEyebrow }}
                 </span>
 
-                <h1 class="m-display mt-7 max-w-2xl text-[42px] sm:text-6xl lg:text-[74px]">
+                <h1 class="m-display mt-8 text-[40px] sm:text-6xl lg:text-[72px]">
                     @foreach ($heroLines as $i => $line)
                     <span class="m-line"><span style="--d:{{ 0.08 + $i * 0.12 }}s" @if($loop->last)class="m-gradient-text"@endif>{{ $line }}</span></span>
                     @endforeach
                 </h1>
 
-                <p class="m-lead m-blur-in mt-7 max-w-xl text-lg" style="--d:.5s">
+                <p class="m-lead m-blur-in mt-8 max-w-xl text-lg" style="--d:.5s">
                     {{ $heroSubtitle }}
                 </p>
 
-                <div class="m-rise mt-9 flex flex-col gap-3 sm:flex-row" style="--d:.62s">
+                <div class="m-rise mt-10 flex flex-col gap-3 sm:flex-row" style="--d:.62s">
                     <a href="{{ route('login') }}" class="btn-primary px-7 py-3.5" data-magnetic>
                         {{ $ctaPrimary }}
                     </a>
@@ -32,7 +38,7 @@
                     </a>
                 </div>
 
-                <div class="m-rise mt-12 flex flex-wrap items-center gap-x-8 gap-y-3 text-[13px] text-slate-500" style="--d:.74s">
+                <div class="m-rise mt-12 flex flex-wrap items-center gap-x-8 gap-y-3 text-[13px] text-[color:var(--m-muted)]" style="--d:.74s">
                     @foreach (['Role-aware access', 'Live referral lifecycle', 'Audited by default'] as $proof)
                     <span class="flex items-center gap-2">
                         <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-accent-500/12 text-accent-300 ring-1 ring-accent-400/25">
@@ -43,59 +49,9 @@
                     @endforeach
                 </div>
             </div>
-
-            {{-- HERO VISUAL --}}
-            <div class="m-visual mx-auto w-full max-w-[540px]" data-parallax="0.05">
-                <div class="m-blur-in relative" style="--d:.4s">
-                    <div class="m-window m-tilt" data-tilt="6">
-                        <div class="m-window__bar">
-                            <span class="m-dot"></span>
-                            <span class="m-dot"></span>
-                            <span class="m-dot"></span>
-                            <span class="m-window__title">Referral · REF-2026-A1B2C3</span>
-                            <span class="m-live"><span class="m-live__dot"></span>Live</span>
-                        </div>
-
-                        <div class="m-window__body">
-                            <div class="m-route">
-                                <div class="m-node">
-                                    <span class="m-node__badge">AH</span>
-                                    <span><b>Al-Hilal</b><small>Sending</small></span>
-                                </div>
-                                <span class="m-route__track"><span class="m-route__pulse"></span></span>
-                                <div class="m-node m-node--recv">
-                                    <span class="m-node__badge">SH</span>
-                                    <span><b>Shifa</b><small>Receiving</small></span>
-                                </div>
-                            </div>
-
-                            <div class="m-vitals">
-                                <span class="m-chip">BP <b>160/95</b></span>
-                                <span class="m-chip">HR <b>118</b></span>
-                                <span class="m-chip">SpO₂ <b>94%</b></span>
-                                <span class="m-chip">GCS <b>14</b></span>
-                            </div>
-
-                            <svg viewBox="0 0 320 64" class="m-wave" aria-hidden="true">
-                                <path d="M0 34 H44 l6 -4 l5 -16 l6 30 l6 -24 l5 14 H148 l7 -6 l6 -16 l6 28 l6 -22 l5 12 H320"/>
-                            </svg>
-
-                            <div class="m-alert">
-                                <span class="m-alert__ping">
-                                    <svg viewBox="0 0 20 20" fill="none" class="h-4 w-4"><path d="M10 5v6m0 3.5v.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M10 2.5 17.5 16h-15L10 2.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
-                                </span>
-                                <span class="min-w-0">
-                                    <b>Critical pre-alert · STEMI 62/M</b>
-                                    <small>Cath-lab unlocked · team briefed · bed confirmed</small>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
-        <div class="relative mx-auto hidden max-w-7xl px-8 pb-5 lg:block">
+        <div class="relative mx-auto hidden max-w-7xl px-8 pb-6 text-center lg:block">
             <span class="m-cue m-fade" style="--d:1.1s">
                 <span>Scroll</span>
                 <span class="m-cue__rail"></span>
@@ -118,7 +74,7 @@
                 ];
             @endphp
             <div class="m-marquee__track">
-                @foreach ($marquee as $item)
+                @foreach (array_merge($marquee, $marquee) as $item)
                 <span class="m-marquee__item">{{ $item }}</span>
                 @endforeach
             </div>
@@ -500,16 +456,50 @@
                     <div class="section-eyebrow reveal">{{ $contactEyebrow }}</div>
                     <h2 class="reveal reveal-delay-1 mt-4 text-3xl font-extrabold tracking-tight text-brand-950 sm:text-4xl">Let's talk.</h2>
                     <p class="reveal reveal-delay-2 mt-4 max-w-md text-slate-600">Questions about the platform, onboarding a hospital, or running a pilot on your network — reach the operations team directly.</p>
-                </div>
-                <div>
-                    <div class="m-card m-card-hover reveal grid gap-5 p-8 sm:grid-cols-2">
-                        @if ($contact['email'])<div><p class="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Email</p><p class="mt-1 font-semibold text-brand-950">{{ $contact['email'] }}</p></div>@endif
-                        @if ($contact['phone'])<div><p class="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Phone</p><p class="mt-1 font-semibold text-brand-950">{{ $contact['phone'] }}</p></div>@endif
-                        @if ($contact['address'])<div class="sm:col-span-2"><p class="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Operations</p><p class="mt-1 font-semibold text-brand-950">{{ $contact['address'] }}</p></div>@endif
-                        @if (empty(array_filter($contact)))
-                        <p class="text-sm text-slate-500 sm:col-span-2">Contact details are configured by the platform team.</p>
+
+                    <div class="reveal reveal-delay-3 mt-8 divide-y divide-[color:var(--m-border)] overflow-hidden rounded-xl border border-[color:var(--m-border)] bg-[color:var(--m-panel)]">
+                        @if ($contact['address'])
+                            <div class="flex items-start gap-4 px-5 py-4">
+                                <span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent-500/12 text-accent-400 ring-1 ring-accent-400/20">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-4.5 w-4.5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1116 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                </span>
+                                <div class="min-w-0">
+                                    <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Office</p>
+                                    <p class="mt-1 font-semibold text-brand-950">{{ $contact['address'] }}</p>
+                                </div>
+                            </div>
+                        @endif
+                        @if ($contact['email'])
+                            <a href="mailto:{{ $contact['email'] }}" class="flex items-start gap-4 px-5 py-4 transition hover:bg-[color:var(--m-panel-2)]">
+                                <span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent-500/12 text-accent-400 ring-1 ring-accent-400/20">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-4.5 w-4.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 6L2 7"/></svg>
+                                </span>
+                                <div class="min-w-0">
+                                    <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Email</p>
+                                    <p class="mt-1 truncate font-semibold text-brand-950">{{ $contact['email'] }}</p>
+                                </div>
+                            </a>
+                        @endif
+                        @if ($contact['phone'])
+                            <a href="tel:{{ preg_replace('/\s+/', '', $contact['phone']) }}" class="flex items-start gap-4 px-5 py-4 transition hover:bg-[color:var(--m-panel-2)]">
+                                <span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent-500/12 text-accent-400 ring-1 ring-accent-400/20">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-4.5 w-4.5"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 1.9.7 2.8a2 2 0 01-.5 2.1L8.1 9.8a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.8.6 2.8.7a2 2 0 011.8 2.1z"/></svg>
+                                </span>
+                                <div class="min-w-0">
+                                    <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Phone</p>
+                                    <p class="mt-1 font-semibold text-brand-950">{{ $contact['phone'] }}</p>
+                                </div>
+                            </a>
                         @endif
                     </div>
+                </div>
+                <div class="reveal reveal-delay-3 overflow-hidden rounded-xl border border-[color:var(--m-border-strong)] bg-[color:var(--m-panel)]">
+                    <iframe
+                        title="BADBAADO office location — Hodan, Mogadishu"
+                        src="https://www.openstreetmap.org/export/embed.html?bbox=45.288%2C2.014%2C45.348%2C2.074&amp;layer=mapnik&amp;marker=2.0439%2C45.3182"
+                        class="block h-[320px] w-full lg:h-[380px]"
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"></iframe>
                 </div>
             </div>
         </div>

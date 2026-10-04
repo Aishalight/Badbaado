@@ -232,7 +232,10 @@ class DataIntegrityAndScaleTest extends TestCase
             'audit_logs_action_index',
             'audit_logs_created_at_index',
             'audit_logs_action_created_index',
-            'notifications_user_read_index',
+            // Backs the unread badge count the console layout runs per page load.
+            'idx_notifications_user_read',
+            // Backs the unread-alarm query that filters by severity.
+            'notifications_user_severity_read_index',
         ];
 
         foreach ($expected as $index) {
@@ -241,6 +244,18 @@ class DataIntegrityAndScaleTest extends TestCase
                 "Expected index {$index} to exist for operational queries."
             );
         }
+    }
+
+    public function test_notifications_table_has_no_duplicate_user_read_indexes(): void
+    {
+        $indexes = collect(Schema::getIndexes('notifications'))
+            ->filter(fn (array $index) => $index['columns'] === ['user_id', 'read_at']);
+
+        $this->assertCount(
+            1,
+            $indexes,
+            'The notifications table must carry exactly one (user_id, read_at) index; duplicates slow every write.'
+        );
     }
 
     private function indexExists(string $name): bool

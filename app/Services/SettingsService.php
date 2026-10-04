@@ -20,9 +20,9 @@ class SettingsService
             'platform.name' => ['value' => 'BADBAADO', 'type' => 'string', 'group' => 'Platform', 'label' => 'Platform name', 'description' => 'Public-facing platform name.', 'is_protected' => true],
             'platform.tagline' => ['value' => 'Connecting Hospitals, Connecting Care', 'type' => 'string', 'group' => 'Platform', 'label' => 'Tagline', 'description' => 'Displayed in public headings and the console masthead.', 'is_protected' => false],
             'platform.maintenance_mode' => ['value' => false, 'type' => 'boolean', 'group' => 'Platform', 'label' => 'Maintenance mode', 'description' => 'When enabled, non-administrators see a maintenance notice instead of the console.', 'is_protected' => false],
-            'contact.support_email' => ['value' => null, 'type' => 'string', 'group' => 'Contact', 'label' => 'Support email', 'description' => 'Public contact / support email address.', 'is_protected' => false],
-            'contact.support_phone' => ['value' => null, 'type' => 'string', 'group' => 'Contact', 'label' => 'Support phone', 'description' => 'Public contact / support phone number.', 'is_protected' => false],
-            'contact.address' => ['value' => null, 'type' => 'string', 'group' => 'Contact', 'label' => 'Operations address', 'description' => 'Public operational address.', 'is_protected' => false],
+            'contact.support_email' => ['value' => 'support@badbaado.com', 'type' => 'string', 'group' => 'Contact', 'label' => 'Support email', 'description' => 'Public contact / support email address.', 'is_protected' => false],
+            'contact.support_phone' => ['value' => '243', 'type' => 'string', 'group' => 'Contact', 'label' => 'Support phone', 'description' => 'Public contact / support phone number.', 'is_protected' => false],
+            'contact.address' => ['value' => 'Hodan, Mogadishu, Somalia', 'type' => 'string', 'group' => 'Contact', 'label' => 'Operations address', 'description' => 'Public operational address.', 'is_protected' => false],
             'auth.registration_enabled' => ['value' => false, 'type' => 'boolean', 'group' => 'Access & security', 'label' => 'Open registration', 'description' => 'When disabled, the public registration endpoint refuses new accounts.', 'is_protected' => false],
             'auth.session_timeout_minutes' => ['value' => 720, 'type' => 'integer', 'group' => 'Access & security', 'label' => 'Session timeout (minutes)', 'description' => 'Idle session lifetime used by the platform.', 'is_protected' => false],
             'backups.retention_days' => ['value' => 30, 'type' => 'integer', 'group' => 'Operations', 'label' => 'Backup retention (days)', 'description' => 'Archives older than this are pruned automatically.', 'is_protected' => false],
@@ -40,12 +40,17 @@ class SettingsService
     public function get(string $key, mixed $default = null): mixed
     {
         $setting = $this->all()->firstWhere('key', $key);
+        $definition = $this->definition($key);
 
         if ($setting !== null) {
-            return $setting->typedValue();
-        }
+            $value = $setting->typedValue();
 
-        $definition = $this->definition($key);
+            // A stored null means "never configured": seeded rows exist for every
+            // definition, so without this they would permanently shadow the default.
+            if ($value !== null) {
+                return $value;
+            }
+        }
 
         return $definition ? $definition['value'] : $default;
     }

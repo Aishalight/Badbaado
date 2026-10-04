@@ -571,6 +571,116 @@
 .m-hero {
     position: relative;
     isolation: isolate;
+    --m-hero-scrim: linear-gradient(
+        100deg,
+        rgb(4 11 21 / 93%) 0%,
+        rgb(4 11 21 / 84%) 34%,
+        rgb(4 11 21 / 44%) 63%,
+        rgb(4 11 21 / 14%) 100%
+    );
+    --m-hero-veil: linear-gradient(
+        180deg,
+        rgb(4 11 21 / 52%) 0%,
+        transparent 24%,
+        transparent 58%,
+        rgb(4 11 21 / 90%) 100%
+    );
+}
+
+html.theme-light .m-hero {
+    --m-hero-scrim: linear-gradient(
+        100deg,
+        rgb(233 241 250 / 94%) 0%,
+        rgb(233 241 250 / 86%) 34%,
+        rgb(233 241 250 / 50%) 63%,
+        rgb(233 241 250 / 20%) 100%
+    );
+    --m-hero-veil: linear-gradient(
+        180deg,
+        rgb(233 241 250 / 70%) 0%,
+        transparent 26%,
+        transparent 56%,
+        rgb(233 241 250 / 92%) 100%
+    );
+}
+
+/* Full-bleed photographic backdrop for the hero */
+.m-hero__media {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+.m-hero__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 28%;
+    filter: saturate(1.08) contrast(1.03);
+}
+
+.m-hero__scrim {
+    position: absolute;
+    inset: 0;
+    background-image: var(--m-hero-veil), var(--m-hero-scrim);
+}
+
+/* Faint brand wash keeps the photograph inside the BADBAADO palette.
+   Painted above the photo but below the scrim, so contrast survives. */
+.m-hero__media::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(
+        112deg,
+        rgb(var(--m-accent-rgb) / 9%),
+        rgb(var(--m-violet-rgb) / 6%) 52%,
+        rgb(var(--m-blue-rgb) / 11%)
+    );
+    mix-blend-mode: soft-light;
+    pointer-events: none;
+}
+
+html.theme-light .m-hero__media::before {
+    mix-blend-mode: multiply;
+    opacity: 0.4;
+}
+
+/* The hero needs to clear the sticky header on small screens */
+@media (max-width: 640px) {
+    .m-hero__image {
+        object-position: 62% 28%;
+    }
+
+    /* Narrow viewports cannot keep the photo clear of the text column */
+    .m-hero {
+        --m-hero-scrim: linear-gradient(
+            180deg,
+            rgb(4 11 21 / 88%) 0%,
+            rgb(4 11 21 / 80%) 40%,
+            rgb(4 11 21 / 93%) 100%
+        );
+    }
+
+    html.theme-light .m-hero {
+        --m-hero-scrim: linear-gradient(
+            180deg,
+            rgb(233 241 250 / 90%) 0%,
+            rgb(233 241 250 / 82%) 40%,
+            rgb(233 241 250 / 94%) 100%
+        );
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .m-hero__image {
+        animation: m-hero-settle 1.6s var(--m-ease) both;
+    }
+}
+
+@keyframes m-hero-settle {
+    from { opacity: 0; transform: scale(1.06); }
+    to { opacity: 1; transform: none; }
 }
 
 .public-shell main > section:first-child {
@@ -980,18 +1090,31 @@
 .m-marquee {
     position: relative;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     overflow: hidden;
     mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
 }
 
+/* The track holds two identical copies of the list, so a -50% shift lands
+   the second copy exactly where the first started: a seamless loop. */
 .m-marquee__track {
     display: flex;
     flex-shrink: 0;
     align-items: center;
     gap: 2.75rem;
     padding-right: 2.75rem;
+    will-change: transform;
+    animation: m-marquee-scroll 42s linear infinite;
+}
+
+.m-marquee:hover .m-marquee__track {
+    animation-play-state: paused;
+}
+
+@keyframes m-marquee-scroll {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(-50%, 0, 0); }
 }
 
 .m-marquee__item {
@@ -1206,174 +1329,187 @@
 }
 
 /* ------------------------------------------------------------------ */
-/*  Auth (sign-in)                                                     */
+/*  Sign-in                                                            */
+/*  Split panel: a plain dark brand side and a plain form side. No    */
+/*  orbs, grid, glow or synthetic activity feed.                       */
 /* ------------------------------------------------------------------ */
-
-.auth-shell .auth-brand-panel {
-    background: linear-gradient(160deg, #061526 0%, #0a2743 45%, #0f3f57 100%);
-    min-height: 100vh;
-}
 
 .auth-shell {
     min-height: 100vh;
 }
 
-@media (min-width: 1024px) {
-    .auth-shell {
-        height: 100vh;
-        overflow: hidden;
-    }
+.auth-shell .auth-brand-panel {
+    background: #0b2a49;
 }
 
-.auth-shell .auth-brand-panel::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 15rem;
-    height: 15rem;
-    border: 1px solid rgb(var(--m-accent-rgb) / 16%);
-    border-radius: 9999px;
-    transform: translate(-50%, -50%) scale(0.78);
-    opacity: 0;
-    pointer-events: none;
-    animation: m-auth-pulse 5.5s var(--m-ease-soft) infinite;
-}
-
-@keyframes m-auth-pulse {
-    0%, 100% { transform: translate(-50%, -50%) scale(0.78); opacity: 0; }
-    35% { opacity: 0.7; }
-    70% { transform: translate(-50%, -50%) scale(1.25); opacity: 0; }
-}
-
-.auth-shell .auth-brand-panel .brand-glow {
-    background-image: radial-gradient(closest-side, rgb(var(--m-accent-rgb) / 40%), transparent);
-    opacity: 0.5;
-    animation: m-brand-pulse 7s var(--m-ease-soft) infinite;
-}
-
-@keyframes m-brand-pulse {
-    0%, 100% { opacity: 0.35; transform: scale(0.96); }
-    50% { opacity: 0.6; transform: scale(1.06); }
-}
-
-.auth-shell .auth-brand-panel .flow-line {
-    animation: m-gate-pulse 4s var(--m-ease-soft) infinite;
-}
-
-@keyframes m-gate-pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgb(var(--m-accent-rgb) / 55%); }
-    50% { box-shadow: 0 0 0 9px rgb(var(--m-accent-rgb) / 0%); }
-}
-
-.auth-shell .auth-brand-panel .status-pill {
-    animation: m-pill-breathe 5s var(--m-ease-soft) infinite;
-}
-
-.auth-shell .auth-brand-panel .status-pill:nth-child(2) {
-    animation-delay: -1.7s;
-}
-
-.auth-shell .auth-brand-panel .status-pill:nth-child(3) {
-    animation-delay: -3.4s;
-}
-
-@keyframes m-pill-breathe {
-    0%, 100% { opacity: 0.85; }
-    50% { opacity: 1; }
-}
-
-/* Live activity feed card */
-.auth-shell .auth-live-card {
-    max-width: 24rem;
-    border-radius: var(--m-radius);
-    border: 1px solid rgb(255 255 255 / 12%);
-    background: rgb(255 255 255 / 6%);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    padding: 1rem;
-    box-shadow: 0 24px 50px -30px rgb(0 0 0 / 55%);
-}
-
-.auth-shell .auth-live-dot {
-    position: relative;
-    box-shadow: 0 0 12px rgb(52 211 153 / 55%);
-}
-
-.auth-shell .auth-live-dot::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 9999px;
-    background: rgb(52 211 153 / 55%);
-    animation: m-live-ring 2.4s var(--m-ease-soft) infinite;
-}
-
-@keyframes m-live-ring {
-    0% { transform: scale(1); opacity: 0.7; }
-    70%, 100% { transform: scale(2.8); opacity: 0; }
+html.theme-light .auth-shell .auth-brand-panel {
+    background: #10395f;
 }
 
 .auth-shell .auth-form-panel {
     background: var(--m-bg);
 }
 
-/* Distinct half-page section for the sign-in form */
-.auth-shell .auth-form-panel::before {
-    content: '';
+/* --- Brand panel composition: type hierarchy + designed rails --- */
+
+.auth-shell .auth-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.5);
+}
+
+.auth-shell .auth-eyebrow::before {
+    content: "";
+    width: 1.5rem;
+    height: 1px;
+    background: rgb(255 255 255 / 0.3);
+}
+
+.auth-shell .auth-headline {
+    margin-top: 1.25rem;
+    font-size: clamp(1.75rem, 3.1vw, 2.5rem);
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: -0.025em;
+    color: #fff;
+    text-wrap: balance;
+}
+
+.auth-shell .auth-panel-label {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.38);
+}
+
+/* Lifecycle rail: nodes joined by a continuous connector line. */
+.auth-shell .auth-rail {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem 0.75rem;
+    padding-left: 0;
+}
+
+.auth-shell .auth-rail__node {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+.auth-shell .auth-rail__dot {
+    position: relative;
+    flex: none;
+    width: 7px;
+    height: 7px;
+    border-radius: 9999px;
+    background: rgb(255 255 255 / 0.9);
+    box-shadow: 0 0 0 3px rgb(11 42 73 / 0.9);
+}
+
+/* Connector runs behind the dots, broken on the last cell of each row. */
+.auth-shell .auth-rail__node::before {
+    content: "";
     position: absolute;
-    inset: 0;
-    background-image:
-        radial-gradient(70% 40% at 18% 0%, rgb(var(--m-accent-rgb) / 9%), transparent 60%),
-        radial-gradient(60% 46% at 100% 100%, rgb(var(--m-violet-rgb) / 8%), transparent 60%);
-    pointer-events: none;
+    top: 50%;
+    right: 0.75rem;
+    left: 0.9rem;
+    height: 1px;
+    background: rgb(255 255 255 / 0.16);
 }
 
-/* Keep the dark form surface clean; the light theme gets the soft wash below. */
-.auth-shell .auth-form-panel::before {
-    background: none;
+.auth-shell .auth-rail__node:nth-child(3n)::before {
+    display: none;
 }
 
-html.theme-light .auth-shell .auth-form-panel {
-    background: var(--m-bg);
+.auth-shell .auth-rail__label {
+    position: relative;
+    font-size: 12.5px;
+    line-height: 1.3;
+    color: rgb(255 255 255 / 0.72);
 }
 
-html.theme-light .auth-shell .auth-form-panel::before {
-    background-image:
-        radial-gradient(70% 40% at 18% 0%, rgb(var(--m-accent-rgb) / 9%), transparent 60%),
-        radial-gradient(60% 46% at 100% 100%, rgb(var(--m-violet-rgb) / 8%), transparent 60%);
+/* Severity legend rows carry their own signal colour. */
+.auth-shell .auth-tier {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+}
+
+.auth-shell .auth-tier__dot {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    margin-top: 0.375rem;
+    border-radius: 9999px;
+    background: #64748b;
+    box-shadow: 0 0 0 3px rgb(255 255 255 / 0.06);
+}
+
+.auth-shell .auth-tier[data-tier="red"] .auth-tier__dot {
+    background: #f87171;
+    box-shadow: 0 0 0 3px rgb(248 113 113 / 0.18);
+}
+
+.auth-shell .auth-tier[data-tier="amber"] .auth-tier__dot {
+    background: #fbbf24;
+    box-shadow: 0 0 0 3px rgb(251 191 36 / 0.18);
+}
+
+.auth-shell .auth-tier[data-tier="blue"] .auth-tier__dot {
+    background: #60a5fa;
+    box-shadow: 0 0 0 3px rgb(96 165 250 / 0.18);
+}
+
+.auth-shell .auth-tier__label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: rgb(255 255 255 / 0.88);
+}
+
+.auth-shell .auth-tier__guide {
+    display: block;
+    margin-top: 0.125rem;
+    font-size: 12px;
+    line-height: 1.4;
+    color: rgb(255 255 255 / 0.5);
+}
+
+@media (min-width: 1024px) {
+    .auth-shell .auth-form-panel {
+        border-left: 1px solid var(--m-border);
+    }
 }
 
 .auth-shell .auth-form-wrap {
     position: relative;
     width: 100%;
-    max-width: 30rem;
+    max-width: 24rem;
     padding: 0;
 }
 
 .auth-shell .auth-form-wrap .input {
-    min-height: 3.4rem;
-    border-radius: var(--m-radius-sm);
-    border: 1px solid var(--m-border);
+    width: 100%;
+    min-height: 2.75rem;
+    padding: 0 0.875rem;
+    border-radius: 8px;
+    border: 1px solid var(--m-border-strong);
     background: var(--m-panel-soft);
     color: var(--m-ink);
     box-shadow: none;
 }
 
-.auth-shell .auth-form-wrap .auth-input {
-    padding-left: 3rem;
-}
-
 .auth-shell .auth-form-wrap .auth-check {
     accent-color: var(--m-accent);
-}
-
-.auth-shell .auth-form-wrap .auth-forgot {
-    color: var(--m-accent);
-}
-
-.auth-shell .auth-form-wrap .auth-forgot:hover {
-    color: var(--m-accent-2);
 }
 
 .auth-shell .auth-form-wrap .input::placeholder {
@@ -1382,12 +1518,13 @@ html.theme-light .auth-shell .auth-form-panel::before {
 
 .auth-shell .auth-form-wrap .input:focus {
     border-color: rgb(var(--m-accent-rgb) / 55%);
-    box-shadow: 0 0 0 4px rgb(var(--m-accent-rgb) / 14%);
+    box-shadow: 0 0 0 3px rgb(var(--m-accent-rgb) / 14%);
     background: var(--m-panel-2);
 }
 
 .auth-shell .auth-form-wrap .label {
     color: var(--m-ink-soft);
+    font-size: 0.8125rem;
 }
 
 .auth-shell .auth-form-wrap .text-slate-500,
@@ -1396,7 +1533,8 @@ html.theme-light .auth-shell .auth-form-panel::before {
 }
 
 .auth-shell .auth-form-wrap .btn-primary {
-    min-height: 3.4rem;
+    min-height: 2.75rem;
+    border-radius: 8px;
 }
 
 .auth-shell a.text-brand-600 {
@@ -1408,9 +1546,9 @@ html.theme-light .auth-shell .auth-form-panel::before {
 }
 
 .auth-shell #login-error {
-    border-color: rgb(255 107 107 / 35%);
-    background: rgb(255 82 82 / 12%);
-    color: #ffb4b4;
+    border-color: rgb(var(--m-red-rgb) / 30%);
+    background: rgb(var(--m-red-rgb) / 10%);
+    color: #f8a5a5;
 }
 
 /* ------------------------------------------------------------------ */
@@ -1481,8 +1619,7 @@ html.theme-light .public-shell .m-menu .text-white {
     .m-sheen::after,
     .m-wave path,
     .m-cue__rail::after,
-.m-live__dot,
-    .auth-live-dot::after {
+    .m-live__dot {
         animation: none !important;
     }
 

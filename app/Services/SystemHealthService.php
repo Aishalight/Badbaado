@@ -226,14 +226,17 @@ class SystemHealthService
      */
     private function publicLink(): array
     {
-        $link = public_path('storage');
+        // Windows junctions are not reported by is_link(), so compare the
+        // resolved paths: public/storage must resolve to the public disk.
+        $resolved = realpath(public_path('storage'));
+        $target = realpath(storage_path('app/public'));
 
-        if (is_link($link)) {
+        if ($target !== false && $resolved === $target) {
             return [
                 'key' => 'storage_link',
                 'label' => 'Public storage link',
                 'status' => 'ok',
-                'detail' => 'Symlink present',
+                'detail' => 'Public disk reachable at /storage',
             ];
         }
 

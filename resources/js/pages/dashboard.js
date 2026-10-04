@@ -10,17 +10,20 @@ const themeColors = () => {
     return {
         ink: styles.getPropertyValue('--m-ink').trim(),
         muted: styles.getPropertyValue('--m-muted').trim(),
+        faint: styles.getPropertyValue('--m-faint').trim(),
         border: styles.getPropertyValue('--m-border').trim(),
+        surface: styles.getPropertyValue('--m-card-solid').trim(),
         accent: styles.getPropertyValue('--m-accent').trim(),
         blue: styles.getPropertyValue('--m-blue').trim(),
         red: styles.getPropertyValue('--m-red-rgb').trim(),
-        tooltip: styles.getPropertyValue('--m-panel-2').trim(),
+        tooltip: styles.getPropertyValue('--m-chrome').trim(),
     };
 };
 
 const baseOptions = (colors) => ({
     responsive: true,
     maintainAspectRatio: false,
+    animation: { duration: 320, easing: 'easeOutQuart' },
     plugins: {
         legend: { display: false },
         tooltip: {
@@ -28,11 +31,14 @@ const baseOptions = (colors) => ({
             backgroundColor: colors.tooltip,
             titleColor: colors.muted,
             bodyColor: colors.ink,
-            padding: 12,
-            cornerRadius: 8,
-            titleFont: { weight: '700', size: 12 },
+            borderColor: colors.border,
+            borderWidth: 1,
+            padding: 10,
+            cornerRadius: 6,
+            titleFont: { weight: '600', size: 11 },
             bodyFont: { size: 12 },
             bodySpacing: 4,
+            caretSize: 4,
         },
     },
 });
@@ -50,28 +56,40 @@ const initTrendChart = (element, colors) => {
                 backgroundColor: (context) => {
                     const chart = context.chart;
                     const { ctx, chartArea } = chart;
-                    if (!chartArea) return `color-mix(in srgb, ${colors.accent} 16%, transparent)`;
+                    if (!chartArea) return `color-mix(in srgb, ${colors.accent} 14%, transparent)`;
                     const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-                    gradient.addColorStop(0, `color-mix(in srgb, ${colors.accent} 22%, transparent)`);
-                    gradient.addColorStop(0.7, `color-mix(in srgb, ${colors.accent} 6%, transparent)`);
+                    gradient.addColorStop(0, `color-mix(in srgb, ${colors.accent} 16%, transparent)`);
                     gradient.addColorStop(1, `color-mix(in srgb, ${colors.accent} 0%, transparent)`);
                     return gradient;
                 },
-                borderWidth: 2.5,
-                pointRadius: 4,
-                pointHoverRadius: 6,
+                borderWidth: 2,
+                borderCapStyle: 'round',
+                borderJoinStyle: 'round',
+                pointRadius: 0,
+                pointHoverRadius: 4,
+                pointHitRadius: 16,
                 pointBackgroundColor: colors.accent,
-                pointBorderColor: '#fff',
+                pointBorderColor: colors.surface,
                 pointBorderWidth: 2,
                 fill: true,
-                tension: 0.38,
+                tension: 0.35,
             }],
         },
         options: {
             ...baseOptions(colors),
+            interaction: { mode: 'index', intersect: false },
             scales: {
-                x: { grid: { display: false }, ticks: { color: colors.muted, font: { size: 11 } } },
-                y: { beginAtZero: true, border: { display: false }, grid: { color: colors.border }, ticks: { color: colors.muted, precision: 0, font: { size: 11 } } },
+                x: {
+                    grid: { display: false },
+                    border: { display: false },
+                    ticks: { color: colors.faint, font: { size: 11 }, maxRotation: 0, autoSkipPadding: 16 },
+                },
+                y: {
+                    beginAtZero: true,
+                    border: { display: false },
+                    grid: { color: colors.border, drawTicks: false },
+                    ticks: { color: colors.faint, precision: 0, font: { size: 11 }, padding: 8 },
+                },
             },
         },
     });
@@ -88,16 +106,18 @@ const initStatusChart = (element, colors) => {
             datasets: [{
                 data: data.map((item) => item.count),
                 backgroundColor: palette,
-                borderColor: colors.ink,
-                borderWidth: 3,
-                hoverOffset: 5,
-                hoverBorderColor: '#fff',
-                hoverBorderWidth: 2,
+                /* A hairline in the surface colour separates the segments.
+                   A thick contrasting border is what reads as "generated". */
+                borderColor: colors.surface,
+                borderWidth: 1,
+                hoverOffset: 4,
+                hoverBorderColor: colors.surface,
+                hoverBorderWidth: 1,
             }],
         },
         options: {
             ...baseOptions(colors),
-            cutout: '72%',
+            cutout: '76%',
             plugins: { ...baseOptions(colors).plugins, legend: { display: false } },
         },
     });

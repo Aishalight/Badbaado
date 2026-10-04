@@ -40,6 +40,7 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     Route::get('referrals/{referral}/attachments/{attachment}', [ReferralAttachmentController::class, 'download'])->middleware('hospital');
 
     Route::get('notifications', [NotificationController::class, 'index']);
+    Route::get('notifications/pending', [NotificationController::class, 'pending']);
     Route::post('notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
     Route::post('notifications/read-all', [NotificationController::class, 'markAllAsRead']);
 

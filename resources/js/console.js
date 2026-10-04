@@ -4,6 +4,7 @@ import '../css/console.css';
 import { api } from './lib/api';
 import { initThemeToggle } from './lib/cinematic';
 import { initDashboardCharts } from './pages/dashboard';
+import * as alarms from './lib/alarms';
 
 const formData = (form) => new FormData(form);
 
@@ -345,12 +346,12 @@ async function deleteAdminResource(button, endpoint, message = 'Are you sure you
 
 async function markNotificationRead(button) {
     button.disabled = true;
-    try { await api.post(`/notifications/${button.dataset.readNotification}/read`); window.location.reload(); } catch (error) { showError(error); button.disabled = false; }
+    try { await api.post(`/notifications/${button.dataset.readNotification}/read`); alarms.acknowledge(); window.location.reload(); } catch (error) { showError(error); button.disabled = false; }
 }
 
 async function markAllNotificationsRead(button) {
     button.disabled = true;
-    try { await api.post('/notifications/read-all'); window.location.reload(); } catch (error) { showError(error); button.disabled = false; }
+    try { await api.post('/notifications/read-all'); alarms.acknowledge(); window.location.reload(); } catch (error) { showError(error); button.disabled = false; }
 }
 
 function imagePreview(input) {
@@ -435,11 +436,82 @@ async function createInlineResource(form, endpoint) {
     }
 }
 
+/**
+ * Alarm switch on the settings page. The permission is only ever requested
+ * from this click, so nothing is asked of the browser on page load.
+ */
+function initAlarmSettings() {
+    const panel = document.querySelector('[data-alarm-settings]');
+    if (! panel) return;
+
+    const toggle = panel.querySelector('[data-alarm-toggle]');
+    const state = panel.querySelector('[data-alarm-state]');
+    const note = panel.querySelector('[data-alarm-note]');
+    const testButton = panel.querySelector('[data-alarm-test]');
+    const testResult = panel.querySelector('[data-alarm-test-result]');
+
+    if (! alarms.isSupported()) {
+        toggle.disabled = true;
+        note.textContent = 'This browser does not support system notifications, so alarms cannot be enabled here.';
+        testButton.disabled = true;
+
+        return;
+    }
+
+    const paint = () => {
+        const on = alarms.isEnabled();
+        toggle.checked = on;
+        state.textContent = on ? 'On' : 'Off';
+
+        if (! on) {
+            note.textContent = 'Off by default. Nothing is requested from your browser until you turn this on.';
+
+            return;
+        }
+
+        note.textContent = alarms.permission() === 'granted'
+            ? 'Alarms are on for this browser. They sound while BADBAADO has an open tab; a closed browser cannot be reached without a push service.'
+            : 'Alarms are on, but this browser is still withholding notification permission.';
+    };
+
+    toggle.addEventListener('change', async () => {
+        if (toggle.checked) {
+            const result = await alarms.enable();
+
+            if (result === 'denied') {
+                note.textContent = 'This browser blocked notifications for BADBAADO. Re-allow it in the site settings, then turn alarms back on.';
+            } else if (result === 'unsupported') {
+                toggle.disabled = true;
+            } else {
+                alarms.start();
+            }
+        } else {
+            alarms.disable();
+        }
+
+        paint();
+    });
+
+    testButton.addEventListener('click', () => {
+        const granted = alarms.permission() === 'granted';
+        alarms.preview('critical');
+
+        testResult.textContent = granted
+            ? 'Played a critical alarm and an operating-system notification.'
+            : 'Played the sound only — this browser has not granted notification permission.';
+    });
+
+    alarms.onChange(paint);
+    paint();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initThemeToggle();
     initDashboardCharts();
     initAdminTabs();
     initIntendedDoctorPicker();
+    initAlarmSettings();
+    if (alarms.isEnabled()) alarms.start();
     document.querySelector('#referral-form')?.addEventListener('submit', (event) => { event.preventDefault(); submitReferral(event.currentTarget); });
     document.querySelector('#is-emergency')?.addEventListener('change', (event) => {
         if (event.currentTarget.checked) {
