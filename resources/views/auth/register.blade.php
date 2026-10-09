@@ -43,9 +43,8 @@
                             <legend class="label">I am registering as</legend>
                             <div class="grid gap-3 sm:grid-cols-2">
                                 @foreach ($types as $type)
-                                    <label
-                                        class="flex cursor-pointer items-start gap-3 rounded-xl border border-[color:var(--m-border)] bg-[var(--m-panel)] p-3.5 transition hover:border-[color:var(--m-border-strong)] has-[:checked]:border-[color:var(--m-accent)] has-[:checked]:ring-1 has-[:checked]:ring-[color:var(--m-accent)]">
-                                        <input type="radio" name="type" value="{{ $type->value }}" class="mt-1"
+                                    <label class="auth-choice">
+                                        <input type="radio" name="type" value="{{ $type->value }}"
                                             @checked(old('type', $type === $types[0]))>
                                         <span>
                                             <span class="block text-sm font-semibold text-[color:var(--m-ink)]">
@@ -107,52 +106,44 @@
                             </div>
                         </div>
 
-                        <div class="auth-field" data-registration-doctor>
-                            <label for="specialty_id" class="label">Specialty</label>
-                            <select name="specialty_id" id="specialty_id" class="input mt-2">
-                                <option value="">Choose a specialty</option>
-                                @foreach ($specialties as $specialty)
-                                    <option value="{{ $specialty->id }}"
-                                        @selected((int) old('specialty_id') === $specialty->id)>
-                                        {{ $specialty->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('specialty_id')
-                                <p class="auth-field-error">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="auth-field" data-registration-doctor>
-                            <label for="license_number" class="label">Medical registration number</label>
-                            <input type="text" name="license_number" id="license_number"
-                                value="{{ old('license_number') }}" class="input mt-2">
-                            @error('license_number')
-                                <p class="auth-field-error">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="auth-field" data-registration-hospital>
-                            <label for="facility_name" class="label">Hospital name</label>
-                            <input type="text" name="facility_name" id="facility_name"
-                                value="{{ old('facility_name') }}" class="input mt-2">
-                            @error('facility_name')
-                                <p class="auth-field-error">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="grid gap-4 sm:grid-cols-2">
+                        <div class="grid gap-4 sm:grid-cols-2" data-registration-doctor>
                             <div class="auth-field">
-                                <label for="location" class="label">Location <span
-                                        class="text-[color:var(--m-muted)]">(optional)</span></label>
-                                <input type="text" name="location" id="location" autocomplete="address-level2"
-                                    value="{{ old('location') }}" class="input mt-2">
-                                @error('location')
+                                <label for="specialty_id" class="label">Specialty</label>
+                                <select name="specialty_id" id="specialty_id" class="input mt-2">
+                                    <option value="">Choose a specialty</option>
+                                    @foreach ($specialties as $specialty)
+                                        <option value="{{ $specialty->id }}"
+                                            @selected((int) old('specialty_id') === $specialty->id)>
+                                            {{ $specialty->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('specialty_id')
                                     <p class="auth-field-error">{{ $message }}</p>
                                 @enderror
                             </div>
 
-                            <div class="auth-field" data-registration-hospital>
+                            <div class="auth-field">
+                                <label for="license_number" class="label">Medical registration number</label>
+                                <input type="text" name="license_number" id="license_number"
+                                    value="{{ old('license_number') }}" class="input mt-2">
+                                @error('license_number')
+                                    <p class="auth-field-error">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="grid gap-4 sm:grid-cols-2" data-registration-hospital>
+                            <div class="auth-field">
+                                <label for="facility_name" class="label">Hospital name</label>
+                                <input type="text" name="facility_name" id="facility_name"
+                                    value="{{ old('facility_name') }}" class="input mt-2">
+                                @error('facility_name')
+                                    <p class="auth-field-error">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div class="auth-field">
                                 <label for="level" class="label">Facility level</label>
                                 <select name="level" id="level" class="input mt-2">
                                     @foreach (['primary', 'secondary', 'tertiary'] as $level)
@@ -165,6 +156,16 @@
                                     <p class="auth-field-error">{{ $message }}</p>
                                 @enderror
                             </div>
+                        </div>
+
+                        <div class="auth-field">
+                            <label for="location" class="label">Location <span
+                                    class="text-[color:var(--m-muted)]">(optional)</span></label>
+                            <input type="text" name="location" id="location" autocomplete="address-level2"
+                                value="{{ old('location') }}" class="input mt-2">
+                            @error('location')
+                                <p class="auth-field-error">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div class="grid gap-4 sm:grid-cols-2">

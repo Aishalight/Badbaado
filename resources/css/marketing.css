@@ -1880,8 +1880,13 @@ html.theme-light .m-hero__media::before {
     padding: 0;
 }
 
-.auth-shell .auth-field + .auth-field {
-    margin-top: 1.35rem;
+/* Vertical rhythm between fields is owned by the form's `space-y-5`, so
+   fields inside two-column grids stay aligned with their sibling. */
+
+/* Keep the `hidden` attribute authoritative for toggled registration groups
+   even when the wrapper carries a `display` utility such as `grid`. */
+.auth-shell [hidden] {
+    display: none;
 }
 
 /* Form side surfaces read as solid sheets: near-black on the dark theme,
@@ -1966,6 +1971,39 @@ html.theme-light .m-hero__media::before {
     border-color: var(--m-accent);
     box-shadow: 0 0 0 2px rgb(var(--m-accent-rgb) / 20%);
     background: #050d18;
+}
+
+/* Provider-type option cards share the input surface (same border, radius and
+   background) so the form reads as one set of controls. */
+.auth-shell .auth-form-wrap .auth-choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.875rem;
+    border: 1px solid rgb(255 255 255 / 14%);
+    border-radius: 0.375rem;
+    background: #050d18;
+    cursor: pointer;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.auth-shell .auth-form-wrap .auth-choice:hover {
+    border-color: rgb(255 255 255 / 26%);
+}
+
+.auth-shell .auth-form-wrap .auth-choice:has(input:checked) {
+    border-color: var(--m-accent);
+    box-shadow: 0 0 0 2px rgb(var(--m-accent-rgb) / 20%);
+}
+
+.auth-shell .auth-form-wrap .auth-choice input[type='radio'] {
+    margin-top: 0.15rem;
+    width: 1.06rem;
+    height: 1.06rem;
+    accent-color: var(--m-accent);
 }
 
 .auth-shell .auth-form-wrap .label {
@@ -2186,6 +2224,27 @@ html.theme-light .auth-shell .auth-form-wrap .input {
 
 html.theme-light .auth-shell .auth-form-wrap .input:focus {
     background: #ffffff;
+}
+
+html.theme-light .auth-shell .auth-form-wrap .auth-choice {
+    border-color: #cbd2c9;
+    background: #ffffff;
+}
+
+html.theme-light .auth-shell .auth-form-wrap .auth-choice:hover {
+    border-color: #9fb0c0;
+}
+
+/* The split sign-in keeps a dark rail in both themes, but the solo pages show
+   the mark on the light panel, where the default white wordmark is invisible. */
+html.theme-light .auth-shell--solo .auth-brand-word {
+    color: var(--m-ink);
+}
+
+html.theme-light .auth-shell--solo .auth-solo-mark .auth-brand-logo {
+    box-shadow:
+        0 0 0 1px var(--m-border-strong),
+        0 16px 34px -18px rgb(8 47 88 / 28%);
 }
 
 html.theme-light .auth-shell .auth-form-wrap .input::placeholder,
