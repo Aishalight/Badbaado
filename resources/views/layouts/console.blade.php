@@ -38,6 +38,7 @@
                 ['route' => 'admin.hospitals', 'label' => 'Hospitals', 'key' => 'admin.hospitals', 'icon' => 'building'],
             ]],
             ['group' => 'People & Access', 'items' => [
+                ['route' => 'admin.applications', 'label' => 'Applications', 'key' => 'admin.applications', 'icon' => 'inbox'],
                 ['route' => 'admin.users', 'label' => 'Users & Access', 'key' => 'admin.users', 'icon' => 'users'],
             ]],
             ['group' => 'Security & Monitoring', 'items' => [
@@ -71,6 +72,9 @@
         ->whereNull('read_at')
         ->whereIn('severity', array_map(fn ($severity) => $severity->value, \App\Enums\NotificationSeverity::interrupting()))
         ->count();
+    $pendingApplications = $roleSlug === 'system_admin'
+        ? \App\Models\ProviderApplication::pending()->count()
+        : 0;
 
     $primary = match ($roleSlug) {
         'healthcare_worker', 'referral_coordinator' => [
@@ -101,6 +105,7 @@
         'bell' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 shrink-0"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>',
         'chart' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 shrink-0"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>',
         'users' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 shrink-0"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>',
+        'inbox' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 shrink-0"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>',
         'network' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 shrink-0"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><path d="M12 7v4m-5.5 7L10 12m8.5 8L14 12"/></svg>',
         'building' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 shrink-0"><path d="M4 21V3h16v18"/><path d="M9 21V14h6v7"/><path d="M8 6h.01M12 6h.01M16 6h.01M8 10h.01M12 10h.01M16 10h.01"/></svg>',
         'shield' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
@@ -154,7 +159,7 @@
                         <a href="{{ route($item['route']) }}" class="console-nav-link flex items-center gap-2.5 rounded-md px-2.5 py-[7px] text-[13px] {{ $active ? 'is-active' : '' }}">
                             <span class="text-slate-400 {{ $active ? 'text-accent-600' : '' }}">{!! $icons[$item['icon']] !!}</span>
                             <span class="flex-1 truncate">{{ $item['label'] }}</span>
-                            @if ($item['key'] === 'notifications' && $unread > 0)<span class="nav-badge rounded-full px-1.5 py-0.5 text-[10px] font-bold {{ $unreadAlarms > 0 ? 'bg-red-500 text-white' : '' }}">{{ $unread }}</span>@endif
+                            @if ($item['key'] === 'notifications' && $unread > 0)<span class="nav-badge rounded-full px-1.5 py-0.5 text-[10px] font-bold {{ $unreadAlarms > 0 ? 'bg-red-500 text-white' : '' }}">{{ $unread }}</span>@elseif ($item['key'] === 'admin.applications' && $pendingApplications > 0)<span class="nav-badge rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-bold text-white">{{ $pendingApplications }}</span>@endif
                         </a>
                     @endforeach
                 @endforeach
@@ -207,7 +212,8 @@
                     <span>{{ $item['label'] }}</span>
                 </a>
             @endforeach
-            <button type="button" data-nav-more class="console-bottomnav-item flex flex-1 flex-col items-center justify-center gap-1 py-2.5 text-[10px] font-semibold text-slate-400 transition">
+            <button type="button" data-nav-more class="console-bottomnav-item relative flex flex-1 flex-col items-center justify-center gap-1 py-2.5 text-[10px] font-semibold text-slate-400 transition">
+                @if ($pendingApplications > 0)<span class="nav-dot absolute right-2.5 top-1.5 h-1.5 w-1.5 rounded-full bg-amber-500"></span>@endif
                 {!! $icons['more'] !!}
                 <span>More</span>
             </button>
@@ -231,7 +237,7 @@
                         <a href="{{ route($item['route']) }}" class="flex items-center gap-3 rounded-md px-2.5 py-2 text-[13px] font-semibold {{ $active ? 'bg-brand-50 text-brand-700' : 'text-slate-600 hover:bg-slate-100' }}">
                             <span class="text-slate-400 {{ $active ? 'text-accent-600' : '' }}">{!! $icons[$item['icon']] !!}</span>
                             <span class="flex-1 truncate">{{ $item['label'] }}</span>
-                            @if ($item['key'] === 'notifications' && $unread > 0)<span class="rounded-full px-1.5 py-0.5 text-[10px] font-bold {{ $unreadAlarms > 0 ? 'bg-red-500 text-white' : 'bg-slate-100 text-slate-600' }}">{{ $unread }}</span>@endif
+                            @if ($item['key'] === 'notifications' && $unread > 0)<span class="rounded-full px-1.5 py-0.5 text-[10px] font-bold {{ $unreadAlarms > 0 ? 'bg-red-500 text-white' : 'bg-slate-100 text-slate-600' }}">{{ $unread }}</span>@elseif ($item['key'] === 'admin.applications' && $pendingApplications > 0)<span class="rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-bold text-white">{{ $pendingApplications }}</span>@endif
                         </a>
                     @endforeach
                 @endforeach

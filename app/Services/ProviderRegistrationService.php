@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
+use App\Enums\NotificationSeverity;
 use App\Enums\ProviderApplicationStatus;
 use App\Enums\ProviderApplicationType;
 use App\Enums\UserStatus;
 use App\Models\Hospital;
+use App\Models\Notification;
 use App\Models\ProviderApplication;
 use App\Models\Role;
 use App\Models\User;
@@ -51,8 +53,34 @@ class ProviderRegistrationService
                 'email' => $user->email,
             ]);
 
+            $this->notifyAdministrators($application);
+
             return $application;
         });
+    }
+
+    /**
+     * Alert every platform administrator that a new application needs review.
+     */
+    private function notifyAdministrators(ProviderApplication $application): void
+    {
+        $applicant = $application->user?->name ?? ($application->payload['name'] ?? 'A new applicant');
+
+        User::whereHas('role', fn ($query) => $query->where('slug', 'system_admin'))
+            ->each(function (User $admin) use ($application, $applicant): void {
+                Notification::create([
+                    'user_id' => $admin->getKey(),
+                    'referral_id' => null,
+                    'type' => 'provider_application_submitted',
+                    'severity' => NotificationSeverity::INFO,
+                    'title' => 'New provider application',
+                    'body' => sprintf(
+                        '%s submitted a %s application awaiting verification.',
+                        $applicant,
+                        $application->type->label(),
+                    ),
+                ]);
+            });
     }
 
     /**
