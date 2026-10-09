@@ -52,6 +52,8 @@ class AuthFeatureTest extends TestCase
         $this->postJson('/api/register', [
             'name' => 'New Clinician',
             'email' => 'new.clinician@example.com',
+            'type' => 'hospital',
+            'facility_name' => 'New Clinician Hospital',
             'password' => 'password',
             'password_confirmation' => 'password',
         ])->assertUnprocessable()
@@ -60,24 +62,27 @@ class AuthFeatureTest extends TestCase
         $this->assertDatabaseMissing('users', ['email' => 'new.clinician@example.com']);
     }
 
-    public function test_register_creates_healthcare_worker_and_returns_201(): void
+    public function test_register_creates_a_pending_provider_application(): void
     {
-        $role = $this->role('healthcare_worker');
         $this->enableRegistration();
 
         $response = $this->postJson('/api/register', [
             'name' => 'New Clinician',
             'email' => 'new.clinician@example.com',
+            'type' => 'hospital',
+            'facility_name' => 'New Clinician Hospital',
             'password' => 'password',
             'password_confirmation' => 'password',
         ]);
 
-        $response->assertCreated()
-            ->assertJsonStructure(['token']);
+        $response->assertStatus(202)
+            ->assertJsonMissing(['token'])
+            ->assertJsonPath('status', 'pending');
 
         $this->assertDatabaseHas('users', [
             'email' => 'new.clinician@example.com',
-            'role_id' => $role->getKey(),
+            'role_id' => null,
+            'status' => 'pending',
         ]);
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\UserStatus;
 use App\Models\AuditLog;
 use App\Models\Role;
 use App\Models\User;
@@ -35,7 +36,7 @@ class SecurityService
                 ->count(),
             'active_sessions' => DB::table('sessions')->where('last_activity', '>=', $now->copy()->subDay()->getTimestamp())->count(),
             'privileged_users' => Role::whereIn('slug', ['system_admin', 'hospital_admin'])->first()
-                ? User::whereIn('role_id', Role::whereIn('slug', ['system_admin', 'hospital_admin'])->pluck('id'))->where('is_active', true)->count()
+                ? User::whereIn('role_id', Role::whereIn('slug', ['system_admin', 'hospital_admin'])->pluck('id'))->where('status', UserStatus::ACTIVE)->count()
                 : 0,
         ];
     }

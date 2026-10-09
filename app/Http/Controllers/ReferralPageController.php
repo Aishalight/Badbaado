@@ -9,7 +9,6 @@ use App\Models\Referral;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 class ReferralPageController extends Controller
@@ -42,39 +41,15 @@ class ReferralPageController extends Controller
 
         $me = auth()->user();
         $hospitals = Hospital::query()
+            ->hospitals()
             ->where('is_active', true)
             ->when($me->hospital_id, fn (Builder $query) => $query->whereKeyNot($me->hospital_id))
-            ->with(['referralStaff' => fn ($query) => $query->get([
-                'users.id', 'users.name', 'users.title', 'users.avatar_path',
-            ])])
             ->orderBy('name')
             ->get();
 
         return view('referrals.create', [
             'hospitals' => $hospitals,
-            'hospitalDirectory' => $this->hospitalDirectory($hospitals),
         ]);
-    }
-
-    /**
-     * Destination options for the dependent doctor picker, keyed by hospital.
-     *
-     * @param  Collection<int, Hospital>  $hospitals
-     * @return array<int, array{id: int, name: string, logo_url: string|null, doctors: array<int, array{id: int, name: string, title: string|null, avatar_url: string|null}>}>
-     */
-    private function hospitalDirectory(Collection $hospitals): array
-    {
-        return $hospitals->map(fn (Hospital $hospital): array => [
-            'id' => $hospital->getKey(),
-            'name' => $hospital->name,
-            'logo_url' => $hospital->logo_url,
-            'doctors' => $hospital->referralStaff->map(fn (User $doctor): array => [
-                'id' => $doctor->getKey(),
-                'name' => $doctor->name,
-                'title' => $doctor->title,
-                'avatar_url' => $doctor->avatar_url,
-            ])->all(),
-        ])->all();
     }
 
     public function show(Referral $referral): View

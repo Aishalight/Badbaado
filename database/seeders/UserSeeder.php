@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\UserStatus;
 use App\Models\Hospital;
 use App\Models\Role;
 use App\Models\User;
@@ -29,7 +30,7 @@ class UserSeeder extends Seeder
                 'name' => 'BADBAADO System Admin',
                 'password' => Hash::make('password'),
                 'role_id' => $systemAdmin->id,
-                'is_active' => true,
+                'status' => UserStatus::ACTIVE,
             ]
         );
 
@@ -47,7 +48,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'hospital_id' => $demoref->id,
                 'role_id' => $hcw->id,
-                'is_active' => true,
+                'status' => UserStatus::ACTIVE,
             ]
         );
 
@@ -59,7 +60,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'hospital_id' => $demoref->id,
                 'role_id' => $coordinator->id,
-                'is_active' => true,
+                'status' => UserStatus::ACTIVE,
             ]
         );
 
@@ -71,7 +72,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'hospital_id' => $demoref->id,
                 'role_id' => $hospitalAdmin->id,
-                'is_active' => true,
+                'status' => UserStatus::ACTIVE,
             ]
         );
 
@@ -90,7 +91,7 @@ class UserSeeder extends Seeder
                     'password' => Hash::make('password'),
                     'hospital_id' => $hospital->id,
                     'role_id' => $hospitalAdmin->id,
-                    'is_active' => true,
+                    'status' => UserStatus::ACTIVE,
                 ]
             );
 
@@ -102,7 +103,7 @@ class UserSeeder extends Seeder
                     'password' => Hash::make('password'),
                     'hospital_id' => $hospital->id,
                     'role_id' => $hcw->id,
-                    'is_active' => true,
+                    'status' => UserStatus::ACTIVE,
                 ]
             );
         }

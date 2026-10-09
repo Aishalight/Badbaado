@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ProviderApplicationStatus;
 use App\Models\Announcement;
 use App\Models\AuditLog;
 use App\Models\Backup;
 use App\Models\Faq;
 use App\Models\Hospital;
 use App\Models\Notification;
+use App\Models\ProviderApplication;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\AnalyticsService;
@@ -43,6 +45,29 @@ class AdminPageController extends Controller
     public function analytics(): View
     {
         return view('admin.analytics', $this->analytics->overview(auth()->user()));
+    }
+
+    /**
+     * Signups waiting on a system administrator's decision.
+     */
+    public function applications(Request $request): View
+    {
+        $status = $request->string('status')->toString() ?: null;
+
+        return view('admin.applications', [
+            'status' => $status,
+            'counts' => [
+                'pending' => ProviderApplication::pending()->count(),
+                'approved' => ProviderApplication::where('status', ProviderApplicationStatus::APPROVED->value)->count(),
+                'rejected' => ProviderApplication::where('status', ProviderApplicationStatus::REJECTED->value)->count(),
+            ],
+            'applications' => ProviderApplication::query()
+                ->with(['user', 'hospital', 'reviewer'])
+                ->when($status, fn ($query) => $query->where('status', $status))
+                ->latest('id')
+                ->paginate(20)
+                ->withQueryString(),
+        ]);
     }
 
     /**

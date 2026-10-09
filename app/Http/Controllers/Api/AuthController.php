@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\ProviderApplicationType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\LoginRequest;
 use App\Http\Requests\Api\RegisterRequest;
 use App\Http\Resources\Api\UserResource;
-use App\Models\Role;
 use App\Models\User;
 use App\Services\AuditLogger;
+use App\Services\ProviderRegistrationService;
 use App\Services\SettingsService;
 use App\Support\AuditActions;
 use App\Support\EqualizesPasswordCheckTime;
@@ -24,6 +25,7 @@ class AuthController extends Controller
     public function __construct(
         private readonly AuditLogger $auditLogger,
         private readonly SettingsService $settingsService,
+        private readonly ProviderRegistrationService $providerRegistrationService,
     ) {}
 
     public function register(RegisterRequest $request): JsonResponse
@@ -34,22 +36,16 @@ class AuthController extends Controller
             ]);
         }
 
-        $role = Role::where('slug', 'healthcare_worker')->firstOrFail();
-
-        $user = User::create([
-            'name' => $request->validated('name'),
-            'email' => $request->validated('email'),
-            'password' => $request->validated('password'),
-            'role_id' => $role->id,
-            'is_active' => true,
-        ]);
-
-        $token = $user->createToken('auth')->plainTextToken;
+        $application = $this->providerRegistrationService->submit(
+            ProviderApplicationType::from($request->validated('type')),
+            $request->applicationPayload(),
+        );
 
         return response()->json([
-            'token' => $token,
-            'user' => new UserResource($user->load(['role', 'hospital'])),
-        ], 201);
+            'message' => 'Your application was submitted for verification.',
+            'application_id' => $application->getKey(),
+            'status' => $application->status->value,
+        ], 202);
     }
 
     public function login(LoginRequest $request): JsonResponse
@@ -78,11 +74,12 @@ class AuthController extends Controller
         if (! $user->is_active) {
             $this->auditLogger->record($user, AuditActions::AUTH_INACTIVE_ACCOUNT, $user, [
                 'email' => $user->email,
+                'status' => $user->status?->value,
                 'guard' => 'sanctum',
             ]);
 
             throw ValidationException::withMessages([
-                'email' => ['This account is disabled. Contact your administrator.'],
+                'email' => [$user->status->blockedMessage()],
             ]);
         }
 

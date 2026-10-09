@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\UserStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\StoreAdminUserRequest;
 use App\Http\Requests\Api\UpdateAdminUserRequest;
@@ -76,7 +77,7 @@ class AdminUserController extends Controller
             'phone' => $request->validated('phone'),
             'role_id' => $role->id,
             'hospital_id' => $hospitalId,
-            'is_active' => true,
+            'status' => UserStatus::ACTIVE,
         ]);
 
         $this->auditLogger->record($request->user(), 'user_created', $user, [
@@ -119,8 +120,8 @@ class AdminUserController extends Controller
 
         $this->authorize('update', $user);
 
-        if ($user->is($actor) && $request->filled('is_active') && ! $request->boolean('is_active')) {
-            abort(422, 'You cannot deactivate your own account.');
+        if ($user->is($actor) && $request->filled('status') && ! $this->resolvesToActive($request->validated('status'))) {
+            abort(422, 'You cannot suspend your own account.');
         }
 
         $updates = [];
@@ -157,8 +158,12 @@ class AdminUserController extends Controller
             $updates['hospital_id'] = $request->validated('hospital_id');
         }
 
-        if ($request->exists('is_active')) {
-            $updates['is_active'] = $request->boolean('is_active');
+        if ($request->exists('status')) {
+            $updates['status'] = $request->validated('status');
+        } elseif ($request->exists('is_active')) {
+            $updates['status'] = $request->boolean('is_active')
+                ? UserStatus::ACTIVE
+                : UserStatus::SUSPENDED;
         }
 
         if ($request->hasFile('avatar')) {
@@ -171,6 +176,16 @@ class AdminUserController extends Controller
         $this->auditLogger->record($request->user(), 'user_updated', $user, array_keys($updates));
 
         return new UserResource($user->fresh(['role', 'hospital']));
+    }
+
+    /**
+     * Whether the requested status still grants console access.
+     */
+    private function resolvesToActive(mixed $status): bool
+    {
+        return $status instanceof UserStatus
+            ? $status === UserStatus::ACTIVE
+            : $status === UserStatus::ACTIVE->value;
     }
 
     private function storeAvatar(StoreAdminUserRequest|UpdateAdminUserRequest $request): ?string

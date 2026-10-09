@@ -3,137 +3,129 @@
 @section('title', 'Sign in: BADBAADO')
 
 @section('body')
-<div class="auth-shell flex min-h-screen flex-col lg:flex-row">
+    <div class="auth-shell auth-shell--split">
+        <span class="auth-wash" aria-hidden="true"></span>
 
-    {{-- Brand panel: describes the product truthfully, no fabricated activity --}}
-    <div class="auth-brand-panel relative flex w-full flex-col overflow-hidden px-6 py-8 sm:px-10 lg:w-[46%] lg:px-14 lg:py-12">
-        <a href="{{ route('home') }}" class="relative flex items-center gap-2.5">
-            <img src="{{ asset('images/badbaado-logo.jpg') }}" alt="" class="h-8 w-8 rounded-lg ring-1 ring-white/20">
-            <span class="text-sm font-bold tracking-tight text-white">BADBAADO</span>
-        </a>
+        <aside class="auth-brand-panel" aria-label="Badbaado platform summary">
+            <span class="auth-brand-backdrop" aria-hidden="true">
+                <span class="m-orb m-orb--1"></span>
+                <span class="m-orb m-orb--2"></span>
+                <span class="m-grain"></span>
+            </span>
 
-        <div class="relative my-auto max-w-lg py-10">
-            <p class="auth-eyebrow">Inter-hospital referral network</p>
+            <div class="auth-brand-inner">
+                <a href="{{ route('home') }}" class="auth-brand-lockup">
+                    <img src="{{ asset('images/badbaado-logo.jpg') }}" alt="" aria-hidden="true"
+                        class="auth-brand-logo">
+                    <span class="auth-brand-word">BADBAADO</span>
+                </a>
 
-            <h2 class="auth-headline">
-                {{ $tagline }}
-            </h2>
-
-            {{-- Lifecycle as a designed rail: connected nodes, not an arrow run --}}
-            <div class="mt-11">
-                <h3 class="auth-panel-label">Referral lifecycle</h3>
-                <ol class="auth-rail mt-4">
-                    @foreach ($stages as $stage)
-                        <li class="auth-rail__node">
-                            <span class="auth-rail__dot" aria-hidden="true"></span>
-                            <span class="auth-rail__label">{{ $stage }}</span>
-                        </li>
-                    @endforeach
-                </ol>
-            </div>
-
-            {{-- Severity legend: what each tier means and what it demands --}}
-            <div class="mt-11">
-                <h3 class="auth-panel-label">Escalation tiers</h3>
-                <ul class="mt-4 space-y-3">
-                    @foreach ($severities as $severity)
-                        <li class="auth-tier" data-tier="{{ $severity->color() }}">
-                            <span class="auth-tier__dot" aria-hidden="true"></span>
-                            <span class="auth-tier__text">
-                                <span class="auth-tier__label">{{ $severity->label() }}</span>
-                                <span class="auth-tier__guide">{{ $severity->guidance() }}</span>
-                            </span>
-                        </li>
-                    @endforeach
-                </ul>
-            </div>
-
-            <div class="mt-11">
-                <h3 class="auth-panel-label">Access levels</h3>
-                <ul class="mt-4 grid grid-cols-2 gap-x-6 gap-y-2">
-                    @foreach ($roles as $role)
-                        <li class="flex items-center gap-2 text-[13px] text-white/65">
-                            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="h-3 w-3 shrink-0 text-white/30">
-                                <path d="M4 10.5 8 14l8-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            {{ $role }}
-                        </li>
-                    @endforeach
-                </ul>
-            </div>
-        </div>
-
-        <p class="relative text-[12px] text-white/35">
-            Every referral action is recorded in the audit trail.
-        </p>
-    </div>
-
-    {{-- Form panel --}}
-    <div class="auth-form-panel relative flex flex-1 items-center justify-center px-5 py-12 sm:px-10">
-        <button type="button" data-theme-toggle aria-label="Toggle light and dark theme" class="absolute right-4 top-4 z-10 inline-flex h-9 w-9 items-center justify-center rounded-md border border-[color:var(--m-border-strong)] bg-[var(--m-panel)] text-[color:var(--m-muted)] transition hover:text-[color:var(--m-ink)] sm:right-6 sm:top-6">
-            <svg data-theme-icon="moon" viewBox="0 0 24 24" fill="none" class="h-4 w-4"><path d="M12 3a7.5 7.5 0 0 0 9 9 8.5 8.5 0 1 1-9-9Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-            <svg data-theme-icon="sun" viewBox="0 0 24 24" fill="none" class="h-4 w-4"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-        </button>
-
-        <div class="auth-form-wrap w-full max-w-sm">
-            <div class="flex flex-col items-center text-center">
-                <img src="{{ asset('images/badbaado-logo.jpg') }}" alt="" class="h-10 w-10 rounded-lg ring-1 ring-[color:var(--m-border-strong)] lg:hidden">
-                <h1 class="mt-5 text-xl font-bold tracking-tight text-brand-950 lg:mt-0">Sign in to BADBAADO</h1>
-                <p class="mt-2 text-sm text-slate-500">Use the account issued by your hospital administrator.</p>
-            </div>
-
-            <form id="login-form" class="mt-8 space-y-4" novalidate>
-                @csrf
-
-                <div>
-                    <label for="email" class="label">Email address</label>
-                    <input
-                        type="email"
-                        name="email"
-                        id="email"
-                        required
-                        autocomplete="email"
-                        autofocus
-                        placeholder="you@hospital.bd"
-                        class="input mt-1.5"
-                    >
+                <div class="auth-brand-copy">
+                    <p class="auth-eyebrow">Inter-hospital referral network</p>
+                    <h2 class="auth-motto">Information arrives before the patient.</h2>
+                    <p class="auth-brand-subtitle">Secure emergency referrals. Faster coordination. Better-informed care.</p>
                 </div>
 
-                <div>
-                    <label for="password" class="label">Password</label>
-                    <input
-                        type="password"
-                        name="password"
-                        id="password"
-                        required
-                        autocomplete="current-password"
-                        placeholder="••••••••"
-                        class="input mt-1.5"
-                    >
+                <div class="auth-network" aria-label="Referral coordination status">
+                    <span class="auth-network__node">ED</span>
+                    <span class="auth-network__rule"></span>
+                    <span class="auth-network__signal"></span>
+                    <span class="auth-network__node auth-network__node--active">BADBAADO</span>
+                    <span class="auth-network__rule"></span>
+                    <span class="auth-network__node">ICU</span>
                 </div>
+            </div>
+        </aside>
 
-                <label for="remember" class="flex cursor-pointer select-none items-center gap-2 text-[13px] text-slate-500">
-                    <input type="checkbox" id="remember" name="remember" class="auth-check h-4 w-4 rounded">
-                    Keep me signed in
-                </label>
+        <main class="auth-form-panel relative">
+            <button type="button" data-theme-toggle aria-label="Toggle light and dark theme"
+                class="auth-theme-toggle absolute right-4 top-4 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-[color:var(--m-border-strong)] bg-[var(--m-panel)] text-[color:var(--m-muted)] shadow-sm transition hover:text-[color:var(--m-ink)] sm:right-6 sm:top-6">
+                <svg data-theme-icon="moon" viewBox="0 0 24 24" fill="none" class="h-4 w-4">
+                    <path d="M12 3a7.5 7.5 0 0 0 9 9 8.5 8.5 0 1 1-9-9Z" stroke="currentColor" stroke-width="1.6"
+                        stroke-linejoin="round" />
+                </svg>
+                <svg data-theme-icon="sun" viewBox="0 0 24 24" fill="none" class="h-4 w-4">
+                    <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6" />
+                    <path
+                        d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"
+                        stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                </svg>
+            </button>
 
-                <div id="login-error" class="hidden rounded-lg border border-red-400/30 bg-red-500/10 px-3 py-2 text-[13px] text-red-200"></div>
+            <div class="auth-form-shell">
+                <div class="auth-form-wrap w-full">
+                    <a href="{{ route('home') }}" class="auth-utility-link mb-6 inline-flex items-center gap-2" aria-label="Back to BADBAADO home">
+                        <span aria-hidden="true">&larr;</span> Back
+                    </a>
+                    <div class="auth-form-header">
+                        <p class="auth-form-kicker">Welcome back</p>
+                        <h1 class="text-[color:var(--m-ink)]">Sign in</h1>
+                        <p>Sign in to continue to Badbaado</p>
+                    </div>
 
-                <button type="submit" id="login-submit" class="btn-primary mt-2 w-full justify-center py-2.5">
-                    Sign in
-                </button>
-            </form>
+                    <form id="login-form" class="space-y-5" novalidate>
+                        @csrf
 
-            <p class="mt-6 text-center text-[13px] text-slate-500">
-                <a href="{{ route('home') }}" class="font-medium text-brand-600 transition hover:text-brand-700">Back to home</a>
-            </p>
-        </div>
+                        <div class="auth-field">
+                            <label for="email" class="label">Work email or username</label>
+                            <input type="email" name="email" id="email" required autocomplete="email" autofocus
+                                placeholder="name@hospital.org" class="input mt-2">
+                        </div>
+
+                        <div class="auth-field auth-field--password">
+                            <label for="password" class="label">Password</label>
+                            <div class="auth-password-wrap">
+                                <input type="password" name="password" id="password" required autocomplete="current-password"
+                                    placeholder="Enter your password" class="input mt-2" aria-label="Password">
+                                <button type="button" class="auth-password-toggle" aria-label="Show password" aria-pressed="false"
+                                    title="Show password">
+                                    <svg data-password-icon="show" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <path d="M2.5 12s3.2-5 9.5-5 9.5 5 9.5 5-3.2 5-9.5 5-9.5-5-9.5-5Z"
+                                            stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+                                        <circle cx="12" cy="12" r="2.25" stroke="currentColor" stroke-width="1.7" />
+                                    </svg>
+                                    <svg data-password-icon="hide" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <path d="m3 3 18 18M10.6 6.25A10.8 10.8 0 0 1 12 6c6.3 0 9.5 6 9.5 6a16.7 16.7 0 0 1-3.4 3.75M6.2 6.9C3.8 8.35 2.5 12 2.5 12s3.2 6 9.5 6c1.4 0 2.65-.3 3.75-.75"
+                                            stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="auth-meta-row">
+                            <label for="remember"
+                                class="flex cursor-pointer select-none items-center gap-2 text-sm text-[color:var(--m-muted)]">
+                                <input type="checkbox" id="remember" name="remember" class="auth-check rounded">
+                                <span>Remember me</span>
+                            </label>
+
+                            <a href="{{ route('password.request') }}" class="auth-utility-link">Forgot password?</a>
+                        </div>
+
+                        <div id="login-error"
+                            class="hidden rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-[13px] text-red-200">
+                        </div>
+
+                        <button type="submit" id="login-submit"
+                            class="btn-primary mt-2 w-full justify-center py-3.5 text-base font-semibold shadow-[0_18px_30px_-20px_rgba(16,111,177,0.8)]">
+                            Sign in
+                        </button>
+
+                        <p class="auth-security-indicator">Protected access • Authorized healthcare personnel</p>
+                    </form>
+
+                    <p class="auth-solo-foot mt-6">
+                        New to BADBAADO?
+                        <a href="{{ route('register') }}" class="auth-utility-link">Create a provider account</a>
+                    </p>
+                </div>
+            </div>
+        </main>
     </div>
-</div>
 @endsection
 
 @push('head')
-<script>
-    window.BADBAADO = { loginOnly: true };
-</script>
+    <script>
+        window.BADBAADO = { loginOnly: true };
+    </script>
 @endpush

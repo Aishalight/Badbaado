@@ -83,6 +83,7 @@ class HospitalIsolationFeatureTest extends TestCase
         $receiving = Hospital::factory()->create();
         $referral = $this->referralFor($referring, $receiving);
         $sender = $this->staff($referring, 'healthcare_worker');
+        $receiver = $this->staff($receiving, 'healthcare_worker');
 
         Sanctum::actingAs($sender);
 
@@ -95,6 +96,16 @@ class HospitalIsolationFeatureTest extends TestCase
             'referral_id' => $referral->getKey(),
             'sender_user_id' => $sender->getKey(),
             'body' => 'Patient en route, ETA 20 minutes.',
+        ]);
+        $this->assertDatabaseHas('notifications', [
+            'user_id' => $receiver->getKey(),
+            'referral_id' => $referral->getKey(),
+            'type' => 'message_received',
+        ]);
+        $this->assertDatabaseMissing('notifications', [
+            'user_id' => $sender->getKey(),
+            'referral_id' => $referral->getKey(),
+            'type' => 'message_received',
         ]);
     }
 }

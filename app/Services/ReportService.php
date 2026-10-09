@@ -108,7 +108,7 @@ class ReportService
             ->cursor();
 
         return [
-            'headers' => ['Name', 'Email', 'Title', 'Phone', 'Role', 'Hospital', 'Active', 'Created at'],
+            'headers' => ['Name', 'Email', 'Title', 'Phone', 'Role', 'Hospital', 'Status', 'Created at'],
             'rows' => $users->map(fn (User $user) => [
                 $user->name,
                 $user->email,
@@ -116,7 +116,7 @@ class ReportService
                 $user->phone ?? '',
                 $user->role?->slug ?? '',
                 $user->hospital?->name ?? 'Platform',
-                $user->is_active ? 'Yes' : 'No',
+                $user->status?->label() ?? '',
                 $user->created_at?->toDateTimeString() ?? '',
             ]),
             'filename' => 'badbaado-users-'.now()->format('Y-m-d-Hi').'.csv',

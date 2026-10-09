@@ -3,9 +3,12 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\UserStatus;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,12 +16,17 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password', 'hospital_id', 'role_id', 'title', 'phone', 'avatar_path', 'is_active'])]
+#[Fillable(['name', 'email', 'password', 'hospital_id', 'role_id', 'specialty_id', 'status', 'title', 'phone', 'avatar_path'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
+
+    /**
+     * Roles allowed to raise, action, or be addressed by a referral.
+     */
+    public const REFERRAL_STAFF_ROLES = ['healthcare_worker', 'referral_coordinator'];
 
     /**
      * Get the attributes that should be cast.
@@ -30,13 +38,30 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'is_active' => 'boolean',
+            'status' => UserStatus::class,
         ];
+    }
+
+    /**
+     * Bridge for the retiring `is_active` column: `status` is the single
+     * source of truth, so every read and write resolves through it.
+     */
+    protected function isActive(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): bool => $this->status === UserStatus::ACTIVE,
+            set: fn (bool|int $value): array => ['status' => $value ? UserStatus::ACTIVE->value : UserStatus::SUSPENDED->value],
+        );
     }
 
     public function hospital(): BelongsTo
     {
         return $this->belongsTo(Hospital::class);
+    }
+
+    public function specialty(): BelongsTo
+    {
+        return $this->belongsTo(Specialty::class);
     }
 
     public function role(): BelongsTo
@@ -82,6 +107,30 @@ class User extends Authenticatable
     public function hasRole(string $slug): bool
     {
         return $this->role?->slug === $slug;
+    }
+
+    /**
+     * Whether this account may originate or action referrals.
+     */
+    public function isReferralStaff(): bool
+    {
+        return in_array($this->role?->slug, self::REFERRAL_STAFF_ROLES, true);
+    }
+
+    /**
+     * Verified independent doctors who can be addressed directly.
+     *
+     * They are the only accounts whose facility is a private practice, which
+     * is what separates them from staff employed by a real hospital.
+     */
+    public function scopeIndependentDoctors(Builder $query): Builder
+    {
+        return $query
+            ->where('status', UserStatus::ACTIVE)
+            ->whereHas('role', fn (Builder $role) => $role->whereIn('slug', self::REFERRAL_STAFF_ROLES))
+            ->whereHas('hospital', fn (Builder $hospital) => $hospital
+                ->where('kind', 'practice')
+                ->where('is_active', true));
     }
 
     /**

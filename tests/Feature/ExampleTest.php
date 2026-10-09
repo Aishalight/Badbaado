@@ -30,6 +30,9 @@ class ExampleTest extends TestCase
 
         $this->get('/login')
             ->assertOk()
-            ->assertSee('Sign in');
+            ->assertSee('Sign in')
+            ->assertSee('Back')
+            ->assertSee('Create a provider account')
+            ->assertSee(route('register'));
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\UserStatus;
 use App\Models\Referral;
 use App\Models\User;
 
@@ -31,7 +32,7 @@ class ReceivingOwnerAssigner
     }
 
     /**
-     * The doctor the referring hospital explicitly addressed, if still eligible.
+     * The doctor the referral was explicitly addressed to, if still eligible.
      */
     private function intendedOwner(Referral $referral): ?User
     {
@@ -41,16 +42,23 @@ class ReceivingOwnerAssigner
 
         return User::query()
             ->whereKey($referral->intended_user_id)
-            ->where('hospital_id', $referral->receiving_hospital_id)
-            ->where('is_active', true)
+            ->where('status', UserStatus::ACTIVE)
+            ->whereHas('role', fn ($query) => $query->whereIn('slug', User::REFERRAL_STAFF_ROLES))
+            ->whereHas('hospital', fn ($query) => $query
+                ->where('kind', 'practice')
+                ->where('is_active', true))
             ->first();
     }
 
     private function preferredOwner(Referral $referral): ?User
     {
+        if ($referral->receiving_hospital_id === null) {
+            return null;
+        }
+
         return User::query()
             ->where('hospital_id', $referral->receiving_hospital_id)
-            ->where('is_active', true)
+            ->where('status', UserStatus::ACTIVE)
             ->whereHas('role', fn ($query) => $query->where('slug', 'healthcare_worker'))
             ->withCount(['referralsAssigned' => fn ($query) => $query->needsTriage()])
             ->orderBy('referrals_assigned_count')
@@ -60,9 +68,13 @@ class ReceivingOwnerAssigner
 
     private function fallbackOwner(Referral $referral, string $roleSlug): ?User
     {
+        if ($referral->receiving_hospital_id === null) {
+            return null;
+        }
+
         return User::query()
             ->where('hospital_id', $referral->receiving_hospital_id)
-            ->where('is_active', true)
+            ->where('status', UserStatus::ACTIVE)
             ->whereHas('role', fn ($query) => $query->where('slug', $roleSlug))
             ->orderBy('id')
             ->first();

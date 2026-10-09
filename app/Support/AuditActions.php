@@ -20,6 +20,12 @@ final class AuditActions
 
     public const USER_CREATED = 'user_created';
 
+    public const PROVIDER_APPLICATION_SUBMITTED = 'provider_application_submitted';
+
+    public const PROVIDER_APPLICATION_APPROVED = 'provider_application_approved';
+
+    public const PROVIDER_APPLICATION_REJECTED = 'provider_application_rejected';
+
     public const USER_UPDATED = 'user_updated';
 
     public const USER_DELETED = 'user_deleted';
@@ -37,6 +43,10 @@ final class AuditActions
     public const AUTH_LOGOUT = 'auth.logout';
 
     public const AUTH_PASSWORD_CHANGED = 'auth.password_changed';
+
+    public const AUTH_PASSWORD_RESET_REQUESTED = 'auth.password_reset_requested';
+
+    public const AUTH_PASSWORD_RESET = 'auth.password_reset';
 
     public const AUTH_INACTIVE_ACCOUNT = 'auth.inactive_account';
 
@@ -85,10 +95,14 @@ final class AuditActions
             self::USER_CREATED,
             self::USER_UPDATED,
             self::USER_DELETED,
+            self::PROVIDER_APPLICATION_APPROVED,
+            self::PROVIDER_APPLICATION_REJECTED,
             self::HOSPITAL_CREATED,
             self::HOSPITAL_UPDATED,
             self::HOSPITAL_DELETED,
             self::AUTH_PASSWORD_CHANGED,
+            self::AUTH_PASSWORD_RESET_REQUESTED,
+            self::AUTH_PASSWORD_RESET,
             self::SETTINGS_UPDATED,
             self::CMS_UPDATED,
             self::ANNOUNCEMENT_CREATED,
@@ -117,6 +131,9 @@ final class AuditActions
             self::REFERRAL_ASSIGNED => 'Referral assigned',
             self::REFERRAL_STATUS_CHANGED => 'Referral status changed',
             self::USER_CREATED => 'User created',
+            self::PROVIDER_APPLICATION_SUBMITTED => 'Application submitted',
+            self::PROVIDER_APPLICATION_APPROVED => 'Application approved',
+            self::PROVIDER_APPLICATION_REJECTED => 'Application rejected',
             self::USER_UPDATED => 'User updated',
             self::USER_DELETED => 'User deleted',
             self::HOSPITAL_CREATED => 'Hospital created',
@@ -126,6 +143,8 @@ final class AuditActions
             self::AUTH_LOGIN_FAILED => 'Failed login',
             self::AUTH_LOGOUT => 'Logout',
             self::AUTH_PASSWORD_CHANGED => 'Password changed',
+            self::AUTH_PASSWORD_RESET_REQUESTED => 'Password reset requested',
+            self::AUTH_PASSWORD_RESET => 'Password reset completed',
             self::AUTH_INACTIVE_ACCOUNT => 'Inactive account rejected',
             self::MESSAGE_SENT => 'Message sent',
             self::ATTACHMENT_DOWNLOADED => 'Attachment downloaded',

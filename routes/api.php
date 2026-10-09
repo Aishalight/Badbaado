@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\AnnouncementController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BackupController;
 use App\Http\Controllers\Api\CmsContentController;
+use App\Http\Controllers\Api\DoctorController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\HospitalController;
 use App\Http\Controllers\Api\MessageController;
@@ -44,7 +45,10 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     Route::post('notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
     Route::post('notifications/read-all', [NotificationController::class, 'markAllAsRead']);
 
+    // Referral destinations. Private practices are deliberately absent from the
+    // hospital list: they only surface through the doctor directory.
     Route::get('hospitals', [HospitalController::class, 'index']);
+    Route::get('doctors', [DoctorController::class, 'index']);
 
     Route::middleware('role:hospital_admin,system_admin')->group(function () {
         Route::get('analytics/overview', [AnalyticsController::class, 'overview']);

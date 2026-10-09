@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnforceIdleSessionTimeout;
+use App\Http\Middleware\EnsureAccountIsActive;
 use App\Http\Middleware\EnsureHospitalAssignment;
 use App\Http\Middleware\EnsurePlatformOperational;
 use App\Http\Middleware\EnsureRole;
@@ -32,6 +33,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => EnsureRole::class,
             'hospital' => EnsureHospitalAssignment::class,
+            'verified' => EnsureAccountIsActive::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

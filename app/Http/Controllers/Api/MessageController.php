@@ -8,21 +8,33 @@ use App\Http\Resources\Api\MessageResource;
 use App\Models\Message;
 use App\Models\Referral;
 use App\Services\AuditLogger;
+use App\Services\ReferralNotifier;
 use App\Support\AuditActions;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
 
 class MessageController extends Controller
 {
-    public function __construct(private readonly AuditLogger $auditLogger) {}
+    public function __construct(
+        private readonly AuditLogger $auditLogger,
+        private readonly ReferralNotifier $referralNotifier,
+    ) {}
 
-    public function index(Referral $referral): AnonymousResourceCollection
+    public function index(Request $request, Referral $referral): AnonymousResourceCollection
     {
         $this->authorize('view', $referral);
 
-        return MessageResource::collection(
-            $referral->messages()->with('sender:id,name,title')->latest()->paginate(50)
-        );
+        $afterId = $request->integer('after_id');
+        $query = $referral->messages()->with('sender:id,name,title');
+
+        if ($afterId > 0) {
+            return MessageResource::collection(
+                $query->where('id', '>', $afterId)->oldest()->limit(50)->get()
+            );
+        }
+
+        return MessageResource::collection($query->latest()->paginate(50));
     }
 
     public function store(StoreMessageRequest $request, Referral $referral): MessageResource
@@ -39,6 +51,7 @@ class MessageController extends Controller
             $this->auditLogger->record($request->user(), AuditActions::MESSAGE_SENT, $message, [
                 'referral_id' => $referral->id,
             ]);
+            $this->referralNotifier->notifyOnMessage($referral, $request->user());
 
             return $message;
         });

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\UserStatus;
 use Database\Factories\HospitalFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,6 +18,7 @@ class Hospital extends Model
         'name',
         'short_name',
         'code',
+        'kind',
         'location',
         'logo_path',
         'phone',
@@ -24,6 +26,28 @@ class Hospital extends Model
         'level',
         'is_active',
     ];
+
+    /**
+     * Hospitals eligible as a referral destination in the hospital picker.
+     *
+     * @param  Builder<Hospital>  $query
+     * @return Builder<Hospital>
+     */
+    public function scopeHospitals(Builder $query): Builder
+    {
+        return $query->where('kind', 'hospital');
+    }
+
+    /**
+     * Private practices backing verified independent doctors.
+     *
+     * @param  Builder<Hospital>  $query
+     * @return Builder<Hospital>
+     */
+    public function scopePractices(Builder $query): Builder
+    {
+        return $query->where('kind', 'practice');
+    }
 
     protected function casts(): array
     {
@@ -53,7 +77,7 @@ class Hospital extends Model
     public function referralStaff(): HasMany
     {
         return $this->users()
-            ->where('is_active', true)
+            ->where('status', UserStatus::ACTIVE)
             ->whereHas('role', fn (Builder $query) => $query->whereIn('slug', ['healthcare_worker', 'referral_coordinator']))
             ->with('role:id,slug,name')
             ->orderBy('name');

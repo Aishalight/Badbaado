@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api;
 
+use App\Enums\UserStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -36,6 +37,7 @@ class UpdateAdminUserRequest extends FormRequest
             'hospital_id' => $this->user()?->hasRole('system_admin')
                 ? ['sometimes', 'nullable', 'integer', 'exists:hospitals,id']
                 : ['prohibited'],
+            'status' => ['sometimes', Rule::enum(UserStatus::class)],
             'is_active' => ['sometimes', 'boolean'],
         ];
     }

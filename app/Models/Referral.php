@@ -97,13 +97,23 @@ class Referral extends Model
             return $query;
         }
 
-        if ($user->hospital_id === null) {
+        // A referral addressed straight to a doctor has no receiving facility,
+        // so the intended doctor is the only receiving-side party.
+        $isIntendedDoctor = $user->isReferralStaff();
+
+        if ($user->hospital_id === null && ! $isIntendedDoctor) {
             return $query->whereRaw('0 = 1');
         }
 
-        return $query->where(function (Builder $q) use ($user) {
-            $q->where('referring_hospital_id', $user->hospital_id)
-                ->orWhere('receiving_hospital_id', $user->hospital_id);
+        return $query->where(function (Builder $q) use ($user, $isIntendedDoctor) {
+            if ($user->hospital_id !== null) {
+                $q->where('referring_hospital_id', $user->hospital_id)
+                    ->orWhere('receiving_hospital_id', $user->hospital_id);
+            }
+
+            if ($isIntendedDoctor) {
+                $q->orWhere('intended_user_id', $user->getKey());
+            }
         });
     }
 

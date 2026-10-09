@@ -5,9 +5,16 @@ import { loginPage } from './pages/login';
 import { renderToast } from './lib/toast';
 import { initReveal } from './lib/reveal';
 import { initCinematic } from './lib/cinematic';
+import { initPasswordToggles } from './lib/password-toggle';
+import { initRegistrationTypeToggle } from './lib/registration-type';
 
 const boot = () => {
     const page = window.BADBAADO ?? {};
+
+    // Sign-in, forgot-password, reset-password and register all carry
+    // password fields.
+    initPasswordToggles();
+    initRegistrationTypeToggle();
 
     if (page.loginOnly) {
         loginPage.init();

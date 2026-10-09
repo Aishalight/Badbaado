@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Enums\ReferralStatus;
 use App\Enums\Urgency;
+use App\Enums\UserStatus;
 use App\Models\Hospital;
 use App\Models\Patient;
 use App\Models\Referral;
@@ -84,10 +85,10 @@ class ReferralSeeder extends Seeder
                     $hcw = User::where('hospital_id', $hospital->id)->whereRelation('role', 'slug', 'healthcare_worker')->first()
                         ?? User::where('hospital_id', $hospital->id)->first();
                     $receivingUser = User::where('hospital_id', $targetHospital->id)
-                        ->where('is_active', true)
+                        ->where('status', UserStatus::ACTIVE)
                         ->whereRelation('role', 'slug', 'healthcare_worker')
                         ->first()
-                        ?? User::where('hospital_id', $targetHospital->id)->where('is_active', true)->first();
+                        ?? User::where('hospital_id', $targetHospital->id)->where('status', UserStatus::ACTIVE)->first();
 
                     if (! $hcw || ! $receivingUser) {
                         continue;

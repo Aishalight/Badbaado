@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserStatus;
 use App\Http\Requests\Api\LoginRequest;
 use App\Models\User;
 use App\Services\AuditLogger;
@@ -39,19 +40,24 @@ class SessionAuthController extends Controller
             ]);
         }
 
-        if (! $user->is_active) {
+        if (! $user->is_active && $user->status !== UserStatus::PENDING) {
             $this->auditLogger->record($user, AuditActions::AUTH_INACTIVE_ACCOUNT, $user, [
                 'email' => $user->email,
+                'status' => $user->status?->value,
                 'guard' => 'web',
             ]);
 
             throw ValidationException::withMessages([
-                'email' => ['This account is disabled. Contact your administrator.'],
+                'email' => [$user->status->blockedMessage()],
             ]);
         }
 
         Auth::login($user);
         $request->session()->regenerate();
+
+        if ($user->status !== UserStatus::ACTIVE) {
+            return redirect()->route('pending');
+        }
 
         return $request->wantsJson()
             ? response()->json(['ok' => true, 'user' => $user->load(['role', 'hospital'])])

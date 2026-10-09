@@ -50,7 +50,7 @@ class ReferralWorkflowService
                 $referral = Referral::create([
                     'referral_number' => $this->referralNumberGenerator->generate(),
                     'referring_hospital_id' => $user->hospital_id,
-                    'receiving_hospital_id' => $data['receiving_hospital_id'],
+                    'receiving_hospital_id' => $data['receiving_hospital_id'] ?? null,
                     'intended_user_id' => $data['intended_user_id'] ?? null,
                     'referring_user_id' => $user->id,
                     'patient_id' => $patient->id,

@@ -35,6 +35,8 @@ class PlatformSecurityControlsTest extends TestCase
         return array_merge([
             'name' => 'New Clinician',
             'email' => 'new.clinician@example.com',
+            'type' => 'hospital',
+            'facility_name' => 'New Clinician Hospital',
             'password' => 'password',
             'password_confirmation' => 'password',
         ], $overrides);
@@ -53,7 +55,7 @@ class PlatformSecurityControlsTest extends TestCase
 
         $this->enableRegistration();
 
-        $this->postJson('/api/register', $this->registrationPayload())->assertCreated();
+        $this->postJson('/api/register', $this->registrationPayload())->assertStatus(202);
     }
 
     public function test_api_login_is_throttled_after_repeated_failures(): void

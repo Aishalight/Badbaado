@@ -18,7 +18,7 @@ import { api } from './api';
 
 const ENABLED_KEY = 'badbaado.alarms.enabled';
 const SEEN_KEY = 'badbaado.alarms.seen';
-const POLL_MS = 30000;
+const POLL_MS = 5000;
 const TITLE_IDLE_MS = 60000;
 const CRITICAL_LOOP_MS = 6000;
 const MAX_ALARM_MS = 5 * 60 * 1000;

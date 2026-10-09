@@ -25,7 +25,18 @@ class HospitalFactory extends Factory
             'phone' => fake()->phoneNumber(),
             'email' => fake()->unique()->companyEmail(),
             'level' => fake()->randomElement(['primary', 'secondary', 'tertiary']),
+            'kind' => 'hospital',
             'is_active' => true,
         ];
+    }
+
+    /**
+     * A private practice backing an independent doctor.
+     */
+    public function practice(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'kind' => 'practice',
+        ]);
     }
 }
