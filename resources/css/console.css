@@ -115,6 +115,25 @@
     color: var(--m-ink);
 }
 
+.console-shell .console-sidebar nav,
+.console-shell .console-sidebar nav a,
+.console-shell .console-nav-sheet nav,
+.console-shell .console-nav-sheet nav a {
+    list-style: none;
+}
+
+.console-shell .console-nav-group > summary {
+    list-style: none;
+}
+
+.console-shell .console-nav-group > summary::marker {
+    content: '';
+}
+
+.console-shell .console-nav-group > summary::-webkit-details-marker {
+    display: none;
+}
+
 .console-shell .console-nav-link {
     position: relative;
     border-radius: 6px;
