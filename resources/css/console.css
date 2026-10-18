@@ -351,6 +351,7 @@
 .dashboard-stat__icon--cyan { background: rgb(var(--m-accent-rgb) / 14%); color: var(--m-accent); }
 .dashboard-stat__icon--red { background: rgb(var(--m-red-rgb) / 14%); color: #fb7185; }
 .dashboard-stat__icon--amber { background: rgb(245 158 11 / 14%); color: #fbbf24; }
+.dashboard-stat__icon svg { width: 1.25rem; height: 1.25rem; }
 
 /* Alert — refined */
 .dashboard-alert {
@@ -1181,6 +1182,7 @@ html.theme-light .console-shell .notification-row.is-unread:not(.notification-ro
     font-size: 1.25rem;
     font-weight: 800;
 }
+.console-shell .analytics-stat__icon svg { width: 1.25rem; height: 1.25rem; }
 
 /* Skip link: hidden until a keyboard user tabs into it */
 .skip-link {

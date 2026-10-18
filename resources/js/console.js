@@ -187,8 +187,6 @@ function openDialog({
             dialog.setAttribute("aria-describedby", text.id);
             dialog.append(heading, text);
 
-            dialog.append(heading, text);
-
             const label = Object.assign(document.createElement("label"), {
                 htmlFor: fieldId,
                 className: "mt-4 block text-sm font-semibold text-slate-700",
@@ -308,21 +306,37 @@ const DESTRUCTIVE_TRANSITIONS = {
 
 async function transition(button) {
     const next = button.dataset.transition;
+    let rejectionReason = null;
 
     if (DESTRUCTIVE_TRANSITIONS[next]) {
-        const confirmed = await confirmDialog(DESTRUCTIVE_TRANSITIONS[next], {
-            title: "This cannot be undone",
-            confirmLabel:
-                next === "withdrawn" ? "Withdraw referral" : "Decline referral",
-        });
+        const confirmed =
+            next === "rejected"
+                ? await openDialog({
+                      title: "Decline referral",
+                      body: "Add a short reason so the referring team knows what needs to change.",
+                      confirmLabel: "Decline referral",
+                      danger: true,
+                      input: {
+                          label: "Reason for declining",
+                          hint: "This message will be visible to the referring team.",
+                          placeholder: "e.g. No monitored bed is available.",
+                      },
+                  })
+                : await confirmDialog(DESTRUCTIVE_TRANSITIONS[next], {
+                      title: "This cannot be undone",
+                      confirmLabel: "Withdraw referral",
+                  });
 
         if (!confirmed) return;
+
+        rejectionReason = next === "rejected" ? confirmed : null;
     }
 
     button.disabled = true;
     try {
         await api.post(`/referrals/${button.dataset.referralId}/transition`, {
             status: next,
+            ...(rejectionReason ? { rejection_reason: rejectionReason } : {}),
         });
         window.location.reload();
     } catch (error) {
@@ -753,6 +767,39 @@ document.addEventListener("DOMContentLoaded", () => {
         .forEach((button) =>
             button.addEventListener("click", () => transition(button)),
         );
+    document.querySelectorAll("[data-reject-application]").forEach((button) =>
+        button.addEventListener("click", async () => {
+            const reason = await openDialog({
+                title: "Reject provider application",
+                body: "Add a clear reason. The applicant will see this when they check their account status.",
+                confirmLabel: "Reject application",
+                danger: true,
+                input: {
+                    label: "Reason for rejection",
+                    placeholder: "e.g. Registration details could not be verified.",
+                },
+            });
+
+            if (!reason) return;
+
+            button.disabled = true;
+            const form = document.createElement("form");
+            form.method = "POST";
+            form.action = `/admin/applications/${button.dataset.rejectApplication}/reject`;
+            [
+                ["_token", document.querySelector('meta[name="csrf-token"]')?.content ?? ""],
+                ["rejection_reason", reason],
+            ].forEach(([name, value]) => {
+                const input = document.createElement("input");
+                input.type = "hidden";
+                input.name = name;
+                input.value = value;
+                form.appendChild(input);
+            });
+            document.body.appendChild(form);
+            form.submit();
+        }),
+    );
     document
         .querySelector("#message-form")
         ?.addEventListener("submit", (event) => {

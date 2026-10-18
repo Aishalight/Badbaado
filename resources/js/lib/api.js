@@ -1,7 +1,11 @@
 function getCsrfToken() {
     const match = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]*)/);
 
-    return match ? decodeURIComponent(match[1]) : null;
+    return (
+        (match ? decodeURIComponent(match[1]) : null) ??
+        document.querySelector('meta[name="csrf-token"]')?.content ??
+        null
+    );
 }
 
 async function raw(method, path, body) {
@@ -16,6 +20,7 @@ async function raw(method, path, body) {
         method,
         headers,
         body: body !== undefined ? (isFormData ? body : JSON.stringify(body)) : undefined,
+        credentials: "same-origin",
     });
 
     let data = null;

@@ -87,14 +87,8 @@
                                         @csrf
                                         <button type="submit" class="btn-primary btn-sm">Approve</button>
                                     </form>
-                                    <form method="POST" action="{{ route('admin.applications.reject', $application) }}"
-                                        class="flex items-center gap-2">
-                                        @csrf
-                                        <input type="text" name="rejection_reason" placeholder="Reason"
-                                            aria-label="Rejection reason for {{ $application->user?->name }}"
-                                            class="input py-1 text-xs" required>
-                                        <button type="submit" class="btn-danger btn-sm">Reject</button>
-                                    </form>
+                                    <button type="button" class="btn-danger btn-sm"
+                                        data-reject-application="{{ $application->id }}">Reject</button>
                                 </div>
                             @else
                                 @if ($application->hospital)

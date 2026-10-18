@@ -32,8 +32,7 @@
                     <div class="auth-form-header">
                         <p class="auth-form-kicker">Provider onboarding</p>
                         <h1 class="text-[color:var(--m-ink)]">Create your BADBAADO account</h1>
-                        <p>Every account is reviewed by a system administrator before it can
-                            reach the console.</p>
+                        <p>Choose the account type that matches your work. Every application is reviewed before access is granted.</p>
                     </div>
 
                     <form method="POST" action="{{ route('register.store') }}" class="space-y-5" data-registration-form novalidate>
@@ -54,7 +53,7 @@
                                                 @if ($type === \App\Enums\ProviderApplicationType::HOSPITAL)
                                                     The first approved user becomes the hospital administrator.
                                                 @else
-                                                    A verified independent practitioner with a private practice.
+                                                    A verified independent practitioner. A separate private practice is created for your referrals.
                                                 @endif
                                             </span>
                                         </span>
@@ -159,7 +158,7 @@
                         </div>
 
                         <div class="auth-field">
-                            <label for="location" class="label">Location <span
+                            <label for="location" class="label">Hospital or practice location <span
                                     class="text-[color:var(--m-muted)]">(optional)</span></label>
                             <input type="text" name="location" id="location" autocomplete="address-level2"
                                 value="{{ old('location') }}" class="input mt-2">

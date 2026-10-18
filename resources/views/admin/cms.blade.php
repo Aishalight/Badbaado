@@ -50,7 +50,7 @@
             <div><p class="section-eyebrow">Publish</p><h3 class="dashboard-section-title mt-1.5">Announcements</h3></div>
             <form data-create-announcement class="grid gap-3 sm:grid-cols-[minmax(0,14rem)_minmax(0,1fr)_auto] items-start">
                 <input class="input" name="title" placeholder="Title" required>
-                <input class="input" name="body" placeholder="Message body" required>
+                <textarea class="input min-h-10 resize-y" name="body" rows="1" placeholder="Announcement text" required></textarea>
                 <button class="btn-accent btn-sm" type="submit">Publish</button>
             </form>
         </div>
