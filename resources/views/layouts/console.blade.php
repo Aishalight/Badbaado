@@ -153,15 +153,25 @@
             </a>
             <nav class="console-nav-scroll flex-1 space-y-0 overflow-y-auto px-2.5 py-3 text-sm font-medium">
                 @foreach ($nav as $section)
-                    <p class="console-nav-group px-2.5 pb-1 pt-4 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400 first:pt-0">{{ $section['group'] }}</p>
-                    @foreach ($section['items'] as $item)
-                        @php($active = $isActive($item['key'], $item['route']))
-                        <a href="{{ route($item['route']) }}" class="console-nav-link flex items-center gap-2.5 rounded-md px-2.5 py-[7px] text-[13px] {{ $active ? 'is-active' : '' }}">
-                            <span class="text-slate-400 {{ $active ? 'text-accent-600' : '' }}">{!! $icons[$item['icon']] !!}</span>
-                            <span class="flex-1 truncate">{{ $item['label'] }}</span>
-                            @if ($item['key'] === 'notifications' && $unread > 0)<span class="nav-badge rounded-full px-1.5 py-0.5 text-[10px] font-bold {{ $unreadAlarms > 0 ? 'bg-red-500 text-white' : '' }}">{{ $unread }}</span>@elseif ($item['key'] === 'admin.applications' && $pendingApplications > 0)<span class="nav-badge rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-bold text-white">{{ $pendingApplications }}</span>@endif
-                        </a>
-                    @endforeach
+                    @php($sectionIsActive = collect($section['items'])->contains(fn (array $item): bool => $isActive($item['key'], $item['route'])))
+                    <details class="console-nav-group group border-b border-slate-200/60 last:border-b-0 first:[&>summary]:pt-0" {{ $sectionIsActive ? 'open' : '' }}>
+                        <summary class="flex cursor-pointer list-none items-center justify-between gap-2 px-2.5 pb-1 pt-4 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400 [&::-webkit-details-marker]:hidden">
+                            <span>{{ $section['group'] }}</span>
+                            <svg viewBox="0 0 16 16" fill="none" class="h-3 w-3 shrink-0 transition-transform group-open:rotate-180" aria-hidden="true">
+                                <path d="m4 6 4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </summary>
+                        <div class="pb-2">
+                            @foreach ($section['items'] as $item)
+                                @php($active = $isActive($item['key'], $item['route']))
+                                <a href="{{ route($item['route']) }}" class="console-nav-link flex items-center gap-2.5 rounded-md px-2.5 py-[7px] text-[13px] {{ $active ? 'is-active' : '' }}">
+                                    <span class="text-slate-400 {{ $active ? 'text-accent-600' : '' }}">{!! $icons[$item['icon']] !!}</span>
+                                    <span class="flex-1 truncate">{{ $item['label'] }}</span>
+                                    @if ($item['key'] === 'notifications' && $unread > 0)<span class="nav-badge rounded-full px-1.5 py-0.5 text-[10px] font-bold {{ $unreadAlarms > 0 ? 'bg-red-500 text-white' : '' }}">{{ $unread }}</span>@elseif ($item['key'] === 'admin.applications' && $pendingApplications > 0)<span class="nav-badge rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-bold text-white">{{ $pendingApplications }}</span>@endif
+                                </a>
+                            @endforeach
+                        </div>
+                    </details>
                 @endforeach
             </nav>
             <div class="shrink-0 border-t border-slate-200/80 p-2">

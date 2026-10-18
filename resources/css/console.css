@@ -107,6 +107,14 @@
     border-color: var(--m-border);
 }
 
+.console-shell .console-sidebar .console-nav-group {
+    border-color: var(--m-border);
+}
+
+.console-shell .console-sidebar .console-nav-group > summary:hover {
+    color: var(--m-ink);
+}
+
 .console-shell .console-nav-link {
     position: relative;
     border-radius: 6px;
