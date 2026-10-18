@@ -205,9 +205,17 @@ if [ "$DO_BUILD" -eq 1 ]; then
         fi
         npm run build
     else
-        warn "npm not found; skipping build."
-        warn "Build locally with 'npm run build' and upload public/build instead."
+        fail "npm not found; cannot verify the frontend asset manifest."
+        fail "Install Node/npm or build locally and upload public/build before deploying."
+        exit 1
     fi
+fi
+
+if [ ! -f public/build/manifest.json ]; then
+    fail "public/build/manifest.json is missing."
+    fail "The application cannot render Blade views until frontend assets are built."
+    fail "Run npm run build on the server, or upload the local public/build directory."
+    exit 1
 fi
 
 # ---------------------------------------------------------------------------
