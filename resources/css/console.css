@@ -123,6 +123,18 @@
     transition: color 0.15s ease, background 0.15s ease;
 }
 
+.console-shell .btn-primary svg,
+.console-shell .btn-primary i,
+.console-shell .btn-secondary svg,
+.console-shell .btn-secondary i,
+.console-shell .btn-accent svg,
+.console-shell .btn-accent i,
+.console-shell .btn-danger svg,
+.console-shell .btn-danger i {
+    width: 1rem;
+    height: 1rem;
+}
+
 .console-shell .console-nav-link:hover {
     background: var(--m-panel);
     color: var(--m-ink);
@@ -351,7 +363,16 @@
 .dashboard-stat__icon--cyan { background: rgb(var(--m-accent-rgb) / 14%); color: var(--m-accent); }
 .dashboard-stat__icon--red { background: rgb(var(--m-red-rgb) / 14%); color: #fb7185; }
 .dashboard-stat__icon--amber { background: rgb(245 158 11 / 14%); color: #fbbf24; }
-.dashboard-stat__icon svg { width: 1.25rem; height: 1.25rem; }
+.dashboard-stat__icon svg,
+.dashboard-stat__icon i { width: 1.25rem; height: 1.25rem; }
+.dashboard-alert__icon svg,
+.dashboard-alert__icon i,
+.dashboard-alert a svg,
+.dashboard-alert a i,
+.dashboard-page a svg,
+.dashboard-page a i,
+.dashboard-patient small svg,
+.dashboard-patient small i { width: 0.875rem; height: 0.875rem; display: inline-block; vertical-align: -0.125em; }
 
 /* Alert — refined */
 .dashboard-alert {
@@ -1182,7 +1203,8 @@ html.theme-light .console-shell .notification-row.is-unread:not(.notification-ro
     font-size: 1.25rem;
     font-weight: 800;
 }
-.console-shell .analytics-stat__icon svg { width: 1.25rem; height: 1.25rem; }
+.console-shell .analytics-stat__icon svg,
+.console-shell .analytics-stat__icon i { width: 1.25rem; height: 1.25rem; }
 
 /* Skip link: hidden until a keyboard user tabs into it */
 .skip-link {

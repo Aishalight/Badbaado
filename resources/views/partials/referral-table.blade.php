@@ -17,7 +17,7 @@
                 </td>
                 <td class="px-5 py-4 text-xs text-slate-600">
                     {{ $referral->referringHospital?->short_name ?? $referral->referringHospital?->name }} <span
-                        class="text-accent-500">→</span>
+                        class="inline-flex text-accent-500"><i data-lucide="arrow-right" aria-hidden="true"></i></span>
                     {{ $referral->receivingHospital?->short_name ?? $referral->receivingHospital?->name ?? ('Dr. ' . ($referral->intendedUser?->name ?? 'direct referral')) }}
                 </td>
                 <td class="px-5 py-4">{!! \App\Support\ReferralFormat::urgencyPill($referral->urgency?->value) !!}</td>

@@ -94,8 +94,7 @@
             <details class="card group">
                 <summary
                     class="flex cursor-pointer list-none items-center justify-between p-5 font-semibold text-brand-950">
-                    <span>Additional clinical details</span><span
-                        class="text-xl font-normal text-slate-400 transition group-open:rotate-45">+</span>
+                    <span>Additional clinical details</span><i data-lucide="plus" class="text-slate-400 transition group-open:rotate-45" aria-hidden="true"></i>
                 </summary>
                 <div class="grid gap-4 border-t border-slate-100 p-5 sm:grid-cols-2">
                     <div><label class="label" for="vitals-hr">Heart rate</label><input class="input mt-1" id="vitals-hr"

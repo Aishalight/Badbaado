@@ -55,7 +55,7 @@
                     @endif
                 </div>
             @else
-                <ul class="divide-y divide-slate-100">
+                <ul class="list-none divide-y divide-slate-100">
                     @foreach ($referrals as $referral)
                         <li>
                             <a href="{{ route('referrals.show', $referral) }}" class="flex items-center gap-4 px-5 py-4 transition hover:bg-brand-50/40">
@@ -74,7 +74,7 @@
                                     </div>
                                     <div class="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-slate-500">
                                         <span class="truncate">{{ $referral->referringHospital?->short_name ?? $referral->referringHospital?->name ?? '-' }}</span>
-                                        <span class="text-slate-300">→</span>
+                                        <i data-lucide="arrow-right" class="text-slate-300" aria-hidden="true"></i>
                                         <span class="truncate">{{ $referral->receivingHospital?->short_name ?? $referral->receivingHospital?->name ?? '-' }}</span>
                                         <span class="text-slate-300">·</span>
                                         <span class="truncate">{{ $referral->department ?? 'General' }}</span>

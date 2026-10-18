@@ -1,6 +1,7 @@
 import "../css/app.css";
 import "../css/theme.css";
 import "../css/console.css";
+import { createIcons, icons } from "lucide";
 import { api } from "./lib/api";
 import { initThemeToggle } from "./lib/cinematic";
 import { initDashboardCharts } from "./pages/dashboard";
@@ -742,6 +743,7 @@ function initAlarmSettings() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    createIcons({ icons });
     initThemeToggle();
     initDashboardCharts();
     initAdminTabs();
