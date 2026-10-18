@@ -123,11 +123,15 @@
 }
 
 .console-shell .console-nav-group > summary {
+    display: flex;
     list-style: none;
+    appearance: none;
 }
 
+.console-shell .console-nav-group > summary::before,
 .console-shell .console-nav-group > summary::marker {
     content: '';
+    display: none;
 }
 
 .console-shell .console-nav-group > summary::-webkit-details-marker {

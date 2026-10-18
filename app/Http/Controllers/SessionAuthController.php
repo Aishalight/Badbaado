@@ -60,7 +60,11 @@ class SessionAuthController extends Controller
         }
 
         return $request->wantsJson()
-            ? response()->json(['ok' => true, 'user' => $user->load(['role', 'hospital'])])
+            ? response()->json([
+                'ok' => true,
+                'redirect' => route('dashboard'),
+                'user' => $user->load(['role', 'hospital']),
+            ])
             : redirect()->intended(route('dashboard'));
     }
 

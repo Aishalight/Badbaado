@@ -22,9 +22,20 @@ async function handleSubmit(event) {
             },
             body: payload,
         });
-        const result = await response.json();
-        if (!response.ok)
-            throw new Error(result.message ?? "Unable to sign in.");
+        const contentType = response.headers.get("content-type") ?? "";
+        const result = contentType.includes("application/json")
+            ? await response.json()
+            : null;
+
+        if (!response.ok) {
+            throw new Error(
+                result?.message ??
+                    (response.status >= 500
+                        ? "The sign-in service is temporarily unavailable. Please try again."
+                        : "Unable to sign in."),
+            );
+        }
+
         window.location.href = result.redirect ?? "/dashboard";
     } catch (error) {
         errorBox.textContent = error.message;
