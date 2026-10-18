@@ -46,25 +46,53 @@
     </section>
 
     <section data-admin-pane="announcements" class="card p-6 hidden">
-        <div class="flex flex-wrap items-end justify-between gap-4">
-            <div><p class="section-eyebrow">Publish</p><h3 class="dashboard-section-title mt-1.5">Announcements</h3></div>
-            <form data-create-announcement class="grid gap-3 sm:grid-cols-[minmax(0,14rem)_minmax(0,1fr)_auto] items-start">
-                <input class="input" name="title" placeholder="Title" required>
-                <textarea class="input min-h-10 resize-y" name="body" rows="1" placeholder="Announcement text" required></textarea>
-                <button class="btn-accent btn-sm" type="submit">Publish</button>
+        <div class="border-b border-slate-100 pb-6">
+            <p class="section-eyebrow">Publish</p>
+            <h3 class="dashboard-section-title mt-1.5">Create an announcement</h3>
+            <p class="faint mt-1 max-w-2xl text-sm">Share a short, visible update with people using the public website.</p>
+            <form data-create-announcement class="mt-5 grid gap-4 lg:max-w-3xl">
+                <div>
+                    <label class="label" for="announcement-title">Title</label>
+                    <input id="announcement-title" class="input mt-1 w-full" name="title" placeholder="Announcement title" required>
+                </div>
+                <div>
+                    <label class="label" for="announcement-body">Message</label>
+                    <textarea id="announcement-body" class="input mt-1 min-h-28 w-full resize-y" name="body" rows="4" placeholder="Write the announcement message" required></textarea>
+                    <p class="helper mt-1.5">Keep the message clear and useful. It will be shown as written.</p>
+                </div>
+                <div class="flex justify-end border-t border-slate-100 pt-4">
+                    <button class="btn-accent" type="submit">Publish announcement</button>
+                </div>
             </form>
         </div>
-        <div class="mt-5 divide-y divide-slate-100">
+        <div class="mt-6">
+            <div class="flex items-baseline justify-between gap-4">
+                <div><p class="section-eyebrow">Manage</p><h3 class="dashboard-section-title mt-1.5">Published announcements</h3></div>
+                <span class="helper">{{ $announcements->count() }} total</span>
+            </div>
+        </div>
+        <div class="mt-4 grid gap-4">
             @forelse ($announcements as $announcement)
-                <div class="flex flex-wrap items-center justify-between gap-4 py-4">
-                    <div class="min-w-0 flex-1">
-                        <input class="input w-full" type="text" name="title" value="{{ $announcement->title }}" data-update-announcement-field="{{ $announcement->id }}">
-                        <input class="input mt-2 w-full" type="text" name="body" value="{{ $announcement->body }}" data-update-announcement-field="{{ $announcement->id }}">
-                        <p class="faint mt-1.5 text-xs">By {{ $announcement->author?->name ?? 'System' }} · {{ $announcement->published_at ? $announcement->published_at->format('d M Y H:i') : 'Inactive' }} · <label class="inline-flex items-center gap-1 ml-1 select-none"><input type="checkbox" name="is_active" data-announcement-active="{{ $announcement->id }}" @checked($announcement->is_active)> Visible</label></p>
-                    </div>
-                    <div class="flex gap-2">
-                        <button class="btn-secondary btn-sm" data-update-announcement="{{ $announcement->id }}" type="button">Save</button>
-                        <button class="btn-danger btn-sm" data-delete-announcement="{{ $announcement->id }}" type="button">Delete</button>
+                <div class="rounded-lg border border-slate-200/80 p-4 sm:p-5">
+                    <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+                        <div class="grid gap-4">
+                            <div>
+                                <label class="label" for="announcement-{{ $announcement->id }}-title">Title</label>
+                                <input id="announcement-{{ $announcement->id }}-title" class="input mt-1 w-full" type="text" name="title" value="{{ $announcement->title }}" data-update-announcement-field="{{ $announcement->id }}">
+                            </div>
+                            <div>
+                                <label class="label" for="announcement-{{ $announcement->id }}-body">Message</label>
+                                <textarea id="announcement-{{ $announcement->id }}-body" class="input mt-1 min-h-24 w-full resize-y" name="body" rows="3" data-update-announcement-field="{{ $announcement->id }}">{{ $announcement->body }}</textarea>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+                                <p class="faint text-xs">By {{ $announcement->author?->name ?? 'System' }} · {{ $announcement->published_at ? $announcement->published_at->format('d M Y H:i') : 'Inactive' }}</p>
+                                <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 select-none"><input type="checkbox" name="is_active" data-announcement-active="{{ $announcement->id }}" @checked($announcement->is_active)> Visible to visitors</label>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 lg:pt-6">
+                            <button class="btn-secondary btn-sm" data-update-announcement="{{ $announcement->id }}" type="button">Save changes</button>
+                            <button class="btn-danger btn-sm" data-delete-announcement="{{ $announcement->id }}" type="button">Delete</button>
+                        </div>
                     </div>
                 </div>
             @empty

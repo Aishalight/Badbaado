@@ -16,12 +16,30 @@
     </div>
 
     <section class="card p-6">
-        <div><p class="section-eyebrow">Broadcast</p><h3 class="dashboard-section-title mt-1.5">Send a platform alert</h3><p class="faint mt-1 text-xs">Creates an in-app notification for every active account matching the audience.</p></div>
-        <form data-alert-form class="mt-5 grid gap-4 lg:grid-cols-[12rem_minmax(0,16rem)_minmax(0,1fr)_auto]">
-            <div><label class="label">Audience</label><select class="input mt-1 w-full" name="audience" required><option value="all">Everyone</option>@foreach(['hospital_admin', 'referral_coordinator', 'healthcare_worker'] as $audience)<option value="{{ $audience }}">{{ ucfirst(str_replace('_', ' ', $audience)) }}s</option>@endforeach</select></div>
-            <div><label class="label">Title</label><input class="input mt-1 w-full" name="title" placeholder="e.g. Scheduled maintenance" required></div>
-            <div><label class="label">Message</label><textarea class="input mt-1 min-h-10 w-full resize-y" name="body" rows="1" placeholder="What should recipients know?" required></textarea></div>
-            <div class="flex items-end"><button class="btn-accent" type="submit">Send alert</button></div>
+        <div>
+            <p class="section-eyebrow">Broadcast</p>
+            <h3 class="dashboard-section-title mt-1.5">Compose a platform alert</h3>
+            <p class="faint mt-1 max-w-2xl text-sm">Send an in-app notification to active accounts. Use alerts for important operational updates, not routine content.</p>
+        </div>
+        <form data-alert-form class="mt-5 grid gap-5">
+            <div class="grid gap-5 sm:grid-cols-2">
+                <div>
+                    <label class="label" for="alert-audience">Audience</label>
+                    <select id="alert-audience" class="input mt-1 w-full" name="audience" required><option value="all">Everyone</option>@foreach(['hospital_admin', 'referral_coordinator', 'healthcare_worker'] as $audience)<option value="{{ $audience }}">{{ ucfirst(str_replace('_', ' ', $audience)) }}s</option>@endforeach</select>
+                    <p class="helper mt-1.5">Only active accounts in this group will receive it.</p>
+                </div>
+                <div>
+                    <label class="label" for="alert-title">Title</label>
+                    <input id="alert-title" class="input mt-1 w-full" name="title" placeholder="e.g. Scheduled maintenance" required>
+                </div>
+            </div>
+            <div>
+                <label class="label" for="alert-body">Message</label>
+                <textarea id="alert-body" class="input mt-1 min-h-32 w-full resize-y" name="body" rows="5" placeholder="What should recipients know?" required></textarea>
+            </div>
+            <div class="flex justify-end border-t border-slate-100 pt-4">
+                <button class="btn-accent" type="submit">Send platform alert</button>
+            </div>
         </form>
     </section>
 
