@@ -38,7 +38,13 @@ class AnalyticsService
             ->count();
 
         $recent = $this->scopedReferrals($user)
-            ->with(['referringHospital', 'receivingHospital', 'referringUser:id,name,title', 'patient'])
+            ->with([
+                'referringHospital',
+                'receivingHospital',
+                'referringUser:id,name,title',
+                'intendedUser:id,name,title',
+                'patient',
+            ])
             ->orderByDesc('created_at')
             ->limit(6)
             ->get();

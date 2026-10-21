@@ -8,8 +8,10 @@ use App\Models\AuditLog;
 use App\Models\Backup;
 use App\Models\Faq;
 use App\Models\Hospital;
+use App\Models\Message;
 use App\Models\Notification;
 use App\Models\ProviderApplication;
+use App\Models\Referral;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\AnalyticsService;
@@ -23,6 +25,7 @@ use App\Services\SettingsService;
 use App\Services\SystemHealthService;
 use App\Support\AuditActions;
 use App\Support\DatabaseExpressions;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -134,6 +137,41 @@ class AdminPageController extends Controller
             'isSystem' => $isSystem,
             'isHospitalAdmin' => $isHospitalAdmin,
         ]);
+    }
+
+    /**
+     * Delete a user account. Referrals and messages authored by the user are
+     * preserved (user references become NULL) so the referral lifecycle stays
+     * auditable.
+     */
+    public function destroyUser(Request $request, User $user): RedirectResponse
+    {
+        $this->authorize('delete', $user);
+
+        if ($user->is($request->user())) {
+            return back()->withErrors(['user' => 'You cannot delete your own account.']);
+        }
+
+        $userName = $user->name;
+
+        // Detach the account from the records it authored before removing it,
+        // so no foreign key blocks the delete. The clinical rows themselves
+        // stay in place.
+        DB::transaction(function () use ($user): void {
+            Referral::where('referring_user_id', $user->getKey())
+                ->update(['referring_user_id' => null]);
+            Message::where('sender_user_id', $user->getKey())
+                ->update(['sender_user_id' => null]);
+
+            $user->delete();
+        });
+
+        $this->auditLogger->record($request->user(), AuditActions::USER_DELETED, null, [
+            'deleted_user_id' => $user->getKey(),
+            'deleted_user_name' => $userName,
+        ]);
+
+        return back()->with('status', 'Account '.$userName.' has been deleted.');
     }
 
     public function hospitals(): View

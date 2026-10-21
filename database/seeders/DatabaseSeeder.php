@@ -17,9 +17,14 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RoleSeeder::class,
             SpecialtySeeder::class,
+            // Hospitals must exist before the users, because the user seeder
+            // attaches every account to a facility.
+            HospitalSeeder::class,
             UserSeeder::class,
             CmsContentSeeder::class,
             SystemSettingsSeeder::class,
+            ReferralSeeder::class,
+            DemoFlowSeeder::class,
         ]);
     }
 }

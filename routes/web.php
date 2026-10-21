@@ -20,6 +20,7 @@ Route::get('/', LandingController::class)->name('home');
 Route::get('/how-it-works', [PageController::class, 'howItWorks'])->name('how-it-works');
 Route::get('/features', [PageController::class, 'features'])->name('features');
 Route::get('/about', [PageController::class, 'about'])->name('about');
+Route::get('/flows', [PageController::class, 'flows'])->name('flows');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', LoginPageController::class)->name('login');
@@ -57,13 +58,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/referrals', [ReferralPageController::class, 'index'])->middleware('hospital')->name('referrals.index');
     Route::get('/referrals/new', [ReferralPageController::class, 'create'])->middleware('hospital')->name('referrals.create');
+    Route::post('/referrals', [ReferralPageController::class, 'store'])->middleware('hospital')->name('referrals.store');
     Route::get('/referrals/{referral}', [ReferralPageController::class, 'show'])->middleware('hospital')->name('referrals.show');
+    Route::post('/referrals/{referral}/transition', [ReferralPageController::class, 'transition'])->middleware('hospital')->name('referrals.transition');
+    Route::post('/referrals/{referral}/messages', [ReferralPageController::class, 'storeMessage'])->middleware('hospital')->name('referrals.messages.store');
 
     Route::get('/notifications', NotificationPageController::class)->name('notifications.index');
 
     Route::middleware('role:hospital_admin,system_admin')->group(function () {
         Route::get('/admin/analytics', [AdminPageController::class, 'analytics'])->name('admin.analytics');
         Route::get('/admin/users', [AdminPageController::class, 'users'])->name('admin.users');
+        Route::delete('/admin/users/{user}', [AdminPageController::class, 'destroyUser'])->name('admin.users.destroy');
     });
 
     Route::middleware('role:system_admin')->group(function () {

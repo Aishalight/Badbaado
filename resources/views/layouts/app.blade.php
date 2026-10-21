@@ -28,6 +28,9 @@
     @stack('head')
 </head>
 <body class="h-full bg-[var(--m-bg)] font-sans antialiased">
+    <div class="mx-auto w-full max-w-6xl px-4 sm:px-6">
+        <x-flash />
+    </div>
     @yield('body')
 </body>
 </html>

@@ -7,3 +7,41 @@
 <form class="filter-bar mb-4" method="GET"><input class="input max-w-sm" name="q" value="{{ request('q') }}" placeholder="Search name or email"><button class="btn-secondary" type="submit">Search</button>@if(request('q'))<a href="{{ route('admin.users') }}" class="btn-ghost btn-sm">Reset</a>@endif</form>
 <div class="card overflow-x-auto"><table class="data-table"><thead class="bg-slate-50 text-[11px] uppercase tracking-wider text-slate-500"><tr><th>User</th><th>Hospital</th><th>Phone</th><th>Active</th><th></th></tr></thead><tbody class="divide-y divide-slate-100">@foreach($users as $user)<tr><td><div class="flex items-center gap-3">@include('partials.avatar', ['user' => $user, 'size' => 'h-10 w-10'])<div class="min-w-0"><input name="name" type="text" value="{{ $user->name }}" class="input py-1 text-sm" data-update-user-field="{{ $user->id }}"><p class="text-xs text-slate-500 mt-1"><input name="email" type="email" value="{{ $user->email }}" class="input py-1 text-xs" data-update-user-field="{{ $user->id }}"></p></div></div><div class="mt-2 flex items-center gap-2 pl-[3.25rem]"><input name="avatar" type="file" accept="image/jpeg,image/png,image/webp" class="input max-w-56 py-1 text-xs"><button class="btn-secondary btn-sm" type="button" data-upload-user-photo="{{ $user->id }}">Save photo</button></div></td><td class="text-slate-600">{{ $user->hospital?->name ?? 'Network' }}</td><td><input name="phone" type="text" value="{{ $user->phone ?? '' }}" class="input py-1 text-sm" data-update-user-field="{{ $user->id }}"></td><td><label class="flex items-center gap-2 text-xs"><input name="is_active" type="checkbox" data-update-user="{{ $user->id }}" @checked($user->is_active)> Active</label></td><td class="text-right"><div class="flex gap-2 justify-end"><button class="btn-secondary btn-sm" data-update-user="{{ $user->id }}" type="button">Save</button><button class="btn-danger btn-sm" data-delete-user="{{ $user->id }}" type="button">Delete</button></div></td></tr>@endforeach</tbody></table>@include('partials.pager', ['pager' => $users])</div>
 @endsection
+
+@push('scripts')
+<script>
+    (function () {
+        document.querySelectorAll('[data-delete-user]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var userId = btn.getAttribute('data-delete-user');
+                var row = btn.closest('tr');
+                var nameCell = row.querySelector('td');
+                var userName = nameCell ? nameCell.textContent.trim() : 'this account';
+
+                if (!confirm('Are you sure you want to delete '+userName+'? Referrals and messages they created will be preserved (attributed to a deleted account).')) {
+                    return;
+                }
+
+                btn.disabled = true;
+                btn.textContent = 'Deleting...';
+
+                fetch('{{ route('admin.users.destroy', '__ID__') }}'.replace('__ID__', userId), {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                    },
+                })
+                .then(function (response) {
+                    if (!response.ok) return response.json().then(function (err) { throw new Error(err.message || 'Delete failed'); });
+                    row.remove();
+                })
+                .catch(function (error) {
+                    alert(error.message || 'Could not delete account.');
+                    btn.disabled = false;
+                    btn.textContent = 'Delete';
+                });
+            });
+        });
+    })();
+</script>

@@ -7,100 +7,117 @@
     $urgencyOptions = \App\Support\ReferralFormat::urgencyOptions();
 @endphp
 
-@section('heading', 'Referrals')
-@section('content')
-    <div class="mx-auto max-w-6xl">
-        <div class="flex flex-wrap items-end justify-between gap-4">
-            <div>
-                <div class="section-eyebrow">Referrals</div>
-                <h2 class="page-heading mt-1">All referrals</h2>
-            </div>
-            @can('create', \App\Models\Referral::class)
-            <a href="{{ route('referrals.create') }}" class="btn btn-primary">
-                <svg viewBox="0 0 20 20" fill="none" class="h-4 w-4"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-                New referral
-            </a>
-            @endcan
-        </div>
+@section('title', 'Referrals · BADBAADO')
+@section('heading', 'Referral workspace')
 
-        <form method="GET" action="{{ route('referrals.index') }}" class="mt-5 flex flex-wrap items-end gap-3">
+@section('content')
+<div class="mx-auto max-w-7xl">
+    <x-page-header
+        eyebrow="Referrals"
+        title="All referrals"
+        description="Every referral across your network, most recent first. Filter by status or urgency to focus your work."
+    >
+        @can('create', \App\Models\Referral::class)
+            <x-btn variant="accent" size="lg" href="{{ route('referrals.create') }}" class="whitespace-nowrap">
+                <svg viewBox="0 0 20 20" fill="none" class="h-4 w-4 mr-2"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                New referral
+            </x-btn>
+        @endcan
+    </x-page-header>
+
+    <!-- Filter bar -->
+    <section class="rounded-[14px] border border-slate-200/80 bg-white shadow-card p-5 sm:p-6 mb-6">
+        <form method="GET" action="{{ route('referrals.index') }}" class="grid gap-3 sm:grid-cols-4 items-end">
             <div>
-                <label for="filter-status" class="mb-1 block text-xs font-semibold text-slate-600">Status</label>
-                <select id="filter-status" name="status" class="input sm:w-52" onchange="this.form.submit()">
+                <label for="filter-status" class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Status</label>
+                <select id="filter-status" name="status" class="input w-full" onchange="this.form.submit()">
                     @foreach ($statusOptions as $value => $label)
                         <option value="{{ $value }}" @selected($statusFilter === $value)>{{ $label }}</option>
                     @endforeach
                 </select>
             </div>
             <div>
-                <label for="filter-urgency" class="mb-1 block text-xs font-semibold text-slate-600">Urgency</label>
-                <select id="filter-urgency" name="urgency" class="input sm:w-44" onchange="this.form.submit()">
+                <label for="filter-urgency" class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Urgency</label>
+                <select id="filter-urgency" name="urgency" class="input w-full" onchange="this.form.submit()">
                     @foreach ($urgencyOptions as $value => $label)
                         <option value="{{ $value }}" @selected($urgencyFilter === $value)>{{ $label }}</option>
                     @endforeach
                 </select>
             </div>
-            <button type="submit" class="sr-only">Apply filters</button>
+            <div class="flex h-[2.5rem]">
+                <button type="submit" class="btn btn-primary">Apply filters</button>
+            </div>
             @if ($statusFilter || $urgencyFilter)
-                <a href="{{ route('referrals.index') }}" class="btn btn-ghost btn-sm">Clear filters</a>
+                <div class="flex h-[2.5rem]">
+                    <a href="{{ route('referrals.index') }}" class="btn btn-ghost">Clear filters</a>
+                </div>
             @endif
         </form>
+    </section>
 
-        <div class="card mt-4 overflow-hidden">
-            @if ($referrals->isEmpty())
-                <div class="px-6 py-12 text-center">
-                    <p class="text-sm text-slate-500">No referrals match.</p>
-                    @if ($statusFilter || $urgencyFilter)
-                        <a href="{{ route('referrals.index') }}" class="btn btn-ghost mt-3">Clear filters</a>
-                    @endif
-                </div>
-            @else
-                <ul class="list-none divide-y divide-slate-100">
+    <!-- Referral list -->
+    <section class="rounded-[16px] border border-slate-200/80 bg-white shadow-card overflow-hidden">
+        @if ($referrals->isEmpty())
+            <x-empty-state
+                icon="list"
+                title="No referrals match"
+                description="There are no referrals matching your current filters."
+                :action="$statusFilter || $urgencyFilter ? route('referrals.index') : null"
+                action-label="Clear filters"
+            />
+        @else
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="border-b border-slate-50 bg-slate-25/50">
+                        <th class="px-6 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-slate-400">Referral</th>
+                        <th class="px-6 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-slate-400">Patient</th>
+                        <th class="px-6 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-slate-400">Route</th>
+                        <th class="px-6 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-slate-400">Urgency</th>
+                        <th class="px-6 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-slate-400">Status</th>
+                        <th class="px-6 py-3 text-right text-[11px] font-bold uppercase tracking-wider text-slate-400">Updated</th>
+                        <th class="px-6 py-3 text-right text-[11px] font-bold uppercase tracking-wider text-slate-400"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
                     @foreach ($referrals as $referral)
-                        <li>
-                            <a href="{{ route('referrals.show', $referral) }}" class="flex items-center gap-4 px-5 py-4 transition hover:bg-brand-50/40">
-                                @if ($referral->receivingHospital)
-                                    @include('partials.hospital-logo', ['hospital' => $referral->receivingHospital, 'size' => 'h-9 w-9'])
-                                @endif
-                                <div class="min-w-0 flex-1">
-                                    <div class="flex flex-wrap items-center gap-2">
-                                        <span class="font-mono text-xs text-slate-400">{{ $referral->referral_number }}</span>
-                                        <span class="truncate text-sm font-semibold text-slate-800">
-                                            {{ $referral->patient?->name ?? 'Unnamed patient' }}
-                                        </span>
-                                        @if ($referral->is_emergency)
-                                            <span class="badge bg-red-50 text-red-600">Emergency</span>
-                                        @endif
-                                    </div>
-                                    <div class="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-slate-500">
-                                        <span class="truncate">{{ $referral->referringHospital?->short_name ?? $referral->referringHospital?->name ?? '-' }}</span>
-                                        <i data-lucide="arrow-right" class="text-slate-300" aria-hidden="true"></i>
-                                        <span class="truncate">{{ $referral->receivingHospital?->short_name ?? $referral->receivingHospital?->name ?? '-' }}</span>
-                                        <span class="text-slate-300">·</span>
-                                        <span class="truncate">{{ $referral->department ?? 'General' }}</span>
-                                        @if ($referral->intendedUser)
-                                            <span class="text-slate-300">·</span>
-                                            <span class="badge bg-accent-50 text-accent-700">for {{ $referral->intendedUser->name }}</span>
-                                        @endif
-                                        <span class="text-slate-300">·</span>
-                                        <span class="truncate">{{ $referral->assignedTo?->name ?? $referral->referringUser?->name ?? '-' }}</span>
-                                    </div>
+                        <tr class="group hover:bg-brand-50/30 transition">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <span class="font-mono text-xs font-semibold text-slate-500">{{ $referral->referral_number }}</span>
+                                    @if ($referral->is_emergency)
+                                        <x-badge variant="critical" class="text-[10px]">Pre-alert</x-badge>
+                                    @endif
                                 </div>
-                                <div class="hidden items-center gap-2 md:flex">
-                                    {!! \App\Support\ReferralFormat::urgencyPill($referral->urgency?->value) !!}
-                                    {!! \App\Support\ReferralFormat::statusPill($referral->status?->value) !!}
+                            </td>
+                            <td class="px-6 py-4 min-w-0">
+                                <p class="text-sm font-semibold text-slate-800 truncate">{{ $referral->patient?->name ?? 'Unnamed patient' }}</p>
+                                <p class="text-xs text-slate-500">{{ $referral->department ?? 'General' }}</p>
+                            </td>
+                            <td class="px-6 py-4 min-w-0">
+                                <div class="flex items-center gap-2">
+                                    @include('partials.hospital-logo', ['hospital' => $referral->referringHospital, 'size' => 'h-6 w-6'])
+                                    <span class="text-xs text-slate-400">→</span>
+                                    @include('partials.hospital-logo', ['hospital' => $referral->receivingHospital, 'size' => 'h-6 w-6'])
                                 </div>
-                                <div class="text-xs tabular-nums text-slate-400">{{ $referral->created_at?->format('M j, H:i') }}</div>
-                            </a>
-                        </li>
+                                <p class="mt-1 text-xs text-slate-500 truncate max-w-[200px]">{{ $referral->referringHospital?->short_name ?? '-' }} → {{ $referral->receivingHospital?->short_name ?? '-' }}</p>
+                            </td>
+                            <td class="px-6 py-4">{!! \App\Support\ReferralFormat::urgencyPill($referral->urgency?->value) !!}</td>
+                            <td class="px-6 py-4">{!! \App\Support\ReferralFormat::statusPill($referral->status?->value) !!}</td>
+                            <td class="px-6 py-4 text-right text-xs tabular-nums text-slate-500">{{ $referral->created_at?->format('M j, H:i') }}</td>
+                            <td class="px-6 py-4 text-right">
+                                <a href="{{ route('referrals.show', $referral) }}" class="text-sm font-semibold text-brand-600 hover:text-brand-700 transition">Open <i data-lucide="arrow-up-right" class="h-3.5 w-3.5 ml-1"></i></a>
+                            </td>
+                        </tr>
                     @endforeach
-                </ul>
-                @if ($referrals->hasPages())
-                    <div class="border-t border-slate-100 px-5 py-3">
-                        {{ $referrals->links() }}
-                    </div>
-                @endif
+                </tbody>
+            </table>
+
+            @if ($referrals->hasPages())
+                <div class="border-t border-slate-100 bg-slate-25/50 px-6 py-4">
+                    {{ $referrals->links() }}
+                </div>
             @endif
-        </div>
-    </div>
+        @endif
+    </section>
+</div>
 @endsection

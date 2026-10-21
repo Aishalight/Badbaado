@@ -10,32 +10,92 @@
     $incoming = $counts['incoming'];
 @endphp
 
+@section('title', 'Dashboard · BADBAADO')
 @section('heading', $isCoordinator ? 'Coordination desk' : 'Care team workspace')
+
 @section('content')
 <div class="dashboard-page mx-auto max-w-7xl space-y-8">
-    <div class="dashboard-hero">
-        <div><p class="section-eyebrow">{{ $isCoordinator ? 'Coordination desk' : 'Care team workspace' }}</p><h2 class="page-heading mt-2 text-3xl">{{ $isCoordinator ? 'Keep every handover moving.' : 'Good to see you, '.$me->name.'.' }}</h2><p class="mt-2 max-w-2xl text-sm text-slate-500">{{ $isCoordinator ? 'Review incoming referrals and keep teams ready.' : 'Your latest referrals and care activity.' }}</p></div>
-@can('create', \App\Models\Referral::class)<a href="{{ route('referrals.create') }}" class="btn-accent"><i data-lucide="plus" aria-hidden="true"></i> New referral</a>@endcan
-    </div>
+    <!-- Page header -->
+    <x-page-header
+        eyebrow="{{ $isCoordinator ? 'Coordination desk' : 'Care team workspace' }}"
+        title="{{ $isCoordinator ? 'Keep every handover moving.' : 'Good to see you, ' . $me->name . '.' }}"
+        description="{{ $isCoordinator ? 'Review incoming referrals and keep teams ready.' : 'Your latest referrals and care activity.' }}"
+    >
+        @can('create', \App\Models\Referral::class)
+            <x-btn variant="accent" size="lg" href="{{ route('referrals.create') }}"><i data-lucide="plus" class="h-4 w-4 shrink-0"></i> New referral</x-btn>
+        @endcan
+    </x-page-header>
 
+    <!-- Emergency alert -->
     @if ($emergencies > 0)
-        <div class="dashboard-alert"><span class="dashboard-alert__icon"><i data-lucide="triangle-alert" aria-hidden="true"></i></span><div><strong>{{ $emergencies }} emergency referral{{ $emergencies === 1 ? '' : 's' }}</strong><p>Need{{ $emergencies === 1 ? '' : 's' }} attention in your workspace.</p></div><a href="{{ route('referrals.index') }}">Review queue <i data-lucide="arrow-up-right" aria-hidden="true"></i></a></div>
+        <section class="rounded-[14px] border border-red-200 bg-red-50 shadow-card p-5 sm:p-6 flex items-start gap-4">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-100 text-red-600">
+                <i data-lucide="triangle-alert" class="h-5 w-5"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-red-800">{{ $emergencies }} emergency referral{{ $emergencies === 1 ? '' : 's' }}</p>
+                <p class="mt-0.5 text-sm text-red-700">Need immediate attention in your workspace.</p>
+            </div>
+            <a href="{{ route('referrals.index') }}?urgency=critical" class="btn btn-primary btn-sm whitespace-nowrap">Review queue <i data-lucide="arrow-up-right" class="h-3.5 w-3.5 ml-1.5"></i></a>
+        </section>
     @endif
 
-    <div class="dashboard-metrics grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div class="dashboard-stat dashboard-stat--blue"><div class="dashboard-stat__top"><span class="dashboard-stat__icon dashboard-stat__icon--blue"><i data-lucide="chart-no-axes-combined" aria-hidden="true"></i></span><span class="dashboard-stat__trend">All time</span></div><p class="dashboard-stat__value mt-5">{{ $total }}</p><p class="dashboard-stat__label">{{ $isCoordinator ? 'Network referrals' : 'Total referrals' }}</p></div>
-        <div class="dashboard-stat dashboard-stat--cyan"><div class="dashboard-stat__top"><span class="dashboard-stat__icon dashboard-stat__icon--cyan"><i data-lucide="clock-3" aria-hidden="true"></i></span><span class="dashboard-stat__trend">Live now</span></div><p class="dashboard-stat__value mt-5">{{ $isCoordinator ? $incoming : $active }}</p><p class="dashboard-stat__label">{{ $isCoordinator ? 'Incoming to review' : 'Active transfers' }}</p></div>
-        <div class="dashboard-stat dashboard-stat--red"><div class="dashboard-stat__top"><span class="dashboard-stat__icon dashboard-stat__icon--red"><i data-lucide="triangle-alert" aria-hidden="true"></i></span><span class="dashboard-stat__trend">Priority</span></div><p class="dashboard-stat__value mt-5">{{ $emergencies }}</p><p class="dashboard-stat__label">Emergencies</p></div>
-        <div class="dashboard-stat dashboard-stat--amber"><div class="dashboard-stat__top"><span class="dashboard-stat__icon dashboard-stat__icon--amber"><i data-lucide="badge-check" aria-hidden="true"></i></span><span class="dashboard-stat__trend">High acuity</span></div><p class="dashboard-stat__value mt-5">{{ $urgent }}</p><p class="dashboard-stat__label">Critical / high</p></div>
-    </div>
+    <!-- Metrics -->
+    <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <x-metric-card label="Total referrals" value="{{ $total }}" note="Across your visible network" icon="chart-column" variant="blue" />
+        <x-metric-card label="{{ $isCoordinator ? 'Incoming to review' : 'Active transfers' }}" value="{{ $isCoordinator ? $incoming : $active }}" note="Live now" icon="clock" variant="cyan" />
+        <x-metric-card label="Emergencies" value="{{ $emergencies }}" note="Priority" icon="triangle-alert" variant="red" />
+        <x-metric-card label="Critical / high" value="{{ $urgent }}" note="High acuity" icon="badge-check" variant="amber" />
+    </section>
 
-    <div class="flex items-center justify-between"><div><p class="section-eyebrow">Your queue</p><h2 class="dashboard-section-title mt-1">Recent referrals</h2></div><a href="{{ route('referrals.index') }}" class="inline-flex items-center gap-1 text-sm font-semibold text-accent-600 hover:text-accent-500">View all <i data-lucide="arrow-up-right" aria-hidden="true"></i></a></div>
-    <section class="dashboard-queue">
+    <!-- Your queue -->
+    <x-section-header
+        eyebrow="Your queue"
+        title="Recent referrals"
+        description="Pick up where you left off. Referrals are shown most recent first."
+    >
+        <a href="{{ route('referrals.index') }}" class="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600 hover:text-brand-700 transition">
+            View all referrals <i data-lucide="arrow-up-right" class="h-3.5 w-3.5"></i>
+        </a>
+    </x-section-header>
+
+    <section class="rounded-[16px] border border-slate-200/80 bg-white shadow-card overflow-hidden">
         @if ($referrals->isEmpty())
-            <div class="dashboard-empty"><div class="dashboard-empty__icon"><i data-lucide="inbox" aria-hidden="true"></i></div><h2>No referrals yet</h2><p>Create your first patient referral to start the handover.</p>@can('create', \App\Models\Referral::class)<a href="{{ route('referrals.create') }}" class="btn-accent mt-5">Create a referral</a>@endcan</div>
+            <x-empty-state
+                icon="inbox"
+                title="No referrals yet"
+                description="Create your first patient referral to start the handover."
+                :action="route('referrals.create')"
+                action-label="Create a referral"
+            />
         @else
-            <div class="dashboard-queue__head"><span>Patient and route</span><span>Status</span><span>Updated</span></div>
-            <ul class="list-none">@foreach ($referrals->take(8) as $referral)<li><a href="{{ route('referrals.show', $referral) }}" class="dashboard-queue__row"><div class="dashboard-patient"><span class="dashboard-patient__avatar">{{ strtoupper(substr($referral->patient?->name ?? 'P', 0, 1)) }}</span><span><strong>{{ $referral->patient?->name ?? 'Unnamed patient' }}</strong><small>{{ $referral->referringHospital?->short_name ?? '-' }} <i data-lucide="arrow-right" aria-hidden="true"></i> {{ $referral->receivingHospital?->short_name ?? '-' }} · {{ $referral->department ?? 'General' }}</small></span></div><div class="hidden sm:block">{!! \App\Support\ReferralFormat::statusPill($referral->status->value) !!}</div><time>{{ $referral->created_at?->format('M j, H:i') }}</time></a></li>@endforeach</ul>
+            <div class="divide-y divide-slate-50">
+                @foreach ($referrals->take(10) as $referral)
+                    <a href="{{ route('referrals.show', $referral) }}" class="block px-6 py-4 transition hover:bg-brand-50/40 group">
+                        <div class="flex flex-wrap items-center gap-3 mb-2">
+                            <span class="font-mono text-xs text-slate-400 group-hover:text-brand-600 transition">{{ $referral->referral_number }}</span>
+                            @if ($referral->is_emergency)
+                                <x-badge variant="critical" class="text-[10px]">Emergency</x-badge>
+                            @endif
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm font-semibold text-slate-800 truncate group-hover:text-brand-700 transition">{{ $referral->patient?->name ?? 'Unnamed patient' }}</p>
+                            <div class="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-slate-500">
+                                <span class="truncate">{{ $referral->referringHospital?->short_name ?? $referral->referringHospital?->name ?? '-' }}</span>
+                                <i data-lucide="arrow-right" class="text-slate-300 h-3 w-3" aria-hidden="true"></i>
+                                <span class="truncate">{{ $referral->receivingHospital?->short_name ?? $referral->receivingHospital?->name ?? '-' }}</span>
+                                <span class="text-slate-300">·</span>
+                                <span class="truncate">{{ $referral->department ?? 'General' }}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            {!! \App\Support\ReferralFormat::urgencyPill($referral->urgency?->value) !!}
+                            {!! \App\Support\ReferralFormat::statusPill($referral->status?->value) !!}
+                        </div>
+                        <time class="text-xs tabular-nums text-slate-400">{{ $referral->created_at?->format('M j, H:i') }}</time>
+                    </a>
+                @endforeach
+            </div>
         @endif
     </section>
 </div>

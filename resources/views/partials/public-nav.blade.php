@@ -15,6 +15,7 @@
             <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'is-current' : '' }}">Home</a>
             <a href="{{ route('how-it-works') }}" class="nav-link {{ request()->routeIs('how-it-works') ? 'is-current' : '' }}">How it works</a>
             <a href="{{ route('features') }}" class="nav-link {{ request()->routeIs('features') ? 'is-current' : '' }}">Features</a>
+            <a href="{{ route('flows') }}" class="nav-link {{ request()->routeIs('flows') ? 'is-current' : '' }}">Example flows</a>
             <a href="{{ route('about') }}" class="nav-link {{ request()->routeIs('about') ? 'is-current' : '' }}">About</a>
         </nav>
 
@@ -38,6 +39,7 @@
             <a href="{{ route('how-it-works') }}" class="rounded-lg px-3 py-2.5 text-slate-500 transition hover:bg-white/10 hover:text-white {{ request()->routeIs('how-it-works') ? 'bg-white/10 text-white' : '' }}">How it works</a>
             <a href="{{ route('features') }}" class="rounded-lg px-3 py-2.5 text-slate-500 transition hover:bg-white/10 hover:text-white {{ request()->routeIs('features') ? 'bg-white/10 text-white' : '' }}">Features</a>
             <a href="{{ route('about') }}" class="rounded-lg px-3 py-2.5 text-slate-500 transition hover:bg-white/10 hover:text-white {{ request()->routeIs('about') ? 'bg-white/10 text-white' : '' }}">About</a>
+            <a href="{{ route('flows') }}" class="rounded-lg px-3 py-2.5 text-slate-500 transition hover:bg-white/10 hover:text-white {{ request()->routeIs('flows') ? 'bg-white/10 text-white' : '' }}">Example flows</a>
             <a href="{{ route('login') }}" class="btn-primary mt-4 justify-center">Sign in</a>
         </nav>
     </div>
